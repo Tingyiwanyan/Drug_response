@@ -34,7 +34,7 @@ def get_cell_line_feature(cell_line: str, drug_name: str):
 	d_cid = drug_index_match.loc[drug_index_match['unique_Compound_Name'] == drug_name]['PubChemID'].values[0]
 	print(d_cid)
 
-	comp = Compound.from_cid(d_cid)
+	comp = Compound.from_cid(str(d_cid))
 	csmile = comp.canonical_smiles
 
 	return gene_exp, csmile
