@@ -68,7 +68,7 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 				drug_name = drug_names[j]
 				cell_line_name = cell_line_names[i]
 				features = get_cell_line_feature(cell_line_name, drug_name)
-				ic50_value = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line_name][drug_name][0]
+				ic50_value = cell_line_drug.loc[cell_line_drug['CCLE_ID'] == cell_line_name][drug_name][0]
 				if not features == None:
 					cell_line_name_list.append(cell_line_name)
 					drug_name_list.append(drug_name)
