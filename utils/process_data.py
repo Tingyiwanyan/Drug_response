@@ -30,7 +30,7 @@ def get_cell_line_feature(cell_line: str, drug_name: str):
 	cell line gene expression together with drug smile sequence
 	"""
 	#try:
-	gene_exp = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line].values[0][1:]
+	gene_exp = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line].values[0]
 	d_cid = drug_index_match.loc[drug_index_match['unique_Compound_Name'] == drug_name]['PubChemID'].values[0]
 
 	comp = Compound.from_cid(d_cid)
