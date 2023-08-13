@@ -65,7 +65,7 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	drug_compound_smile_list = []
 	IC50_list = []
 
-	for i in range(10):
+	for i in range(len(cell_line_names)):
 		for j in range(len(drug_names)):
 			
 			drug_name = drug_names[j]
