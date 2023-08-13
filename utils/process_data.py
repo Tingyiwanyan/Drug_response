@@ -54,7 +54,7 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	-------
 	the data frame for training and testing
 	"""
-	drug_names = cell_line_drug.columns()[1:].to_list()
+	drug_names = cell_line_drug.columns[1:].to_list()
 	cell_line_names = cell_line_drug['Cell_line_Name'].to_list()
 	cell_line_name_list = []
 	drug_name_list = []
