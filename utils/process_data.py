@@ -75,11 +75,12 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 					gene_expression_data_list.append(features[0])
 					drug_compound_smile_list.append(features[1])
 					IC50_list.append(ic50_value)
+				print("im here")
+				print(i)
 			except:
 				pass
 
-
-	df_cell_line_drug = pd.Dataframe(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
+	df_cell_line_drug = pd.DataFrame(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
 		drug_compound_smile_list, IC50_list)),columns=['cell_line_name','drug_name','gene_expression_data',\
 		'drug_compound_smile','IC50_value'])
 
