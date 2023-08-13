@@ -41,7 +41,7 @@ def get_cell_line_feature(cell_line: str, drug_name: str):
 		return None
 
 
-def generate_feature_frame(cell_line_drug: pd.Dataframe):
+def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	"""
 	Generate the dataframe containing: cell_line_name, drug_name,
 	gene_expression_data, drug_compound_smile, and IC50 values
