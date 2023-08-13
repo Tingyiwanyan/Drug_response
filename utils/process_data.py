@@ -17,7 +17,7 @@ drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 
 def get_cell_line_feature(cell_line: str, drug_name: str):
 	"""
-	generate single cell_line features, including gene expression
+	Generate single cell_line features, including gene expression
 	and drug smile molecule sqeuence features.
 	
 	Parameters:
@@ -39,6 +39,52 @@ def get_cell_line_feature(cell_line: str, drug_name: str):
 		return gene_exp, csmile
 	except:
 		return None
+
+
+def generate_feature_frame(cell_line_drug: pd.Dataframe):
+	"""
+	Generate the dataframe containing: cell_line_name, drug_name,
+	gene_expression_data, drug_compound_smile, and IC50 values
+
+	Parameter:
+	----------
+	cell_line_drug: dataframe of cell_line& drug IC50 values
+
+	Return:
+	-------
+	the data frame for training and testing
+	"""
+	drug_names = cell_line_drug.columns()[1:].to_list()
+	cell_line_names = cell_line_drug['Cell_line_Name'].to_list()
+	cell_line_name_list = []
+	drug_name_list = []
+	gene_expression_data_list = []
+	drug_compound_smile_list = []
+	IC50_list = []
+
+	for i in range(len(cell_line_names)):
+		for j in range(len(drug_names)):
+			drug_name = drug_names[j]
+			cell_line_name = cell_line_names[i]
+			features = get_cell_line_feature(cell_line_name, drug_name)
+			ic50_value = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line_name][drug_name][0]
+			if not features == None:
+				cell_line_name_list.append(cell_line_name)
+				drug_name_list.append(drug_name)
+				gene_expression_data_list.append(features[0])
+				drug_compound_smile_list.append(features[1])
+				IC50_list.append(ic50_value)
+
+
+	df_cell_line_drug = pd.Dataframe(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
+		drug_compound_smile_list, IC50_list)),columns=['cell_line_name','drug_name','gene_expression_data',\
+		'drug_compound_smile','IC50_value'])
+
+	return df_cell_line_drug
+
+
+
+
 
 	
 
