@@ -66,17 +66,16 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 
 	for i in range(len(cell_line_names)):
 		for j in range(len(drug_names)):
-			try:
-				drug_name = drug_names[j]
-				cell_line_name = cell_line_names[i]
-				features = get_cell_line_feature(cell_line_name, drug_name)
-				#print(features)
-				ic50_value = cell_line_drug.loc[cell_line_drug['Cell_line_Name'] == cell_line_name][drug_name][0]
-				print(drug_name)
-				print(cell_line_name)
-				print(ic50_value)
-			except:
-				continue
+			
+			drug_name = drug_names[j]
+			cell_line_name = cell_line_names[i]
+			features = get_cell_line_feature(cell_line_name, drug_name)
+			#print(features)
+			ic50_value = cell_line_drug.loc[cell_line_drug['Cell_line_Name'] == cell_line_name][drug_name][0]
+			print(drug_name)
+			print(cell_line_name)
+			print(ic50_value)
+
 			if not features == None:
 				cell_line_name_list.append(cell_line_name)
 				drug_name_list.append(drug_name)
