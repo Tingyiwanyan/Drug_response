@@ -64,16 +64,19 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 
 	for i in range(len(cell_line_names)):
 		for j in range(len(drug_names)):
-			drug_name = drug_names[j]
-			cell_line_name = cell_line_names[i]
-			features = get_cell_line_feature(cell_line_name, drug_name)
-			ic50_value = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line_name][drug_name][0]
-			if not features == None:
-				cell_line_name_list.append(cell_line_name)
-				drug_name_list.append(drug_name)
-				gene_expression_data_list.append(features[0])
-				drug_compound_smile_list.append(features[1])
-				IC50_list.append(ic50_value)
+			try:
+				drug_name = drug_names[j]
+				cell_line_name = cell_line_names[i]
+				features = get_cell_line_feature(cell_line_name, drug_name)
+				ic50_value = gene_expression.loc[gene_expression['CCLE_ID'] == cell_line_name][drug_name][0]
+				if not features == None:
+					cell_line_name_list.append(cell_line_name)
+					drug_name_list.append(drug_name)
+					gene_expression_data_list.append(features[0])
+					drug_compound_smile_list.append(features[1])
+					IC50_list.append(ic50_value)
+			except:
+				pass
 
 
 	df_cell_line_drug = pd.Dataframe(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
