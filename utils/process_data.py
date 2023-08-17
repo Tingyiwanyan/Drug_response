@@ -86,12 +86,11 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	drug_compound_smile_list = []
 	IC50_list = []
 
-	#for i in range(len(cell_line_names)):
-		#for j in range(len(drug_names)):
-			
+	for i in range(len(cell_line_names)):
+		for j in range(len(drug_names)):		
 
-	for i in range(3):
-		for j in range(10):
+	#for i in range(3):
+		#for j in range(10):
 			drug_name = drug_names[j]
 			cell_line_name = cell_line_names[i]
 			features = get_cell_line_feature(cell_line_name, drug_name)
@@ -115,10 +114,10 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 		'drug_compound_smile','IC50_value'])
 
 	for i in range(len(df_cell_line_drug.index)):
-		print("converting gene expression")
-		print(i)
 		try:
 			df_cell_line_drug['gene_expression_data'][i] = list(df_cell_line_drug['gene_expression_data'][i][0])
+			print("converting gene expression")
+			print(i)
 		except:
 			pass
 
