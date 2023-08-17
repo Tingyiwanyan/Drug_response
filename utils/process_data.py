@@ -32,7 +32,7 @@ def process_gene_expression(gene_expression: str)-> list:
 	gene expression data in list form
 	"""
 	gene_expression = gene_expression.replace('[','')
-	gene_expression = gene_expression.replace(']'.'')
+	gene_expression = gene_expression.replace(']','')
 
 
 
