@@ -8,11 +8,15 @@ gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_
 cell_line_drug_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.rds"
 drug_index_match_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.annot.csv"
 
+feature_frame_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug_cellline_features.csv"
+
 
 
 gene_expression = pyreadr.read_r(gene_expression_path)[None]
 cell_line_drug = pyreadr.read_r(cell_line_drug_path)[None]
 drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
+
+drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 
 def get_cell_line_feature(cell_line: str, drug_name: str):
