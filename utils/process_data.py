@@ -101,10 +101,10 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 			print(cell_line_name)
 			print(ic50_value)
 
-			
+			print(features[0])
 			cell_line_name_list.append(cell_line_name)
 			drug_name_list.append(drug_name)
-			gene_expression_data_list.append(list(features[0][0]))
+			gene_expression_data_list.append(list(features[0]))
 			drug_compound_smile_list.append(features[1])
 			IC50_list.append(ic50_value)
 			print("im here")
