@@ -19,6 +19,23 @@ drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 
+def process_gene_expression(gene_expression: str)-> list:
+	"""
+	Process sting-wise gene expression data
+
+	Parameters:
+	-----------
+	raw_input: string gene expression data
+
+	Returns:
+	--------
+	gene expression data in list form
+	"""
+	gene_expression = gene_expression.replace('[','')
+	gene_expression = gene_expression.replace(']'.'')
+
+
+
 def get_cell_line_feature(cell_line: str, drug_name: str):
 	"""
 	Generate single cell_line features, including gene expression
@@ -69,9 +86,12 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	drug_compound_smile_list = []
 	IC50_list = []
 
-	for i in range(len(cell_line_names)):
-		for j in range(len(drug_names)):
+	#for i in range(len(cell_line_names)):
+		#for j in range(len(drug_names)):
 			
+
+	for i in range(3):
+		for j in range(10):
 			drug_name = drug_names[j]
 			cell_line_name = cell_line_names[i]
 			features = get_cell_line_feature(cell_line_name, drug_name)
