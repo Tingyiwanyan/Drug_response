@@ -19,6 +19,9 @@ drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 
+
+
+
 def process_gene_expression(gene_expression: str)-> list:
 	"""
 	Process sting-wise gene expression data
@@ -33,6 +36,12 @@ def process_gene_expression(gene_expression: str)-> list:
 	"""
 	gene_expression = gene_expression.replace('[','')
 	gene_expression = gene_expression.replace(']','')
+
+	gene_expression = gene_expression[1:]
+
+	return gene_expression
+
+
 
 
 
@@ -100,7 +109,7 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 			print(cell_line_name)
 			print(ic50_value)
 
-			print(features[0])
+			#print(features[0])
 			cell_line_name_list.append(cell_line_name)
 			drug_name_list.append(drug_name)
 			gene_expression_data_list.append(features[0])
