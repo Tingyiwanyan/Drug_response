@@ -20,8 +20,6 @@ drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 
 
-
-
 def process_gene_expression(gene_expression: str)-> list:
 	"""
 	Process sting-wise gene expression data
@@ -36,13 +34,12 @@ def process_gene_expression(gene_expression: str)-> list:
 	"""
 	gene_expression = gene_expression.replace('[','')
 	gene_expression = gene_expression.replace(']','')
+	gene_expression = gene_expression.split(",")
+	gene_expression = [float(x) for x in gene_expression]
 
 	gene_expression = gene_expression[1:]
 
 	return gene_expression
-
-
-
 
 
 def get_cell_line_feature(cell_line: str, drug_name: str):
