@@ -35,6 +35,7 @@ def process_gene_expression(gene_expression: str)-> list:
 	gene_expression = gene_expression.replace('[','')
 	gene_expression = gene_expression.replace(']','')
 	gene_expression = gene_expression.split(",")
+	gene_expression = gene_expression[1:]
 	gene_expression = [float(x) for x in gene_expression]
 
 	gene_expression = gene_expression[1:]
