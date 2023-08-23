@@ -19,6 +19,66 @@ drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 
+"""
+One hot encoding smile drug molecule sequence, reference:
+https://towardsdatascience.com/basic-molecular-representation-for-machine-learning-b6be52e9ff76
+"""
+SMILES_CHARS = [' ',
+                '#', '%', '(', ')', '+', '-', '.', '/',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                '=', '@',
+                'A', 'B', 'C', 'F', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P',
+                'R', 'S', 'T', 'V', 'X', 'Z',
+                '[', '\\', ']',
+                'a', 'b', 'c', 'e', 'g', 'i', 'l', 'n', 'o', 'p', 'r', 's',
+                't', 'u']
+
+
+smi2index = dict( (c,i) for i,c in enumerate( SMILES_CHARS ) )
+index2smi = dict( (i,c) for i,c in enumerate( SMILES_CHARS ) )
+
+def smiles_encoder( smiles, maxlen=120 ):
+    X = np.zeros( ( maxlen, len( SMILES_CHARS ) ) )
+    for i, c in enumerate( smiles ):
+        X[i, smi2index[c] ] = 1
+    return X
+
+def smiles_decoder( X ):
+    smi = ''
+    X = X.argmax( axis=-1 )
+    for i in X:
+        smi += index2smi[ i ]
+    return smi
+
+# get a taste of caffeine -----------------------------------------------------
+caffeine_smiles = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C'
+
+caffeine_encoding = smiles_encoder(caffeine_smiles)
+
+
+
+def generate_data_frame(gene_expressions: list, drug_smile: list, ic50_list: list):
+	"""
+	generate data frame for training and testing
+
+	Parameters:
+	-----------
+	gene_expression: list of all gene_expression data
+	drug_smile: list of all drug smile data
+	ic50_list: list of ic50 values
+
+	Returns:
+	--------
+	ready to split dataframe
+	"""
+	for i in range(len(gene_expression)):
+
+	gene_expression_df = list(map(process_gene_expression, gene_expressions))
+
+
+#def one_hot_encoding_smile(drug_smile: str):
+
+
 
 def process_gene_expression(gene_expression: str)-> list:
 	"""
