@@ -37,7 +37,7 @@ SMILES_CHARS = [' ',
 smi2index = dict( (c,i) for i,c in enumerate( SMILES_CHARS ) )
 index2smi = dict( (i,c) for i,c in enumerate( SMILES_CHARS ) )
 
-def smiles_encoder( smiles, maxlen=240 )-> list:
+def smiles_encoder( smiles, maxlen=150 )-> list:
     X = np.zeros( ( maxlen, len( SMILES_CHARS ) ) )
     for i, c in enumerate( smiles ):
         X[i, smi2index[c] ] = 1
