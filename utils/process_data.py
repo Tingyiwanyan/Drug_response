@@ -58,22 +58,22 @@ caffeine_encoding = smiles_encoder(caffeine_smiles)
 
 
 #def generate_data_frame(gene_expressions: list, drug_smile: list, ic50_list: list):
-	"""
-	generate data frame for training and testing
+"""
+generate data frame for training and testing
 
-	Parameters:
-	-----------
-	gene_expression: list of all gene_expression data
-	drug_smile: list of all drug smile data
-	ic50_list: list of ic50 values
+Parameters:
+-----------
+gene_expression: list of all gene_expression data
+drug_smile: list of all drug smile data
+ic50_list: list of ic50 values
 
-	Returns:
-	--------
-	ready to split dataframe
-	"""
-	#for i in range(len(gene_expression)):
+Returns:
+--------
+ready to split dataframe
+"""
+#for i in range(len(gene_expression)):
 
-	#gene_expression_df = list(map(process_gene_expression, gene_expressions))
+#gene_expression_df = list(map(process_gene_expression, gene_expressions))
 
 
 #def one_hot_encoding_smile(drug_smile: str):
