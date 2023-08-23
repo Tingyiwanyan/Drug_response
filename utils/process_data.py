@@ -87,7 +87,6 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 		print(i)
 		gene_expression = process_gene_expression(gene_expression)
 		drug_compound = smiles_encoder(drug_compound)
-		drug_one_hot_encoding.append(drug_compound)
 		cell_line_name_list.append(drug_cellline_features_df['cell_line_name'][i])
 		drug_name_list.append(drug_cellline_features_df['drug_name'][i])
 		gene_expression_data_list.append(gene_expression)
