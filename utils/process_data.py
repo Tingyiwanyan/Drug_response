@@ -86,6 +86,8 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 		#try:
 		print(i)
 		gene_expression = process_gene_expression(gene_expression)
+		if gene_expression == []:
+			continue
 		drug_compound = smiles_encoder(drug_compound)
 		cell_line_name_list.append(drug_cellline_features_df['cell_line_name'][i])
 		drug_name_list.append(drug_cellline_features_df['drug_name'][i])
