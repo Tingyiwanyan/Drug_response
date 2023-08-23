@@ -90,6 +90,7 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 
 	drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
 
+	return drug_cellline_features_df
 
 	#gene_expression_df = list(map(process_gene_expression, gene_expressions))
 
