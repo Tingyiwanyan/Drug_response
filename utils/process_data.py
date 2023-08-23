@@ -74,7 +74,7 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 	"""
 	drug_one_hot_encoding = []
 
-	for i in range(len(gene_expression)):
+	for i in range(len(drug_cellline_features_df)):
 		gene_expression = drug_cellline_features_df['gene_expression_data'][i]
 		drug_compound = drug_cellline_features_df['drug_compound_smile'][i]
 
