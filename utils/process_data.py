@@ -72,7 +72,12 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 	--------
 	filtered feature frame with cleaned data
 	"""
-	drug_one_hot_encoding = []
+	cell_line_name_list = []
+	drug_name_list = []
+	gene_expression_data_list = []
+	drug_compound_smile_list = []
+	drug_one_hot_encoding_list = []
+	IC50_list = []
 
 	for i in range(len(drug_cellline_features_df)):
 		gene_expression = drug_cellline_features_df['gene_expression_data'][i]
@@ -83,14 +88,24 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 			gene_expression = process_gene_expression(gene_expression)
 			drug_compound = smiles_encoder(drug_compound)
 			drug_one_hot_encoding.append(drug_compound)
-			drug_cellline_features_df['gene_expression_data'][i] = gene_expression
+			cell_line_name_list.append(drug_cellline_features_df['cell_line_name'][i])
+			drug_name_list.append(drug_cellline_features_df['drug_name'][i])
+			gene_expression_data_list.append(gene_expression)
+			drug_compound_smile_list.append(drug_cellline_features_df['drug_compound_smile'][i])
+			drug_one_hot_encoding_list.append(drug_compound)
+			IC50_list.append(drug_cellline_features_df['IC50_value'][i])
+			#drug_cellline_features_df['gene_expression_data'][i] = gene_expression
 		except:
-			drug_cellline_features_df.drop(i)
+			continue
 
 
-	drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
+	#drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
 
-	return drug_cellline_features_df
+	df_cell_line_drug_feature = pd.DataFrame(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
+		drug_compound_smile_list, drug_one_hot_encoding_list, IC50_list)),columns=['cell_line_name','drug_name','gene_expression_data',\
+		'drug_compound_smile','drug_one_hot_encoding','IC50_value'])
+
+	return df_cell_line_drug_feature
 
 	#gene_expression_df = list(map(process_gene_expression, gene_expressions))
 
