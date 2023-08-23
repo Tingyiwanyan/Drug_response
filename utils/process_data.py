@@ -37,10 +37,13 @@ SMILES_CHARS = [' ',
 smi2index = dict( (c,i) for i,c in enumerate( SMILES_CHARS ) )
 index2smi = dict( (i,c) for i,c in enumerate( SMILES_CHARS ) )
 
-def smiles_encoder( smiles, maxlen=120 ):
+def smiles_encoder( smiles, maxlen=120 )-> list:
     X = np.zeros( ( maxlen, len( SMILES_CHARS ) ) )
     for i, c in enumerate( smiles ):
         X[i, smi2index[c] ] = 1
+
+    X = np.concatenate(X,0)
+    X = list(X)
     return X
 
 def smiles_decoder( X ):
@@ -57,23 +60,38 @@ caffeine_encoding = smiles_encoder(caffeine_smiles)
 
 
 
-#def generate_data_frame(gene_expressions: list, drug_smile: list, ic50_list: list):
-"""
-generate data frame for training and testing
+def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
+	"""
+	generate data frame for training and testing
 
-Parameters:
------------
-gene_expression: list of all gene_expression data
-drug_smile: list of all drug smile data
-ic50_list: list of ic50 values
+	Parameters:
+	-----------
+	drug_cellline_features_df: raw feature dataframe 
 
-Returns:
---------
-ready to split dataframe
-"""
-#for i in range(len(gene_expression)):
+	Returns:
+	--------
+	filtered feature frame with cleaned data
+	"""
+	drug_one_hot_encoding = []
 
-#gene_expression_df = list(map(process_gene_expression, gene_expressions))
+	for i in range(len(gene_expression)):
+		gene_expression = drug_cellline_features_df['gene_expression_data'][i]
+		drug_compound = drug_cellline_features_df['drug_compound_smile'][i]
+
+		try:
+			print(i)
+			gene_expression = process_gene_expression(gene_expression)
+			drug_compound = smiles_encoder(drug_compound)
+			drug_one_hot_encoding.append(drug_compound)
+			drug_cellline_features_df['gene_expression_data'][i] = gene_expression
+		except:
+			drug_cellline_features_df.drop(i)
+
+
+	drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
+
+
+	#gene_expression_df = list(map(process_gene_expression, gene_expressions))
 
 
 #def one_hot_encoding_smile(drug_smile: str):
