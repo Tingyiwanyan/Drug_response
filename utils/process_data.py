@@ -83,20 +83,20 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 		gene_expression = drug_cellline_features_df['gene_expression_data'][i]
 		drug_compound = drug_cellline_features_df['drug_compound_smile'][i]
 
-		try:
-			print(i)
-			gene_expression = process_gene_expression(gene_expression)
-			drug_compound = smiles_encoder(drug_compound)
-			drug_one_hot_encoding.append(drug_compound)
-			cell_line_name_list.append(drug_cellline_features_df['cell_line_name'][i])
-			drug_name_list.append(drug_cellline_features_df['drug_name'][i])
-			gene_expression_data_list.append(gene_expression)
-			drug_compound_smile_list.append(drug_cellline_features_df['drug_compound_smile'][i])
-			drug_one_hot_encoding_list.append(drug_compound)
-			IC50_list.append(drug_cellline_features_df['IC50_value'][i])
+		#try:
+		print(i)
+		gene_expression = process_gene_expression(gene_expression)
+		drug_compound = smiles_encoder(drug_compound)
+		drug_one_hot_encoding.append(drug_compound)
+		cell_line_name_list.append(drug_cellline_features_df['cell_line_name'][i])
+		drug_name_list.append(drug_cellline_features_df['drug_name'][i])
+		gene_expression_data_list.append(gene_expression)
+		drug_compound_smile_list.append(drug_cellline_features_df['drug_compound_smile'][i])
+		drug_one_hot_encoding_list.append(drug_compound)
+		IC50_list.append(drug_cellline_features_df['IC50_value'][i])
 			#drug_cellline_features_df['gene_expression_data'][i] = gene_expression
-		except:
-			continue
+		#except:
+			#continue
 
 
 	#drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
