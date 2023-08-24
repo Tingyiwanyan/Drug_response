@@ -178,7 +178,8 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 
 	return gene_expression_list, drug_one_hot_encoding_list, ic50_list
 
-def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame):
+def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_index: int, 
+	batch_size: int= 32):
 	"""
 	extract from the clean feature dataframe to generate chunk of training 
 	or testing data
@@ -191,9 +192,9 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame):
 	--------
 	np array of training or testing data
 	"""
-	gene_expression_list = list(drug_cellline_features_clean_df['gene_expression_data'])
-	drug_one_hot_encoding_list = list(drug_cellline_features_clean_df['drug_one_hot_encoding'])
-	ic50_list = list(drug_cellline_features_clean_df['IC50_value'])
+	gene_expression_list = list(drug_cellline_features_clean_df['gene_expression_data'][starting_index:starting_index+batch_size])
+	drug_one_hot_encoding_list = list(drug_cellline_features_clean_df['drug_one_hot_encoding'][starting_index:starting_index+batch_size])
+	ic50_list = list(drug_cellline_features_clean_df['IC50_value'][starting_index:starting_index+batch_size])
 
 	return genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
 
