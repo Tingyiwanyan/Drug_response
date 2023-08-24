@@ -79,7 +79,7 @@ def process_ic50(ic50_input: str)->float:
 
 	return ic50_input
 
-def genereate_data_feature(drug_cellline_features_df: pd.DataFrame)->np.array:
+#def genereate_data_feature(drug_cellline_features_df: pd.DataFrame)->np.array:
 
 
 def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
