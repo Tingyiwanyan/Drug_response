@@ -56,10 +56,22 @@ def smiles_decoder( X ):
         smi += index2smi[ i ]
     return smi
 
-# get a taste of caffeine -----------------------------------------------------
-caffeine_smiles = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C'
 
-caffeine_encoding = smiles_encoder(caffeine_smiles)
+def normalize_ic50_drug(drug_cellline_features_clean_df: pd.DataFrame)-> pd.DataFrame:
+	"""
+	return the dataframe with drug-based normalized ic50 values
+	"""
+	drug_names = list(drug_cellline_features_clean_df['drug_name'])
+	ic50 = list(drug_cellline_features_clean_df['IC50_value'])
+	comparing_drug_names = list(cell_line_drug.columns)[1:]
+	drug_ic50_mean = []
+	drug_ic50_std = []
+	for i in comparing_drug_names:
+		index = np.where(np.array(comparing_drug_names)==i)[0]
+		drug_ic50 = [ic50[x] for x in index]
+		drug_ic50 = list(map(normalize_ic50, drug_ic50))
+
+
 
 
 def normalize_ic50(ic50_inputs: list)->list:
@@ -220,7 +232,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 	gene_expression_list, drug_one_hot_encoding_list, ic50_list = \
 	genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
 
-	ic50_list = normalize_ic50(ic50_list)
+	#ic50_list = normalize_ic50(ic50_list)
 	gene_expression_array = np.array(gene_expression_list)
 	drug_one_hot_encoding_array = np.array(drug_one_hot_encoding_list)
 
