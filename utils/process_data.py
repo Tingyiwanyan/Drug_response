@@ -178,6 +178,25 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 
 	return gene_expression_list, drug_one_hot_encoding_list, ic50_list
 
+def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame):
+	"""
+	extract from the clean feature dataframe to generate chunk of training 
+	or testing data
+
+	Parameters:
+	-----------
+	drug_cellline_features_clean_df: drug cellline featrure dataframe
+
+	Returns:
+	--------
+	np array of training or testing data
+	"""
+	gene_expression_list = list(drug_cellline_features_clean_df['gene_expression_data'])
+	drug_one_hot_encoding_list = list(drug_cellline_features_clean_df['drug_one_hot_encoding'])
+	ic50_list = list(drug_cellline_features_clean_df['IC50_value'])
+
+	return genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
+
 def process_gene_expression(gene_expression: str)-> list:
 	"""
 	Process sting-wise gene expression data
