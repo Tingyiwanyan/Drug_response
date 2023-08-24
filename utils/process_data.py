@@ -79,8 +79,6 @@ def process_ic50(ic50_input: str)->float:
 
 	return ic50_input
 
-#def genereate_data_feature(drug_cellline_features_df: pd.DataFrame)->np.array:
-
 
 def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 	"""
@@ -136,6 +134,49 @@ def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 #def one_hot_encoding_smile(drug_smile: str):
 
 
+def convert_to_list(text_data: str)-> list:
+	"""
+	convert text data to list structure
+
+	Parameters:
+	-----------
+	text_data: str input for list converting
+
+	Returns:
+	--------
+	converted list
+	"""
+	text_data = text_data.replace('[','')
+	text_data = text_data.replace(']','')
+	text_data = text_data.split(",")
+	text_data = [float(x) for x in text_data]
+
+	return text_data
+
+def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list, 
+	ic50s: list)->np.array:
+	"""
+	generate model acceptable data features
+
+	Parameters:
+	-----------
+	gene_expressions: list of gene expression data
+	drug_one_hot_encodings: list of drug one hot encodings
+	ic50s: list of ic50 values
+
+	Returns:
+	--------
+	the converted data features for train and test
+	"""
+	gene_expressions_list = []
+	drug_one_hot_encoding_list = []
+	ic50_list = []
+
+	gene_expression_list = list(map(convert_to_list, gene_expressions))
+	drug_one_hot_encoding_list = list(map(convert_to_list, drug_one_hot_encodings))
+	ic50_list = list(map(process_ic50, ic50s))
+
+	return gene_expression_list, drug_one_hot_encoding_list, ic50_list
 
 def process_gene_expression(gene_expression: str)-> list:
 	"""
@@ -155,7 +196,7 @@ def process_gene_expression(gene_expression: str)-> list:
 	gene_expression = gene_expression[1:]
 	gene_expression = [float(x) for x in gene_expression]
 
-	gene_expression = gene_expression[1:]
+	#gene_expression = gene_expression[1:]
 
 	return gene_expression
 
