@@ -220,7 +220,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 	gene_expression_list, drug_one_hot_encoding_list, ic50_list = \
 	genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
 
-	ic50_list = normalized_ic50(ic50_list)
+	ic50_list = normalize_ic50(ic50_list)
 	gene_expression_array = np.array(gene_expression_list)
 	drug_one_hot_encoding_array = np.array(drug_one_hot_encoding_list)
 
