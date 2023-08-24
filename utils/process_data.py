@@ -82,6 +82,7 @@ def normalize_ic50(ic50_inputs: list)->list:
 	return normalized_ic50
 
 
+
 def process_ic50(ic50_input: str)->float:
 	"""
 	generate float value ic50
@@ -216,7 +217,16 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 	drug_one_hot_encoding_list = list(drug_cellline_features_clean_df['drug_one_hot_encoding'][starting_index:starting_index+batch_size])
 	ic50_list = list(drug_cellline_features_clean_df['IC50_value'][starting_index:starting_index+batch_size])
 
-	return genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
+	gene_expression_list, drug_one_hot_encoding_list, ic50_list = \
+	genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
+
+	ic50_list = normalized_ic50(ic50_list)
+	gene_expression_array = np.array(gene_expression_list)
+	drug_one_hot_encoding_array = np.array(drug_one_hot_encoding_list)
+
+	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
+
+	return cell_line_drug_feature, ic50_list
 
 def process_gene_expression(gene_expression: str)-> list:
 	"""
