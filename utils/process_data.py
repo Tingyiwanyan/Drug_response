@@ -62,6 +62,26 @@ caffeine_smiles = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C'
 caffeine_encoding = smiles_encoder(caffeine_smiles)
 
 
+def normalize_ic50(ic50_inputs: list)->list:
+	"""
+	normalize ic50 values through the list
+
+	Parameters:
+	-----------
+	ic50_inputs: list of raw ic50 input
+
+	Returns:
+	--------
+	normalized ic50 values
+	"""
+	max = np.max(ic50_inputs)
+	min = np.min(ic50_inputs)
+
+	normalized_ic50 = [(x-min)/(max-min) for x in ic50_inputs]
+
+	return normalized_ic50
+
+
 def process_ic50(ic50_input: str)->float:
 	"""
 	generate float value ic50
