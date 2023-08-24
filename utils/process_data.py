@@ -10,6 +10,8 @@ drug_index_match_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_con
 
 feature_frame_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug_cellline_features.csv"
 
+feature_clean_frame_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug_celline_features_clean.csv"
+
 
 
 gene_expression = pyreadr.read_r(gene_expression_path)[None]
@@ -18,6 +20,7 @@ drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 
 drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
+drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
 
 """
 One hot encoding smile drug molecule sequence, reference:
@@ -58,6 +61,25 @@ caffeine_smiles = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C'
 
 caffeine_encoding = smiles_encoder(caffeine_smiles)
 
+
+def process_ic50(ic50_input: str)->float:
+	"""
+	generate float value ic50
+
+	Parameters:
+	-----------
+	ic50_input: dataframe input 
+
+	Returns:
+	--------
+	ic50 float values
+	"""
+
+	ic50_input = float(ic50_input.split(' ')[3].split('\n')[0])
+
+	return ic50_input
+
+def genereate_data_feature(drug_cellline_features_df: pd.DataFrame)->np.array:
 
 
 def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
