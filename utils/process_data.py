@@ -154,7 +154,7 @@ def convert_to_list(text_data: str)-> list:
 	return text_data
 
 def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list, 
-	ic50s: list)->np.array:
+	ic50s: list):
 	"""
 	generate model acceptable data features
 
