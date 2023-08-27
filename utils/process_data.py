@@ -134,7 +134,6 @@ def z_normalization(drug_ic50_df: pd.DataFrame, drug_name: str, ic50_value: floa
 	--------
 	normalized drug ic50 value
 	"""
-	drug_ic50_df.set_index("drug_name", inplace =True)
 	mean = float(drug_ic50_df.loc[drug_name]['drug_ic50_mean'])
 	std = float(drug_ic50_df.loc[drug_name]['drug_ic50_std'])
 
@@ -164,7 +163,7 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 	drug_compound_smile_list = []
 	drug_one_hot_encoding_list = []
 	IC50_list = []
-
+	drug_ic50_df.set_index("drug_name", inplace =True)
 	#drug_cellline_features_clean_df.set_index()
 	#for row in drug_cellline_features_df['drug_name']:
 	for i in range(len(drug_cellline_features_clean_df)):
