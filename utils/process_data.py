@@ -173,13 +173,15 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 		ic50_value = drug_cellline_features_clean_df['IC50_value'][i]
 		ic50_value = process_ic50(ic50_value)
 		drug_name = drug_cellline_features_clean_df['drug_name'][i]
-		try: 
-			np.isnan(ic50_value)
+		#try: 
+		if np.isnan(ic50_value) == True:
 			print("im here in is nan")
 			print(ic50_value)
 			continue
-		except:
+		else:
 			ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
+		#except:
+			#ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
 		#try:
 		#print(i)
 		#drug_compound = smiles_encoder(drug_compound)
