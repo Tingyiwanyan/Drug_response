@@ -109,6 +109,7 @@ def normalize_ic50_drug(drug_cellline_features_clean_df: pd.DataFrame)-> pd.Data
 		index = np.where(np.array(comparing_drug_names)==i)[0]
 		drug_ic50 = [ic50[x] for x in index]
 		drug_ic50 = list(map(process_ic50, drug_ic50))
+		print(drug_ic50)
 		ic50_mean = np.nanmean(drug_ic50)
 		ic50_std = np.nanstd(drug_ic50)
 		drug_ic50_means.append(ic50_mean)
