@@ -57,23 +57,6 @@ def smiles_decoder( X ):
     return smi
 
 
-def normalize_ic50_drug(drug_cellline_features_clean_df: pd.DataFrame)-> pd.DataFrame:
-	"""
-	return the dataframe with drug-based normalized ic50 values
-	"""
-	drug_names = list(drug_cellline_features_clean_df['drug_name'])
-	ic50 = list(drug_cellline_features_clean_df['IC50_value'])
-	comparing_drug_names = list(cell_line_drug.columns)[1:]
-	drug_ic50_mean = []
-	drug_ic50_std = []
-	for i in comparing_drug_names:
-		index = np.where(np.array(comparing_drug_names)==i)[0]
-		drug_ic50 = [ic50[x] for x in index]
-		drug_ic50 = list(map(normalize_ic50, drug_ic50))
-
-
-
-
 def normalize_ic50(ic50_inputs: list)->list:
 	"""
 	normalize ic50 values through the list
@@ -112,6 +95,29 @@ def process_ic50(ic50_input: str)->float:
 
 	return ic50_input
 
+
+def normalize_ic50_drug(drug_cellline_features_clean_df: pd.DataFrame)-> pd.DataFrame:
+	"""
+	return the dataframe with drug-based normalized ic50 values
+	"""
+	drug_names = list(drug_cellline_features_clean_df['drug_name'])
+	ic50 = list(drug_cellline_features_clean_df['IC50_value'])
+	comparing_drug_names = list(cell_line_drug.columns)[1:]
+	drug_ic50_means = []
+	drug_ic50_stds = []
+	for i in comparing_drug_names:
+		index = np.where(np.array(comparing_drug_names)==i)[0]
+		drug_ic50 = [ic50[x] for x in index]
+		drug_ic50 = list(map(process_ic50, drug_ic50))
+		ic50_mean = np.nanmean(drug_ic50)
+		ic50_std = np.nanstd(drug_ic50)
+		drug_ic50_means.append(ic50_mean)
+		drug_ic50_stds.append(ic50_std)
+
+	ic50_normalized_df = pd.DataFrame(list(zip(comparing_drug_names, drug_ic50_means, drug_ic50_stds,\
+		)),columns=['drug_name','drug_ic50_mean','drug_ic50_std'])
+
+	return ic50_normalized_df
 
 def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 	"""
