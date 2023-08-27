@@ -139,7 +139,7 @@ def z_normalization(drug_ic50_df: pd.DataFrame, drug_name: str, ic50_value: floa
 	std = drug_ic50_df['drug_name']['drug_ic50_std']
 
 	return (ic50_value-mean)/std
-	
+
 
 def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, drug_ic50_df: pd.DataFrame):
 	"""
@@ -168,12 +168,15 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 		drug_compound = drug_cellline_features_clean_df['drug_compound_smile'][i]
 		ic50_value = drug_cellline_features_clean_df['IC50_value'][i]
 		drug_name = drug_cellline_features_clean_df['drug_name'][i]
-		if np.isnan(ic50_value):
+		try: 
+			np.isnan(ic50_value):
 			continue
-		else:
+			print("im here in is nan")
+			print(ic50_value)
+		except:
 			ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
 		#try:
-		print(i)
+		#print(i)
 		#drug_compound = smiles_encoder(drug_compound)
 		cell_line_name_list.append(drug_cellline_features_clean_df['cell_line_name'][i])
 		drug_name_list.append(drug_name)
