@@ -115,7 +115,7 @@ def normalize_ic50_drug(drug_cellline_features_clean_df: pd.DataFrame)-> pd.Data
 		drug_ic50_means.append(ic50_mean)
 		drug_ic50_stds.append(ic50_std)
 
-	ic50_normalized_df = pd.DataFrame(list(zip(comparing_drug_names, drug_ic50_means, drug_ic50_stds,\
+	ic50_normalized_df = pd.DataFrame(list(zip(comparing_drug_names, drug_ic50_means, drug_ic50_stds
 		)),columns=['drug_name','drug_ic50_mean','drug_ic50_std'])
 
 	return ic50_normalized_df
