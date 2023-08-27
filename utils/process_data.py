@@ -137,9 +137,9 @@ def z_normalization(drug_ic50_df: pd.DataFrame, drug_name: str, ic50_value: floa
 	mean = float(drug_ic50_df.loc[drug_name]['drug_ic50_mean'])
 	std = float(drug_ic50_df.loc[drug_name]['drug_ic50_std'])
 
-	print(ic50_value)
-	print(mean)
-	print(std)
+	#print(ic50_value)
+	#print(mean)
+	#print(std)
 
 	return (ic50_value-mean)/std
 
@@ -183,7 +183,7 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 			#ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
 		#try:
 		#print(i)
-		#drug_compound = smiles_encoder(drug_compound)
+		drug_compound = smiles_encoder(drug_compound)
 		cell_line_name_list.append(drug_cellline_features_clean_df['cell_line_name'][i])
 		drug_name_list.append(drug_name)
 		gene_expression_data_list.append(gene_expression)
