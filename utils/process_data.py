@@ -135,8 +135,8 @@ def z_normalization(drug_ic50_df: pd.DataFrame, drug_name: str, ic50_value: floa
 	normalized drug ic50 value
 	"""
 	drug_ic50_df.set_index("drug_name", inplace =True)
-	mean = drug_ic50_df['drug_name']['drug_ic50_mean']
-	std = drug_ic50_df['drug_name']['drug_ic50_std']
+	mean = drug_ic50_df.loc[drug_name]['drug_ic50_mean']
+	std = drug_ic50_df.loc[drug_name]['drug_ic50_std']
 
 	return (ic50_value-mean)/std
 
