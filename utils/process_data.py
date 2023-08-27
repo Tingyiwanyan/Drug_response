@@ -171,6 +171,7 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 		gene_expression = drug_cellline_features_clean_df['gene_expression_data'][i]
 		drug_compound = drug_cellline_features_clean_df['drug_compound_smile'][i]
 		ic50_value = drug_cellline_features_clean_df['IC50_value'][i]
+		ic50_value = process_ic50(ic50_value)
 		drug_name = drug_cellline_features_clean_df['drug_name'][i]
 		try: 
 			np.isnan(ic50_value)
