@@ -24,6 +24,8 @@ drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
 drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
 
+drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_path)
+
 """
 One hot encoding smile drug molecule sequence, reference:
 https://towardsdatascience.com/basic-molecular-representation-for-machine-learning-b6be52e9ff76
