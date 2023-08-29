@@ -303,8 +303,8 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 
 	gene_expression_list = list(map(convert_to_list, gene_expressions))
 	drug_one_hot_encoding_list = list(map(convert_to_list, drug_one_hot_encodings))
-	ic50_list = list(map(process_ic50, ic50s))
-	ic50_list = list(map())
+	#ic50_list = list(map(process_ic50, ic50s))
+	#ic50_list = list(map())
 
 	return gene_expression_list, drug_one_hot_encoding_list, ic50_list
 
