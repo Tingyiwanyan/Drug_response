@@ -306,7 +306,7 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 	#ic50_list = list(map(process_ic50, ic50s))
 	#ic50_list = list(map())
 
-	return gene_expression_list, drug_one_hot_encoding_list, ic50_list
+	return gene_expression_list, drug_one_hot_encoding_list, ic50s
 
 def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_index: int, 
 	batch_size: int= 32):
