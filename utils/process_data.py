@@ -335,7 +335,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 
 	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
 
-	return cell_line_drug_feature, ic50_list
+	return gene_expression_array, ic50_list
 
 def process_gene_expression(gene_expression: str)-> list:
 	"""
