@@ -73,10 +73,10 @@ def normalize_min_max(inputs: list)->list:
 	--------
 	normalized ic50 values
 	"""
-	max = np.max(ic50_inputs)
-	min = np.min(ic50_inputs)
+	max = np.max(inputs)
+	min = np.min(inputs)
 
-	normalized_ic50 = [(x-min)/(max-min) for x in ic50_inputs]
+	normalized_ic50 = [(x-min)/(max-min) for x in inputs]
 
 	return normalized_ic50
 
