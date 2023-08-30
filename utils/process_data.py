@@ -61,7 +61,7 @@ def smiles_decoder( X ):
     return smi
 
 
-def normalize_ic50(ic50_inputs: list)->list:
+def normalize_min_max(inputs: list)->list:
 	"""
 	normalize ic50 values through the list
 
@@ -79,6 +79,23 @@ def normalize_ic50(ic50_inputs: list)->list:
 	normalized_ic50 = [(x-min)/(max-min) for x in ic50_inputs]
 
 	return normalized_ic50
+
+def normalize_min_max_array(inputs: np.array)-> np.array:
+	"""
+	normalize array data on gene expression for learning
+
+	Parameters:
+	-----------
+	inputs: array of data
+
+	Returns:
+	--------
+	min max normalized array of data
+	"""
+	inputs_list = list(inputs)
+	normalized_list = list(map(normalize_min_max, inputs_list))
+
+	return normalized_list
 
 
 
