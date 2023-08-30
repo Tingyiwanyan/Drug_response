@@ -355,6 +355,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 
 	return cell_line_drug_feature, ic50_list
 
+
 def process_gene_expression(gene_expression: str)-> list:
 	"""
 	Process sting-wise gene expression data
