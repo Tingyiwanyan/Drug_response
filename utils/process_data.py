@@ -325,8 +325,7 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 
 	return gene_expression_list, drug_one_hot_encoding_list, ic50s
 
-def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_index: int, 
-	batch_size: int= 32):
+def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, index_array:list =None):
 	"""
 	extract from the clean feature dataframe to generate chunk of training 
 	or testing data
@@ -334,14 +333,16 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 	Parameters:
 	-----------
 	drug_cellline_features_clean_df: drug cellline featrure dataframe
+	index_array: array of index for selecting
 
 	Returns:
 	--------
 	np array of training or testing data
 	"""
-	gene_expression_list = list(drug_cellline_features_clean_df['gene_expression_data'][starting_index:starting_index+batch_size])
-	drug_one_hot_encoding_list = list(drug_cellline_features_clean_df['drug_one_hot_encoding'][starting_index:starting_index+batch_size])
-	ic50_list = list(drug_cellline_features_clean_df['IC50_value'][starting_index:starting_index+batch_size])
+	gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
+	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
+	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
+	drug_name_list = [list(drug_cellline_features_clean_df['drug_name'])[i] for i in index_array]
 
 	gene_expression_list, drug_one_hot_encoding_list, ic50_list = \
 	genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
@@ -353,7 +354,21 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, starting_
 	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
 	cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
 
-	return cell_line_drug_feature, ic50_list
+	return cell_line_drug_feature, ic50_list, drug_name_list
+
+
+def train_test_split(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):
+	"""
+	perform training and testing dataset split
+	"""
+	total_num = len(drug_cellline_features_clean_df)
+	num_list = list(np.array(range(total_num)))
+	train_num = int(np.floor(total_num*train_percent))
+	train_sample_num = random.sample(num_array,train_num)
+
+	test_sample_num = [num_list.remove(i) for i in train_sample_num]
+
+	return train_sample_num, test_sample_num
 
 
 def process_gene_expression(gene_expression: str)-> list:
