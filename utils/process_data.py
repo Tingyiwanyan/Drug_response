@@ -368,6 +368,7 @@ def train_test_split(drug_cellline_features_clean_df: pd.DataFrame, train_percen
 	train_sample_num = random.sample(num_list,train_num)
 
 	[num_list.remove(i) for i in train_sample_num]
+	train_sample_num.sort()
 
 	return train_sample_num, num_list
 
