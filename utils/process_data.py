@@ -5,6 +5,10 @@ import random
 from pubchempy import get_compounds, Compound
 
 
+
+std_threshold = 2.0
+zero_threshold = 200
+
 gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
 cell_line_drug_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.rds"
 drug_index_match_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.annot.csv"
@@ -61,7 +65,7 @@ def smiles_decoder( X ):
         smi += index2smi[ i ]
     return smi
 
-def filtering_raw_gene_expression(gene_expression: pd.DataFrame):
+def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 	"""
 	Compute the variance of each gene expression, and also return 
 	the zero amount of gene expression
@@ -83,8 +87,10 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame):
 		std_list.append(std)
 		zeros_num = list(gene_expression[i]).count(0)
 		zeros_list.append(zeros_num)
+		if std < std_threshold or zeros_num > zero_threshold:
+			gene_expression = gene_expression.drop([i],axis=1)
 
-	return std_list, zeros_list
+	return gene_expression
 
 def normalize_min_max(inputs: list)->list:
 	"""
