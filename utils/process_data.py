@@ -387,7 +387,6 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expr
 	--------
 	np array of training or testing data
 	"""
-	gene_expression_filtered.set_index('CCLE_ID',inplace=True)
 	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
 	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
 	gene_expression_list = [list(gene_expression_filtered.loc[i][1:]) for i in CCLE_names]
