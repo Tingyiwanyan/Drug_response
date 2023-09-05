@@ -81,14 +81,18 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 	std_list = []
 	zeros_list = []
 	gene_names = gene_expression.columns[1:]
-
+	index = 0
 	for i in gene_names:
+		print(index)
 		std = np.nanstd(gene_expression[i])
 		std_list.append(std)
 		zeros_num = list(gene_expression[i]).count(0)
 		zeros_list.append(zeros_num)
 		if std < std_threshold or zeros_num > zero_threshold:
 			gene_expression = gene_expression.drop([i],axis=1)
+			print("im here in condition")
+		print(index)
+		index+= 1
 
 	return gene_expression
 
