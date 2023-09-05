@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pyreadr
 import random
+
 from pubchempy import get_compounds, Compound
 
 
@@ -19,6 +20,8 @@ feature_clean_frame_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_
 
 feature_ic50_normalized_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug_celline_ic50_normalized.csv"
 
+gene_expression_filtered_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug_celline_ic50_normalized.csv"
+
 
 
 gene_expression = pyreadr.read_r(gene_expression_path)[None]
@@ -30,6 +33,8 @@ drug_cellline_features_df = pd.read_csv(feature_frame_path)
 drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
 
 drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_path)
+
+gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
 
 """
 One hot encoding smile drug molecule sequence, reference:
@@ -64,6 +69,15 @@ def smiles_decoder( X ):
     for i in X:
         smi += index2smi[ i ]
     return smi
+
+
+def select_row_gene_expression(gene_expression_filtered: pd.DataFrame, CCLE_name: str)->list:
+	"""
+	return a row of list of gene expression data from filtered dataframe
+	"""
+	
+	return list(gene_expression_filtered.loc[CCLE_name][1:])
+
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 	"""
@@ -259,8 +273,6 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 
 	return df_cell_line_drug_feature_ic50_normalied
 
-
-
 def generate_data_frame(drug_cellline_features_df: pd.DataFrame):
 	"""
 	generate data frame for training and testing
@@ -360,7 +372,7 @@ def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list,
 
 	return gene_expression_list, drug_one_hot_encoding_list, ic50s
 
-def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, index_array:list =None):
+def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expression_filtered: pd.Dataframe, index_array:list =None):
 	"""
 	extract from the clean feature dataframe to generate chunk of training 
 	or testing data
@@ -368,13 +380,16 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, index_arr
 	Parameters:
 	-----------
 	drug_cellline_features_clean_df: drug cellline featrure dataframe
+	gene_expression_filtered: filtered gene expression data
 	index_array: array of index for selecting
 
 	Returns:
 	--------
 	np array of training or testing data
 	"""
-	gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
+	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
+	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
+	gene_expression_list = [list(gene_expression_filtered.loc[i][1:]) for i in CCLE_names]
 	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
 	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
 	drug_name_list = [list(drug_cellline_features_clean_df['drug_name'])[i] for i in index_array]
