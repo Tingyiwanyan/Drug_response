@@ -61,6 +61,30 @@ def smiles_decoder( X ):
         smi += index2smi[ i ]
     return smi
 
+def filtering_raw_gene_expression(gene_expression: pd.DataFrame):
+	"""
+	Compute the variance of each gene expression, and also return 
+	the zero amount of gene expression
+
+	Parameters:
+	-----------
+	gene_expression: cell line gene expression input
+
+	Returns:
+	--------
+	dataframe with gene expression variance and zero amount
+	"""
+	std_list = []
+	zeros_list = []
+	gene_names = gene_expression.columns[1:]
+
+	for i in gene_names:
+		std = np.nonstd(gene_expression[i])
+		std_list.append(std)
+		zeros_num = list(gene_expression[i]).count(0)
+		zeros_list.append(zeros_num)
+
+	return std_list, zeros_list
 
 def normalize_min_max(inputs: list)->list:
 	"""
@@ -97,7 +121,6 @@ def normalize_min_max_array(inputs: np.array)-> np.array:
 	normalized_list = list(map(normalize_min_max, inputs_list))
 
 	return np.array(normalized_list)
-
 
 
 def process_ic50(ic50_input: str)->float:
@@ -185,6 +208,7 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 	drug_compound_smile_list = []
 	drug_one_hot_encoding_list = []
 	IC50_list = []
+	
 	drug_ic50_df.set_index("drug_name", inplace =True)
 	#drug_cellline_features_clean_df.set_index()
 	#for row in drug_cellline_features_df['drug_name']:

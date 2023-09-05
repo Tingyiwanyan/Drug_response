@@ -7,6 +7,10 @@ from sklearn import linear_model
 #df_cell_line_drug_ic50_normalized = generate_df_normalized_ic50(drug_cellline_features_clean_df, ic50_df)
 
 reg = linear_model.Ridge()
+train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50_normalized_df)
+
+cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cellline_features_ic50_normalized_df, train_sample_num)
+cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, test_sample_num)
 #cell_line_drug_feature, ic50_list = process_chunck_data(drug_cellline_features_ic50_normalized_df,0,5000)
 
 #cell_line_drug_feature_test, ic50_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df,10000,10899)
