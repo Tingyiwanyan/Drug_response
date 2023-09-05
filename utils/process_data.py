@@ -79,7 +79,7 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame):
 	gene_names = gene_expression.columns[1:]
 
 	for i in gene_names:
-		std = np.nonstd(gene_expression[i])
+		std = np.nanstd(gene_expression[i])
 		std_list.append(std)
 		zeros_num = list(gene_expression[i]).count(0)
 		zeros_list.append(zeros_num)
