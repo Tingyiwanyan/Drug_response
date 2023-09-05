@@ -6,7 +6,7 @@ from pubchempy import get_compounds, Compound
 
 
 
-std_threshold = 2.0
+std_threshold = 1.5
 zero_threshold = 200
 
 gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
@@ -91,7 +91,7 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 		if std < std_threshold or zeros_num > zero_threshold:
 			gene_expression = gene_expression.drop([i],axis=1)
 			print("im here in condition")
-		print(index)
+		#print(index)
 		index+= 1
 
 	return gene_expression
