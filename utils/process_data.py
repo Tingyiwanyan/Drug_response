@@ -128,9 +128,9 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 			print("im here in condition")
 		#print(index)
 		index+= 1
-	gene_expression = gene_expression.drop(filtered_list,axis=1)
+	#gene_expression = gene_expression.drop(filtered_list,axis=1)
 
-	return gene_expression
+	return std_list, zeros_list
 
 def normalize_min_max(inputs: list)->list:
 	"""
