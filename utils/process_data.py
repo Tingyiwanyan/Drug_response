@@ -22,6 +22,8 @@ feature_ic50_normalized_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/d
 
 gene_expression_filtered_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/gene_expression_filtered.csv"
 
+gene_expression_selected_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/gene_expression_selected.csv"
+
 
 
 gene_expression = pyreadr.read_r(gene_expression_path)[None]
@@ -34,7 +36,9 @@ drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
 
 drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_path)
 
-gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
+gene_expression_selected = pd.read_csv(gene_expression_selected_path)
+
+#gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
 
 """
 One hot encoding smile drug molecule sequence, reference:
@@ -70,13 +74,28 @@ def smiles_decoder( X ):
         smi += index2smi[ i ]
     return smi
 
-
 def select_row_gene_expression(gene_expression_filtered: pd.DataFrame, CCLE_name: str)->list:
 	"""
 	return a row of list of gene expression data from filtered dataframe
 	"""
 	
 	return list(gene_expression_filtered.loc[CCLE_name][1:])
+
+def selecting_filtered_gene_expression(gene_expression: pd.DataFrame, CCLE_names:list)->pd.DataFrame:
+	"""
+	Selecting the gene_expression data from CCLE_names
+
+	Parameters:
+	-----------
+	gene_expression: gene expression data frame
+	CCLE_names: list of CCLE names to be selected
+
+	Returns:
+	--------
+	selected gene expression dataframe
+	"""
+
+	return gene_expression[gene_expression['CCLE_ID'].isin(CCLE_names)]
 
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
