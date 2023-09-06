@@ -7,7 +7,7 @@ from pubchempy import get_compounds, Compound
 
 
 
-std_threshold = 1.5
+std_threshold = 0.6
 zero_threshold = 250
 
 gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
@@ -117,7 +117,7 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 	gene_names = gene_expression.columns[2:]
 	index = 0
 	for i in gene_names:
-		print(index)
+		#print(index)
 		std = np.nanstd(gene_expression[i])
 		std_list.append(std)
 		zeros_num = list(gene_expression[i]).count(0)
@@ -125,12 +125,12 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 		if std < std_threshold or zeros_num > zero_threshold:
 			#gene_expression = gene_expression.drop([i],axis=1)
 			filtered_list.append(i)
-			print("im here in condition")
+			#print("im here in condition")
 		#print(index)
 		index+= 1
-	#gene_expression = gene_expression.drop(filtered_list,axis=1)
+	gene_expression = gene_expression.drop(filtered_list,axis=1)
 
-	return std_list, zeros_list
+	return gene_expression
 
 def normalize_min_max(inputs: list)->list:
 	"""
