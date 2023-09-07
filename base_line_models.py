@@ -3,6 +3,8 @@ from sklearn import linear_model
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import EarlyStopping
+from tensorflow.keras import layers
+from tensorflow.keras import regularizers
 
 epochs = 30
 
