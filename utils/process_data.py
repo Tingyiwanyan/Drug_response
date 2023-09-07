@@ -38,7 +38,7 @@ drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_
 
 gene_expression_selected = pd.read_csv(gene_expression_selected_path)
 
-#gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
+gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
 
 """
 One hot encoding smile drug molecule sequence, reference:
