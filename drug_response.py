@@ -1,7 +1,8 @@
 import numpy as np
 from utils.process_data import *
 from base_line_models import *
-from sklearn import linear_model
+from drug_transformer import *
+#from sklearn import linear_model
 
 
 #ic50_df = normalize_ic50_drug(drug_cellline_features_clean_df)
@@ -19,7 +20,7 @@ cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunc
 
 model = shallow_nn(cell_line_drug_feature.shape[1])
 
-hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=200)
+hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
 #cell_line_drug_feature, ic50_list = process_chunck_data(drug_cellline_features_ic50_normalized_df,0,5000)
 
 #cell_line_drug_feature_test, ic50_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df,10000,10899)
