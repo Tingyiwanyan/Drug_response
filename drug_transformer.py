@@ -30,7 +30,7 @@ def masked_softmax(X, valid_lens):  #@save
                            value=-1e6)
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 
-
+"""
 class CrossAttention(BaseAttention):
   def call(self, x, context):
     attn_output, attn_scores = self.mha(
@@ -46,7 +46,7 @@ class CrossAttention(BaseAttention):
     x = self.layernorm(x)
 
     return x
-
+"""
 
 class PositionalEncoding(tf.keras.layers.Layer):  #@save
     """Positional encoding."""
