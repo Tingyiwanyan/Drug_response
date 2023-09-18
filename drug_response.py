@@ -18,9 +18,9 @@ cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cel
 cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	test_sample_num)
 
-model = shallow_nn(cell_line_drug_feature.shape[1])
+#model = shallow_nn(cell_line_drug_feature.shape[1])
 
-hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
+#hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
 #cell_line_drug_feature, ic50_list = process_chunck_data(drug_cellline_features_ic50_normalized_df,0,5000)
 
 #cell_line_drug_feature_test, ic50_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df,10000,10899)
