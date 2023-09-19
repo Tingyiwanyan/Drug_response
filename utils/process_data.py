@@ -428,6 +428,47 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expr
 
 	return cell_line_drug_feature, ic50_list, drug_name_list
 
+def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFrame, gene_expression_filtered: pd.DataFrame, index_array:list =None):
+	"""
+	extract from the clean feature dataframe to generate chunk of training 
+	or testing data for transformer input
+
+	Parameters:
+	-----------
+	drug_cellline_features_clean_df: drug cellline featrure dataframe
+	gene_expression_filtered: filtered gene expression data
+	index_array: array of index for selecting
+
+	Returns:
+	--------
+	np array of training or testing data
+	corresponding array of valid length
+	"""
+	drug_smile_length = []
+	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
+	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
+	gene_expression_list = [list(gene_expression_filtered.loc[i][1:]) for i in CCLE_names]
+	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
+	drug_smile_list = [list(drug_cellline_features_clean_df['drug_compound_smile'])[i] for i in index_array]
+	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
+	drug_name_list = [list(drug_cellline_features_clean_df['drug_name'])[i] for i in index_array]
+
+	for i in range(len(drug_smile_list)):
+		length = len(drug_smile_list[i])
+		drug_smile_length.append(length)
+
+	gene_expression_list, drug_one_hot_encoding_list, ic50_list = \
+	genereate_data_feature(gene_expression_list, drug_one_hot_encoding_list, ic50_list)
+
+	#ic50_list = normalize_ic50(ic50_list)
+	gene_expression_array = np.array(gene_expression_list)
+	drug_one_hot_encoding_array = np.array(drug_one_hot_encoding_list)
+	gene_expression_array = normalize_min_max_array(gene_expression_array)
+	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
+	#cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
+
+	return gene_expression_array, drug_one_hot_encoding_array, ic50_list, drug_name_list,drug_smile_length
+
 
 def train_test_split(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):
 	"""

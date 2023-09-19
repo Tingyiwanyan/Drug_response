@@ -126,7 +126,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
         super().__init__()
-        self.attention = d2l.MultiHeadAttention(
+        self.attention = MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
@@ -145,7 +145,7 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
                  norm_shape, ffn_num_hiddens, num_heads, dropout, i):
         super().__init__()
         self.i = i
-        self.attention1 = d2l.MultiHeadAttention(
+        self.attention1 = MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.attention2 = d2l.MultiHeadAttention(

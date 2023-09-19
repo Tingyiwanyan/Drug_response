@@ -13,10 +13,19 @@ train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50
 
 gene_expression_filtered.set_index('CCLE_ID',inplace=True)
 
+"""
 cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	test_sample_num)
+"""
+
+gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+	train_sample_num)
+
+gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list_test,drug_smile_length_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+	test_sample_num)
+
 
 #model = shallow_nn(cell_line_drug_feature.shape[1])
 
