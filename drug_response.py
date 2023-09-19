@@ -20,10 +20,10 @@ cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunc
 	test_sample_num)
 """
 
-gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 
-gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list_test,drug_smile_length_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list_test,drug_smile_length_test = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	test_sample_num)
 
 
