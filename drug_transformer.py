@@ -66,6 +66,17 @@ class PositionalEncoding(tf.keras.layers.Layer):  #@save
         return self.dropout(X, **kwargs)
 
 
+class AddNorm(tf.keras.layers.Layer):  #@save
+    """The residual connection followed by layer normalization."""
+    def __init__(self, dropout):
+        super().__init__()
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        self.ln = tf.keras.layers.LayerNormalization()
+
+    def call(self, X, Y, **kwargs):
+        return self.ln(self.dropout(Y, **kwargs) + X)
+
+
 class DotProductAttention(tf.keras.layers.Layer):  #@save
     """Scaled dot product attention."""
     def __init__(self, dropout):
@@ -124,14 +135,14 @@ class MultiHeadAttention(tf.keras.layers.Layer):  #@save
 class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
     """The Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
-        super().__init__()
+    	num_heads, dropout, bias=False):
+        #super().__init__()
         self.attention = MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             bias)
-        self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
-        self.addnorm2 = AddNorm(norm_shape, dropout)
+        self.addnorm1 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
+        self.addnorm2 = AddNorm(dropout)
 
     def call(self, X, valid_lens, **kwargs):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs),
@@ -142,39 +153,18 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
 class TransformerDecoderBlock(tf.keras.layers.Layer):
     # The i-th block in the Transformer decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, i):
-        super().__init__()
-        self.i = i
+                 num_heads, dropout):
+        #super().__init__()
         self.attention1 = MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.attention2 = d2l.MultiHeadAttention(
+        self.attention2 = MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout)
-        self.addnorm2 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
-        self.addnorm3 = AddNorm(norm_shape, dropout)
+        self.addnorm2 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
+        self.addnorm3 = AddNorm(dropout)
 
-    def call(self, X, state, **kwargs):
-        enc_outputs, enc_valid_lens = state[0], state[1]
-        # During training, all the tokens of any output sequence are processed
-        # at the same time, so state[2][self.i] is None as initialized. When
-        # decoding any output sequence token by token during prediction,
-        # state[2][self.i] contains representations of the decoded output at
-        # the i-th block up to the current time step
-        if state[2][self.i] is None:
-            key_values = X
-        else:
-            key_values = tf.concat((state[2][self.i], X), axis=1)
-        state[2][self.i] = key_values
-        if kwargs["training"]:
-            batch_size, num_steps, _ = X.shape
-            # Shape of dec_valid_lens: (batch_size, num_steps), where every
-            # row is [1, 2, ..., num_steps]
-            dec_valid_lens = tf.repeat(
-                tf.reshape(tf.range(1, num_steps + 1),
-                           shape=(-1, num_steps)), repeats=batch_size, axis=0)
-        else:
-            dec_valid_lens = None
+    def call(self, X, enc_valid_lens, dec_valid_lens,**kwargs):
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens,
                              **kwargs)
@@ -187,9 +177,13 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
         return self.addnorm3(Z, self.ffn(Z), **kwargs), state
 
 
-class Drug_transformer():
+class Drug_transformer(tf.keras.layers.Layer):
 
-	def __init__(self, encoder_dim, decoder_dim):
-		model = Sequential()
+	def __init__(self, encoder_dim, decoder_dim, num_hidden, enc_valid_lens, doc_valid_lens, num_head,drop_out):
+		
+		self.trans_encoder = TransformerEncoderBlock(encoder_dim,encoder_dim,encoder_dim,num_hidden,num_head,drop_out)
+		#self.trans_decoder = TransformerDecoderBlock()
+		
+
 
 
