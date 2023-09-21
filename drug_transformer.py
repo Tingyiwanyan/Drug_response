@@ -56,7 +56,7 @@ def masked_softmax(X, valid_lens, value):
 
 	X = tf.where(mask, X, value)
 
-	return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1), X
+	return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1), X, mask
 
 
 
