@@ -109,13 +109,6 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
-		"""
-		Parameters:
-		-----------
-		num_hiddens: dimension for the embedding layer
-		num_heads: numbers for the multihead attention
-		dropout: dropout ratio
-		"""
         self.num_heads = num_heads
         self.attention = DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
