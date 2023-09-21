@@ -109,13 +109,13 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
-    	"""
-    	Parameters:
-    	-----------
-    	num_hiddens: dimension for the embedding layer
-    	num_heads: numbers for the multihead attention
-    	dropout: dropout ratio
-    	"""
+		"""
+		Parameters:
+		-----------
+		num_hiddens: dimension for the embedding layer
+		num_heads: numbers for the multihead attention
+		dropout: dropout ratio
+		"""
         self.num_heads = num_heads
         self.attention = DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
@@ -190,7 +190,7 @@ class Drug_transformer():
 	def __init__(self, encoder_dim, decoder_dim, num_hidden, enc_valid_lens, doc_valid_lens, num_head,drop_out):
 		
 		self.trans_encoder = TransformerEncoderBlock(encoder_dim,encoder_dim,encoder_dim,num_hidden,num_head,drop_out)
-		self.trans_decoder = TransformerDecoderBlock()
+		#self.trans_decoder = TransformerDecoderBlock()
 		
 
 
