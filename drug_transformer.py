@@ -30,25 +30,37 @@ def masked_softmax(X, valid_lens):  #@save
                            value=-1e6)
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 
-"""
-class CrossAttention(BaseAttention):
-  def call(self, x, context):
-    attn_output, attn_scores = self.mha(
-        query=x,
-        key=context,
-        value=context,
-        return_attention_scores=True)
 
-    # Cache the attention scores for plotting later.
-    self.last_attn_scores = attn_scores
+def masked_softmax(X, valid_lens, value):
+	"""
+	Apply masked softmax to attention matrix, note, this function adapts
+	only to encoder
 
-    x = self.add([x, attn_output])
-    x = self.layernorm(x)
+	Parameters:
+	-----------
+	X: input attention matrix, 3D tensor:[batch_size, query_seq_length, key_seq_length]
+	valid_lens: 1D tensor specifying the valid length for each attention matrix: [batch_size, ]
 
-    return x
-"""
+	Returns:
+	--------
+	masked softmax attention score matrix
+	"""
+	shape_X = X.shape
+	X = tf.reshape(X, shape=(-1, X.shape[-1]))
+	maxlen = X.shape[1]
+	mask = tf.range(start=0, limit=X.shape[1], dtype=tf.float32)[None,:]
+	mask = tf.broadcast_to(mask, shape=(X.shape[0], X.shape[1]))
 
-class PositionalEncoding(tf.keras.layers.Layer):  #@save
+	valid_lens = tf.repeat(valid_lens, repeats = X.shape[1])
+	mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
+
+	X = tf.where(mask, X, value)
+
+	return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1), X
+
+
+
+class PositionalEncoding(tf.keras.layers.Layer):  
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
@@ -95,25 +107,27 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 
 
-class MultiHeadAttention(tf.keras.layers.Layer):  #@save
-    """Multi-head attention."""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 num_heads, dropout, bias=False, **kwargs):
-        super().__init__()
+class MultiHeadAttention(tf.keras.layers.Layer):  
+    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+    	"""
+    	Parameters:
+    	-----------
+    	num_hiddens: dimension for the embedding layer
+    	num_heads: numbers for the multihead attention
+    	dropout: dropout ratio
+    	"""
         self.num_heads = num_heads
         self.attention = DotProductAttention(dropout)
-        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
-        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
-        self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
-        self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
+        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+        self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+        #self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
 
     def call(self, queries, keys, values, valid_lens, **kwargs):
-        # Shape of queries, keys, or values:
-        # (batch_size, no. of queries or key-value pairs, num_hiddens)
-        # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-        # After transposing, shape of output queries, keys, or values:
-        # (batch_size * num_heads, no. of queries or key-value pairs,
-        # num_hiddens / num_heads)
+
         queries = self.W_q(queries)
         keys = self.W_k(keys)
         values = self.W_v(values)
@@ -128,18 +142,15 @@ class MultiHeadAttention(tf.keras.layers.Layer):  #@save
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
 
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = self.transpose_output(output)
-        return self.W_o(output_concat)
+        #output_concat = self.transpose_output(output)
+        return output
 
 
 class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
     """The Transformer encoder block."""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-    	num_heads, dropout, bias=False):
+    def __init__(self, num_hiddens, num_heads, dropout, bias=False):
         #super().__init__()
-        self.attention = MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
-            bias)
+        self.attention = MultiHeadAttention(num_hidden, num_heads, dropout,bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
@@ -152,14 +163,11 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
 
 class TransformerDecoderBlock(tf.keras.layers.Layer):
     # The i-th block in the Transformer decoder
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 num_heads, dropout):
+    def __init__(self, num_hiddens, num_heads, dropout):
         #super().__init__()
-        self.attention1 = MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.attention2 = MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
         self.addnorm3 = AddNorm(dropout)
@@ -177,12 +185,12 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
         return self.addnorm3(Z, self.ffn(Z), **kwargs), state
 
 
-class Drug_transformer(tf.keras.layers.Layer):
+class Drug_transformer():
 
 	def __init__(self, encoder_dim, decoder_dim, num_hidden, enc_valid_lens, doc_valid_lens, num_head,drop_out):
 		
 		self.trans_encoder = TransformerEncoderBlock(encoder_dim,encoder_dim,encoder_dim,num_hidden,num_head,drop_out)
-		#self.trans_decoder = TransformerDecoderBlock()
+		self.trans_decoder = TransformerDecoderBlock()
 		
 
 
