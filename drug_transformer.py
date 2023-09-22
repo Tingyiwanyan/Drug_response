@@ -1,9 +1,9 @@
 import tensorflow as tf
 import numpy as np
+from tensorflow.keras.layers import Input
 
-
+"""
 def masked_softmax(X, valid_lens):  #@save
-    """Perform softmax operation by masking elements on the last axis."""
     # X: 3D tensor, valid_lens: 1D or 2D tensor
     def _sequence_mask(X, valid_len, value=0):
         maxlen = X.shape[1]
@@ -29,9 +29,9 @@ def masked_softmax(X, valid_lens):  #@save
         X = _sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens,
                            value=-1e6)
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
+"""
 
-
-def masked_softmax(X, valid_lens, value):
+def masked_softmax(X, valid_lens, value=-1e6):
 	"""
 	Apply masked softmax to attention matrix, note, this function adapts
 	only to encoder
@@ -45,19 +45,21 @@ def masked_softmax(X, valid_lens, value):
 	--------
 	masked softmax attention score matrix
 	"""
-	shape_X = X.shape
-	X = tf.reshape(X, shape=(-1, X.shape[-1]))
-	maxlen = X.shape[1]
-	mask = tf.range(start=0, limit=shape_X[1], dtype=tf.float32)[None,:]
-	mask = tf.broadcast_to(mask, shape=(X.shape[0], shape_X[1]))
+	if valid_lens == None:
+		return tf.nn.softmax(X, axis=-1)
+	else:
+		shape_X = X.shape
+		X = tf.reshape(X, shape=(-1, X.shape[-1]))
+		maxlen = X.shape[1]
+		mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
+		mask = tf.broadcast_to(mask, shape=(X.shape[0], shape_X[-1]))
 
-	valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
-	mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
+		valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
+		mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
 
-	X = tf.where(mask, X, value)
+		X = tf.where(mask, X, value)
 
-	return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1), X, mask
-
+		return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)#, X, mask
 
 
 class PositionalEncoding(tf.keras.layers.Layer):  
@@ -95,10 +97,6 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
 
-    # Shape of queries: (batch_size, no. of queries, d)
-    # Shape of keys: (batch_size, no. of key-value pairs, d)
-    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
-    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     def call(self, queries, keys, values, valid_lens=None, **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
@@ -109,6 +107,7 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+    	super().__init__()
         self.num_heads = num_heads
         self.attention = DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
@@ -157,7 +156,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
 class TransformerDecoderBlock(tf.keras.layers.Layer):
     # The i-th block in the Transformer decoder
     def __init__(self, num_hiddens, num_heads, dropout):
-        #super().__init__()
+        super().__init__()
         self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
@@ -165,25 +164,58 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
         self.addnorm3 = AddNorm(dropout)
 
-    def call(self, X, enc_valid_lens, dec_valid_lens,**kwargs):
-        # Self-attention
-        X2 = self.attention1(X, key_values, key_values, dec_valid_lens,
-                             **kwargs)
+    def call(self, X, enc_outputs, enc_valid_lens, dec_valid_lens=None,**kwargs):
+        """
+        Parameters:
+        -----------
+        X: the decoder input sequence (query)
+        enc_outputs: the encoder output embedding (key & value)
+
+        Returns:
+		--------
+		decoder embedding output
+        """
+        X2 = self.attention1(X, X, X, dec_valid_lens, **kwargs)
         Y = self.addnorm1(X, X2, **kwargs)
         # Encoder-decoder attention. Shape of enc_outputs:
         # (batch_size, num_steps, num_hiddens)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens,
                              **kwargs)
         Z = self.addnorm2(Y, Y2, **kwargs)
-        return self.addnorm3(Z, self.ffn(Z), **kwargs), state
+        return self.addnorm3(Z, self.ffn(Z), **kwargs)
 
 
-class Drug_transformer():
-
-	def __init__(self, encoder_dim, decoder_dim, num_hidden, enc_valid_lens, doc_valid_lens, num_head,drop_out):
+class Drug_transformer(tf.keras.Model):
+	"""
+	Implement the drug transformer model architecture
+	"""
+	def __init__(self, num_hiddens, num_head=1,drop_out=0.1):
 		
-		self.trans_encoder = TransformerEncoderBlock(encoder_dim,encoder_dim,encoder_dim,num_hidden,num_head,drop_out)
-		#self.trans_decoder = TransformerDecoderBlock()
+		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_head=num_head,drop_out=drop_out)
+		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_head=num_head,drop_out=drop_out)
+
+		self.num_hiddens = num_hiddens
+		self.embedding_encoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.embedding_decoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+
+		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
+
+	def call(self, X, Y, enc_valid_lens, doc_valid_lens=None):
+		"""
+		construct the transformer model
+		"""
+		X = self.embedding_encoder(X)
+		X = self.pos_encoding(X)
+		X = self.trans_encoder(X)
+
+		Y = self.embedding_decoder(Y)
+		Y = self.trans_decoder(Y, X, enc_valid_lens)
+
+		return Y
+
+
 		
 
 
