@@ -107,8 +107,7 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
-    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
-		self.num_heads = num_heads
+	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
 		self.attention = DotProductAttention(dropout)
 		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
@@ -117,24 +116,24 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 
-    def call(self, queries, keys, values, valid_lens, **kwargs):
+	def call(self, queries, keys, values, valid_lens, **kwargs):
 
-        queries = self.W_q(queries)
-        keys = self.W_k(keys)
-        values = self.W_v(values)
+	    queries = self.W_q(queries)
+	    keys = self.W_k(keys)
+	    values = self.W_v(values)
 
-        #if valid_lens is not None:
-            # On axis 0, copy the first item (scalar or vector) for num_heads
-            # times, then copy the next item, and so on
-            #valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
+	    #if valid_lens is not None:
+	        # On axis 0, copy the first item (scalar or vector) for num_heads
+	        # times, then copy the next item, and so on
+	        #valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
 
-        # Shape of output: (batch_size * num_heads, no. of queries,
-        # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens, **kwargs)
+	    # Shape of output: (batch_size * num_heads, no. of queries,
+	    # num_hiddens / num_heads)
+	    output = self.attention(queries, keys, values, valid_lens, **kwargs)
 
-        # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        #output_concat = self.transpose_output(output)
-        return output
+	    # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
+	    #output_concat = self.transpose_output(output)
+	    return output
 
 
 class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
