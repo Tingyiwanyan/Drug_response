@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+from tensorflow.keras import regularizers
 
 """
 def masked_softmax(X, valid_lens):  #@save
