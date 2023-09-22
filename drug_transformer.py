@@ -189,8 +189,8 @@ class Drug_transformer():
 	"""
 	def __init__(self, num_hiddens, num_head=1,drop_out=0.1):
 		
-		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_head=num_head,drop_out=drop_out)
-		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_head=num_head,drop_out=drop_out)
+		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,drop_out=drop_out)
+		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,drop_out=drop_out)
 
 		self.num_hiddens = num_hiddens
 		self.embedding_encoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
@@ -205,8 +205,8 @@ class Drug_transformer():
 		construct the transformer model
 		"""
 		X_input = Input((None, 130, 56))
-		Y_input = Input((None, 130, 1))
-		enc_valid_lens = Input((None, ))
+		Y_input = Input((None, 5842, 1))
+		enc_valid_lens = Input((None,))
 
 		"""
 		drug smile sequence with position encoding
