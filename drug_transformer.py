@@ -140,7 +140,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
     """The Transformer encoder block."""
     def __init__(self, num_hiddens, num_heads, dropout, bias=False):
         #super().__init__()
-        self.attention = MultiHeadAttention(num_hidden, num_heads, dropout,bias)
+        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
