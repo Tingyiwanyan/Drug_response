@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
 
 """
 def masked_softmax(X, valid_lens):  #@save
@@ -107,16 +108,14 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
-    	#super().__init__()
-    	self.num_heads = num_heads
-        self.attention = DotProductAttention(dropout)
-        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-        self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-        #self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
+		self.num_heads = num_heads
+		self.attention = DotProductAttention(dropout)
+		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 
     def call(self, queries, keys, values, valid_lens, **kwargs):
 
@@ -124,10 +123,10 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         keys = self.W_k(keys)
         values = self.W_v(values)
 
-        if valid_lens is not None:
+        #if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
             # times, then copy the next item, and so on
-            valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
+            #valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
@@ -185,7 +184,7 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
         return self.addnorm3(Z, self.ffn(Z), **kwargs)
 
 
-class Drug_transformer(tf.keras.Model):
+class Drug_transformer():
 	"""
 	Implement the drug transformer model architecture
 	"""
@@ -202,18 +201,30 @@ class Drug_transformer(tf.keras.Model):
 
 		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
 
-	def call(self, X, Y, enc_valid_lens, doc_valid_lens=None):
+	def model_construction(self, enc_valid_lens, doc_valid_lens=None):
 		"""
 		construct the transformer model
 		"""
-		X = self.embedding_encoder(X)
-		X = self.pos_encoding(X)
-		X = self.trans_encoder(X)
+		X_input = Input((None, 130, 56))
+		Y_input = Input((None, 130, 1))
+		enc_valid_lens = Input((None, ))
 
-		Y = self.embedding_decoder(Y)
+		"""
+		drug smile sequence with position encoding
+		"""
+		X = self.embedding_encoder(X_input)
+		X = self.pos_encoding(X)
+		X = self.trans_encoder(X, enc_valid_lens)
+
+		"""
+		Gene expression without position encoding
+		"""
+		Y = self.embedding_decoder(Y_input)
 		Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		return Y
+		model = Model(inputs=(X_input, Y_input), outputs=Y)
+
+		return model
 
 
 		
