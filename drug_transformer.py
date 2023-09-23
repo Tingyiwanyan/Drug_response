@@ -38,7 +38,7 @@ def masked_softmax(X, valid_lens, value=-1e6):
 class PositionalEncoding(tf.keras.layers.Layer):  
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        #super().__init__()
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
         # Create a long enough P
         self.P = np.zeros((1, max_len, num_hiddens))
@@ -78,7 +78,7 @@ class AddNorm(tf.keras.layers.Layer):  #@save
 class DotProductAttention(tf.keras.layers.Layer):  #@save
     """Scaled dot product attention."""
     def __init__(self, dropout):
-        #super().__init__()
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
 
     def call(self, queries, keys, values, valid_lens=None, **kwargs):
@@ -91,6 +91,7 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
 	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+		super().__init__()
 		self.attention = DotProductAttention(dropout)
 		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
@@ -122,7 +123,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
     """The Transformer encoder block."""
     def __init__(self, num_hiddens, num_heads, dropout, bias=False):
-        #super().__init__()
+        super().__init__()
         self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
@@ -137,7 +138,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
 class TransformerDecoderBlock(tf.keras.layers.Layer):
     # The i-th block in the Transformer decoder
     def __init__(self, num_hiddens, num_heads, dropout):
-        #super().__init__()
+        super().__init__()
         self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(dropout)
         self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
