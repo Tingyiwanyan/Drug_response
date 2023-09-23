@@ -188,9 +188,9 @@ class Drug_transformer():
 		"""
 		construct the transformer model
 		"""
-		X_input = Input((None, 130, 56))
-		Y_input = Input((None, 5842, 1))
-		enc_valid_lens = Input((None,))
+		X_input = Input((130, 56))
+		Y_input = Input((5842, 1))
+		enc_valid_lens = Input((1))
 
 		"""
 		drug smile sequence with position encoding
