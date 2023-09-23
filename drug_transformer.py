@@ -25,7 +25,7 @@ def masked_softmax(X, valid_lens, value=-1e6):
 		X = tf.reshape(X, shape=(-1, X.shape[-1]))
 		maxlen = X.shape[1]
 		mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
-		mask = tf.broadcast_to(mask, shape=(X.shape[0], shape_X[-1]))
+		#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
 
 		valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 		mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
