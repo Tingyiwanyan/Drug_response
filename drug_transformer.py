@@ -190,7 +190,7 @@ class Drug_transformer():
 		"""
 		X_input = Input((130, 56))
 		Y_input = Input((5842, 1))
-		enc_valid_lens = Input((,))
+		enc_valid_lens = Input(())
 
 		"""
 		drug smile sequence with position encoding
