@@ -52,6 +52,17 @@ class PositionalEncoding(tf.keras.layers.Layer):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
 
+class PositionWiseFFN(tf.keras.layers.Layer):  #@save
+    """The positionwise feed-forward network."""
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
+        self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
+        self.relu = tf.keras.layers.ReLU()
+        self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
+
+    def call(self, X):
+        return self.dense2(self.relu(self.dense1(X)))
+        
 
 class AddNorm(tf.keras.layers.Layer):  #@save
     """The residual connection followed by layer normalization."""
