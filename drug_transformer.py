@@ -62,7 +62,7 @@ class PositionWiseFFN(tf.keras.layers.Layer):  #@save
 
     def call(self, X):
         return self.dense2(self.relu(self.dense1(X)))
-        
+
 
 class AddNorm(tf.keras.layers.Layer):  #@save
     """The residual connection followed by layer normalization."""
@@ -139,7 +139,7 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
     def __init__(self, num_hiddens, num_heads, dropout):
         #super().__init__()
         self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
-        self.addnorm1 = AddNorm(norm_shape, dropout)
+        self.addnorm1 = AddNorm(dropout)
         self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
