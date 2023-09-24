@@ -23,7 +23,7 @@ class masked_softmax(tf.keras.layers.Layer):
 			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
 
-			X = tf.where(mask, X, value)
+			X = tf.where(mask, X, self.value)
 
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
 
