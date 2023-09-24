@@ -19,15 +19,15 @@ class masked_softmax(tf.keras.layers.Layer):
 		if valid_lens == None:
 			return tf.nn.softmax(X, axis=-1)
 		else:
-			shape_X = X.shape
-			#X = tf.reshape(X, shape=(-1, X.shape[-1]))
+			shape_X = tf.shape(X)
+			X = tf.reshape(X, shape=(-1, X.shape[-1]))
 			print("x shape")
 			print(X.shape)
 			maxlen = X.shape[1]
 			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
-			#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
-			mask = tf.expand_dims(mask, 1)
-			mask = tf.broadcast_to(mask, shape=shape_X)
+			mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
+			#mask = tf.expand_dims(mask, 1)
+			#mask = tf.broadcast_to(mask, shape=shape_X)
 
 			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
@@ -40,8 +40,8 @@ class masked_softmax(tf.keras.layers.Layer):
 
 			X = tf.where(mask, X, self.value)
 
-			#return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
-			return tf.nn.softmax(X, axis=-1)
+			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+			#return tf.nn.softmax(X, axis=-1)
 
 
 #def masked_softmax(X, valid_lens, value=-1e6):
@@ -244,10 +244,10 @@ class Drug_transformer():
 		"""
 		Gene expression without position encoding
 		"""
-		Y = self.embedding_decoder(Y_input)
-		Y = self.trans_decoder(Y, X, enc_valid_lens)
+		#Y = self.embedding_decoder(Y_input)
+		#Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		model = Model(inputs=(X_input, Y_input), outputs=Y)
+		model = Model(inputs=X_input, outputs=X)
 
 		return model
 
