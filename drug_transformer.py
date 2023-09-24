@@ -7,11 +7,11 @@ from tensorflow.keras import regularizers
 
 class masked_softmax(tf.keras.layers.Layer):
 	def __init__(self, value=-1e6):
-        super().__init__()
-        self.value = value
+		super().__init__()
+		self.value = value
 
-    def call(self, X, valid_lens **kwargs):
-        if valid_lens == None:
+	def call(self, X, valid_lens **kwargs):
+		if valid_lens == None:
 			return tf.nn.softmax(X, axis=-1)
 		else:
 			shape_X = X.shape
