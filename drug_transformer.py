@@ -4,7 +4,31 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras import regularizers
 
-def masked_softmax(X, valid_lens, value=-1e6):
+
+class masked_softmax(tf.keras.layers.Layer):
+	def __init__(self, value=-1e6):
+        super().__init__()
+        self.value = value
+
+    def call(self, X, valid_lens **kwargs):
+        if valid_lens == None:
+			return tf.nn.softmax(X, axis=-1)
+		else:
+			shape_X = X.shape
+			X = tf.reshape(X, shape=(-1, X.shape[-1]))
+			maxlen = X.shape[1]
+			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
+			#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
+
+			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
+			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
+
+			X = tf.where(mask, X, value)
+
+			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+
+
+#def masked_softmax(X, valid_lens, value=-1e6):
 	"""
 	Apply masked softmax to attention matrix, note, this function adapts
 	only to encoder
@@ -17,6 +41,7 @@ def masked_softmax(X, valid_lens, value=-1e6):
 	Returns:
 	--------
 	masked softmax attention score matrix
+	"""
 	"""
 	if valid_lens == None:
 		return tf.nn.softmax(X, axis=-1)
@@ -33,7 +58,7 @@ def masked_softmax(X, valid_lens, value=-1e6):
 		X = tf.where(mask, X, value)
 
 		return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)#, X, mask
-
+	"""
 
 class PositionalEncoding(tf.keras.layers.Layer):  
     """Positional encoding."""
@@ -80,12 +105,13 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
     def __init__(self, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
+        self.masked_softmax = masked_softmax
 
     def call(self, queries, keys, values, valid_lens=None, **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
             tf.cast(d, dtype=tf.float32))
-        self.attention_weights = masked_softmax(scores, valid_lens)
+        self.attention_weights = self.masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 
 
