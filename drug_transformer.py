@@ -105,7 +105,7 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
     def __init__(self, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        self.masked_softmax = masked_softmax
+        self.masked_softmax = masked_softmax()
 
     def call(self, queries, keys, values, valid_lens=None, **kwargs):
         d = queries.shape[-1]
