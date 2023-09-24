@@ -11,21 +11,29 @@ class masked_softmax(tf.keras.layers.Layer):
 		self.value = value
 
 	def call(self, X, valid_lens, **kwargs):
+		"""
+		Parameters:
+		-----------
+		X: 2D tensor specifying the attention matrix [query_seq_length, key_seq_length]
+		"""
 		if valid_lens == None:
 			return tf.nn.softmax(X, axis=-1)
 		else:
 			shape_X = X.shape
-			X = tf.reshape(X, shape=(-1, X.shape[-1]))
+			#X = tf.reshape(X, shape=(-1, X.shape[-1]))
+			print("x shape")
+			print(X.shape)
 			maxlen = X.shape[1]
 			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
-			#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
+			mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
 
 			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
 
 			X = tf.where(mask, X, self.value)
 
-			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+			#return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+			return tf.nn.softmax(X, axis=-1)
 
 
 #def masked_softmax(X, valid_lens, value=-1e6):
