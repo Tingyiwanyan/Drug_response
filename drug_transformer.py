@@ -26,12 +26,17 @@ class masked_softmax(tf.keras.layers.Layer):
 			maxlen = X.shape[1]
 			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
 			#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
+			mask = tf.expand_dim(mask, 1)
+			mask = tf.broadcast_to(mask, shape=shape_X)
 
 			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
 
 			print("mask shape")
 			print(mask.shape)
+
+			print("valid_len shape")
+			print(valid_lens.shape)
 
 			X = tf.where(mask, X, self.value)
 
