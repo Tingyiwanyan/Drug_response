@@ -244,10 +244,10 @@ class Drug_transformer():
 		"""
 		Gene expression without position encoding
 		"""
-		#Y = self.embedding_decoder(Y_input)
-		#Y = self.trans_decoder(Y, X, enc_valid_lens)
+		Y = self.embedding_decoder(Y_input)
+		Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		model = Model(inputs=X_input, outputs=X)
+		model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
 		return model
 
