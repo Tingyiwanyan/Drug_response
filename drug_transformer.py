@@ -255,7 +255,7 @@ class Drug_transformer():
 		X = self.trans_encoder(X, enc_valid_lens)
 
 		intermediate_shape = tf.shape(X)
-		X = tf.reshape(x, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
+		X = tf.reshape(X, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
 
 		"""
 		Gene expression without position encoding
