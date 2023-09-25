@@ -267,7 +267,7 @@ class Drug_transformer():
 
 		#Y = self.fc_decoder(Y)
 		#Y = self.flattern(Y)
-		#Y = self.projection(Y)
+		Y = self.projection(Y)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
