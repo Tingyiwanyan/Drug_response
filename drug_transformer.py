@@ -244,7 +244,7 @@ class Drug_transformer():
 		construct the transformer model
 		"""
 		X_input = Input((130, 56))
-		Y_input = Input((5842, 1))
+		Y_input = Input((5842))
 		enc_valid_lens = Input(())
 
 		"""
@@ -254,15 +254,20 @@ class Drug_transformer():
 		X = self.pos_encoding(X)
 		X = self.trans_encoder(X, enc_valid_lens)
 
+		intermediate_shape = tf.shape(X)
+		X = tf.reshape(x, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
+
 		"""
 		Gene expression without position encoding
 		"""
 		Y = self.embedding_decoder(Y_input)
-		Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		Y = self.fc_decoder(Y)
-		Y = self.flattern(Y)
-		Y = self.projection(Y)
+		Y = tf.concat([X,Y],axis=1)
+		#Y = self.trans_decoder(Y, X, enc_valid_lens)
+
+		#Y = self.fc_decoder(Y)
+		#Y = self.flattern(Y)
+		#Y = self.projection(Y)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 

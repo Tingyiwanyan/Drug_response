@@ -426,7 +426,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expr
 	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
 	#cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
 
-	return gene_expression_array, drug_one_hot_encoding_array, ic50_list, drug_name_list
+	return cell_line_drug_feature, ic50_list, drug_name_list
 
 def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFrame, gene_expression_filtered: pd.DataFrame, index_array:list =None):
 	"""
