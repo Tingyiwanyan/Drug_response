@@ -229,7 +229,7 @@ class Drug_transformer():
 
 		self.flattern = tf.keras.layers.Flatten()
 
-		self.projection = tf.tf.keras.layers.Dense(1)
+		self.projection = tf.keras.layers.Dense(1)
 
 		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
 
