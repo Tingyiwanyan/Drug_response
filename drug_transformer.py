@@ -260,7 +260,7 @@ class Drug_transformer():
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
-		return model
+		#return model
 
 	def model_compile():
 		"""
