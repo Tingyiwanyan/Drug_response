@@ -136,7 +136,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
 		super().__init__()
 		self.attention = DotProductAttention(dropout)
-		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
+		self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
 		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
