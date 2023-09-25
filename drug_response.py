@@ -35,7 +35,7 @@ gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list
 drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot_encoding_test.shape[0],130,56])
 
 
-k = drug_transformer(200,50)
+k = Drug_transformer(200,50)
 k.model_construction()
 k.model_compile()
 
