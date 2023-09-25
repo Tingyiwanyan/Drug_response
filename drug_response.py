@@ -20,7 +20,7 @@ cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunc
 	test_sample_num)
 """
 
-
+"""
 gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 
@@ -32,9 +32,7 @@ gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list
 
 gene_expression_test = tf.reshape(gene_expression_test,[gene_expression_test.shape[0],gene_expression_test.shape[1],1])
 drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot_encoding_test.shape[0],130,56])
-
-
-
+"""
 
 
 #model = shallow_nn(cell_line_drug_feature.shape[1])
