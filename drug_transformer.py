@@ -262,7 +262,7 @@ class Drug_transformer():
 
 		#return model
 
-	def model_compile():
+	def model_compile(self):
 		"""
 		model compiling for training
 		"""
