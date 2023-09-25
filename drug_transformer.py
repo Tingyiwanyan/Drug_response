@@ -251,8 +251,8 @@ class Drug_transformer():
 		drug smile sequence with position encoding
 		"""
 		X = self.embedding_encoder(X_input)
-		X = self.pos_encoding(X)
-		X = self.trans_encoder(X, enc_valid_lens)
+		#X = self.pos_encoding(X)
+		#X = self.trans_encoder(X, enc_valid_lens)
 
 		intermediate_shape = tf.shape(X)
 		X = tf.reshape(X, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
@@ -265,7 +265,7 @@ class Drug_transformer():
 		Y = tf.concat([X,Y],axis=1)
 		#Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		#Y = self.fc_decoder(Y)
+		Y = self.fc_decoder(Y)
 		#Y = self.flattern(Y)
 		Y = self.projection(Y)
 

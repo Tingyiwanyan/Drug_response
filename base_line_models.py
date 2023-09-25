@@ -31,3 +31,4 @@ def shallow_nn(input_dim:float):
 	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 	return model
+
