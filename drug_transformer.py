@@ -213,7 +213,7 @@ class Drug_transformer():
 	"""
 	Implement the drug transformer model architecture
 	"""
-	def __init__(self, num_hiddens, num_head=1,drop_out=0.1):
+	def __init__(self, num_hiddens, num_hiddens_fc, num_head=1,drop_out=0.1):
 		
 		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
@@ -224,9 +224,16 @@ class Drug_transformer():
 		self.embedding_decoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
         	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 
+		self.fc_decoder = tf.keras.layers.Dense(num_hiddens_fc, use_bias=False, 
+        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+
+		self.flattern = tf.keras.layers.Flatten()
+
+		self.projection = tf.tf.keras.layers.Dense(1)
+
 		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
 
-	def model_construction(self, enc_valid_lens, doc_valid_lens=None):
+	def model_construction(self, doc_valid_lens=None):
 		"""
 		construct the transformer model
 		"""
@@ -247,9 +254,21 @@ class Drug_transformer():
 		Y = self.embedding_decoder(Y_input)
 		Y = self.trans_decoder(Y, X, enc_valid_lens)
 
-		model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
+		Y = self.fc_decoder(Y)
+		Y = self.flattern(Y)
+		Y = self.projection(Y)
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
 		return model
+
+	def model_compile():
+		"""
+		model compiling for training
+		"""
+		self.model.compile(loss= "mean_squared_error" , 
+			optimizer="adam", metrics=["mean_squared_error"])
+
 
 
 		
