@@ -21,11 +21,12 @@ class masked_softmax(tf.keras.layers.Layer):
 		else:
 			shape_X = tf.shape(X)
 			X = tf.reshape(X, shape=(-1, X.shape[-1]))
+			reshape_X = tf.shape(X)
 			print("x shape")
 			print(X.shape)
 			maxlen = X.shape[1]
 			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
-			mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
+			mask = tf.broadcast_to(mask, shape=reshape_X)
 			#mask = tf.expand_dims(mask, 1)
 			#mask = tf.broadcast_to(mask, shape=shape_X)
 
