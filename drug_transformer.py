@@ -136,7 +136,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
 		super().__init__()
 		self.attention = DotProductAttention(dropout)
-		self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
+		#self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
 		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
@@ -147,11 +147,11 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 	def call(self, queries, keys, values, valid_lens, **kwargs):
 
 	    queries = self.W_q(queries)
-	    queries = self.pos_encoding(queries)
+	    #queries = self.pos_encoding(queries)
 	    keys = self.W_k(keys)
-	    keys = self.pos_encoding(keys)
+	    #keys = self.pos_encoding(keys)
 	    values = self.W_v(values)
-	    values = self.pos_encoding(values)
+	    #values = self.pos_encoding(values)
 
 	    #if valid_lens is not None:
 	        # On axis 0, copy the first item (scalar or vector) for num_heads
