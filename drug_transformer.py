@@ -224,11 +224,11 @@ class Drug_transformer():
 		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 
-		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 
 		self.attention = DotProductAttention(dropout)
