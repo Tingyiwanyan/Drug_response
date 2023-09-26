@@ -129,8 +129,8 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
             tf.cast(d, dtype=tf.float32))
         self.attention_weights = self.masked_softmax(scores, valid_lens)
-        return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
-
+        return self.attention_weights
+        #return tf.matmul(self.attention_weights, values)
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
 	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
@@ -224,6 +224,15 @@ class Drug_transformer():
 		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 
+		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
+			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+
+		self.attention = DotProductAttention(dropout)
+
 		self.num_hiddens = num_hiddens
 		self.embedding_encoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
         	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
@@ -247,12 +256,27 @@ class Drug_transformer():
 		Y_input = Input((5842))
 		enc_valid_lens = Input(())
 
+		queries = self.W_q(X_input)
+	    #queries = self.pos_encoding(queries)
+	    keys = self.W_k(X_input)
+	    #keys = self.pos_encoding(keys)
+	    values = self.W_v(X_input)
+
+
+
 		"""
 		drug smile sequence with position encoding
 		"""
-		X = self.embedding_encoder(X_input)
+		#X = self.embedding_encoder(X_input)
 		#X = self.pos_encoding(X)
-		X = self.trans_encoder(X, enc_valid_lens)
+		#X = self.trans_encoder(X, enc_valid_lens)
+
+		attention = self.attention(queries, keys, values, enc_valid_lens)
+
+		X = tf.matmul(attention, values)
+
+		X = tf.keras.layers.Add()([X, values])
+
 
 		intermediate_shape = tf.shape(X)
 		X = tf.reshape(X, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
