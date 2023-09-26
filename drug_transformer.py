@@ -129,7 +129,8 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
             tf.cast(d, dtype=tf.float32))
         self.attention_weights = self.masked_softmax(scores, valid_lens)
-        return self.attention_weights
+        return scores
+        #return self.attention_weights
         #return tf.matmul(self.attention_weights, values)
 
 class MultiHeadAttention(tf.keras.layers.Layer):  
