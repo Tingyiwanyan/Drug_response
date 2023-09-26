@@ -257,10 +257,8 @@ class Drug_transformer():
 		enc_valid_lens = Input(())
 
 		queries = self.W_q(X_input)
-	    #queries = self.pos_encoding(queries)
-	    keys = self.W_k(X_input)
-	    #keys = self.pos_encoding(keys)
-	    values = self.W_v(X_input)
+		keys = self.W_k(X_input)
+		values = self.W_v(X_input)
 
 
 
