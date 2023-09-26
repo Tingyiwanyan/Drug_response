@@ -18,6 +18,7 @@ class masked_softmax(tf.keras.layers.Layer):
 		"""
 		if valid_lens == None:
 			return tf.nn.softmax(X, axis=-1)
+			print("Im here")
 		else:
 			shape_X = tf.shape(X)
 			X = tf.reshape(X, shape=(-1, X.shape[-1]))
@@ -225,12 +226,9 @@ class Drug_transformer():
 		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
 
-		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.W_q = tf.keras.layers.Dense(num_hiddens)
+		self.W_k = tf.keras.layers.Dense(num_hiddens)
+		self.W_v = tf.keras.layers.Dense(num_hiddens)
 
 		self.attention = DotProductAttention(drop_out)
 
