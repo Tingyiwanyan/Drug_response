@@ -231,7 +231,7 @@ class Drug_transformer():
 		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
 			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
 
-		self.attention = DotProductAttention(dropout)
+		self.attention = DotProductAttention(drop_out)
 
 		self.num_hiddens = num_hiddens
 		self.embedding_encoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
