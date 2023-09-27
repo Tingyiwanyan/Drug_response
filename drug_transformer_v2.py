@@ -63,16 +63,16 @@ class position_wise_embedding(tf.keras.Layers):
 	"""
 	def __init__(self, output_dim):
 		super().__init__()
-        self.output_dim = output_dim
+		self.output_dim = output_dim
 
-    def build(self, input_shape, **kwargs):
-    	self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
-    def call(self, input_data, **kwargs):
-    	output_embedding = tf.matmul(input_data, self.kernel)
+	def call(self, input_data, **kwargs):
+		output_embedding = tf.matmul(input_data, self.kernel)
 
-    	return output_embedding
+		return output_embedding
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
