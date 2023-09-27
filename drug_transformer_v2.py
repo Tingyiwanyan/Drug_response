@@ -92,6 +92,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	def __init__(self, output_dim):
 		super().__init__()
 		self.output_dim = output_dim
+		self.masked_softmax = masked_softmax()
 
 	def build(self, input_shape):
 		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
