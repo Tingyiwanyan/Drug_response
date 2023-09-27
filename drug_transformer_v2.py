@@ -107,7 +107,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query)
 		keys = tf.matmul(keys, self.kernel_key)
-		values = tf.matmul(values, self.ketnel_value)
+		values = tf.matmul(values, self.kernel_value)
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 		tf.cast(d, dtype=tf.float32))
