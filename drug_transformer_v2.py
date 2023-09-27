@@ -179,14 +179,14 @@ class concatenation_layer(tf.keras.layers.Layer):
 	"""
 	Define concatenation layer
 	"""
-    def __init__(self):
-        super().__init__()
+	def __init__(self):
+		super().__init__()
 
-    def call(self, X, Y, **kwargs):
-    	X = tf.math.l2_normalization(X, axis=-1)
-    	Y = tf.math.l2_normalization(Y, axis=-1)
+	def call(self, X, Y, **kwargs):
+		X = tf.math.l2_normalization(X, axis=-1)
+		Y = tf.math.l2_normalization(Y, axis=-1)
 
-        return tf.concat([X,Y],axis=1)
+		return tf.concat([X,Y],axis=1)
 
 
 class drug_transformer():
@@ -194,7 +194,7 @@ class drug_transformer():
 	Implement the drug transformer model architecture
 	"""
 	def __init__(self, num_hiddens, num_hiddens_fc):
-		
+
 		self.masked_softmax = masked_softmax()
 		self.position_wise_embedding = position_wise_embedding(100)
 		self.dotproductattention = dotproductattention(100)
@@ -236,7 +236,7 @@ class drug_transformer():
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
 
-		#return model
+	#return model
 
 	def model_compile(self):
 		"""
