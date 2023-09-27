@@ -53,7 +53,7 @@ class positionalEncoding(tf.keras.layers.Layer):
         return self.dropout(X, **kwargs)
 
 
-class position_wise_embedding(tf.keras.Layers):
+class position_wise_embedding(tf.keras.layers.Layer):
 	"""
 	Defome position wise embedding for sequence input embedding
 
