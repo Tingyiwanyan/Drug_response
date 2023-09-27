@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras import regularizers
+import keras.backend as K
 
 
 class masked_softmax(tf.keras.layers.Layer):

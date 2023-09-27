@@ -1,7 +1,7 @@
 import numpy as np
 from utils.process_data import *
 from base_line_models import *
-from drug_transformer import *
+from drug_transformer_v2 import *
 import scipy.stats
 #from sklearn import linear_model
 
@@ -35,7 +35,11 @@ gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list
 drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot_encoding_test.shape[0],130,56])
 
 
-k = Drug_transformer(200,50)
+train_dataset = tf.data.Dataset.from_tensor_slices(
+            (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
+
+
+k = drug_transformer(200,50)
 k.model_construction()
 k.model_compile()
 
