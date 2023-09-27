@@ -105,7 +105,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernal_query)
+		queries = tf.matmul(queries, self.kernel_query)
 		keys = tf.matmul(keys, self.kernel_key)
 		values = tf.matmul(values, self.ketnel_value)
 
