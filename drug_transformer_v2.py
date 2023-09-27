@@ -76,24 +76,24 @@ class position_wise_embedding(tf.keras.Layers):
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
-    """
-    Define scaled dot product layer
+	"""
+	Define scaled dot product layer
 
-    Parameters:
-    -----------
-    kernel_key: embedding matrix for key
-    kernel_value: embedding matrix for value
-    kernel_query: embedding matrix for query
+	Parameters:
+	-----------
+	kernel_key: embedding matrix for key
+	kernel_value: embedding matrix for value
+	kernel_query: embedding matrix for query
 
-    Returns:
-    --------
-    attention_score: the scale dot product score
-    """
-    def __init__(self, output_dim):
-        super().__init__()
-        self.output_dim = output_dim
+	Returns:
+	--------
+	attention_score: the scale dot product score
+	"""
+	def __init__(self, output_dim):
+		super().__init__()
+		self.output_dim = output_dim
 
-    def build(self, input_shape):
+	def build(self, input_shape):
 		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
@@ -103,19 +103,17 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 			initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
-    def call(self, queries, keys, values, valid_lens=None, **kwargs):
-    	d = queries.shape[-1]
-    	queries = tf.matmul(queries, self.kernal_query)
-    	keys = tf.matmul(keys, self.kernel_key)
-    	values = tf.matmul(values, self.ketnel_value)
+	def call(self, queries, keys, values, valid_lens=None, **kwargs):
+		d = queries.shape[-1]
+		queries = tf.matmul(queries, self.kernal_query)
+		keys = tf.matmul(keys, self.kernel_key)
+		values = tf.matmul(values, self.ketnel_value)
 
-        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-            tf.cast(d, dtype=tf.float32))
-        
-        self.attention_weights = self.masked_softmax(scores, valid_lens)
-        return self.attention_weights, values
-        #return self.attention_weights
-        #return tf.matmul(self.attention_weights, values)
+		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+		tf.cast(d, dtype=tf.float32))
+
+		self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return self.attention_weights, values
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
