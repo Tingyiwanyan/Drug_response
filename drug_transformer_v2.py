@@ -130,24 +130,24 @@ class attention_embedding(tf.keras.layers.Layer):
 	the attention embedding matrix
 	"""
 	def __init__(self):
-        super().__init__()
+		super().__init__()
 
-    def call(self, att_weights, input_value, **kwargs):
+	def call(self, att_weights, input_value, **kwargs):
 
-    	return tf.matmul(att_weight, input_value)
+		return tf.matmul(att_weight, input_value)
 
 
 class residual_connection(tf.keras.layers.Layer):
 	"""
 	Define reidual connection layer
 	"""
-    def __init__(self):
-        super().__init__()
+	def __init__(self):
+		super().__init__()
 
-    def call(self, X, Y, **kwargs):
-    	X = tf.math.l2_normalization(X, axis=-1)
-    	Y = tf.math.l2_normalization(Y, axis=-1)
-        return tf.math.add(X,Y)
+	def call(self, X, Y, **kwargs):
+		X = tf.math.l2_normalization(X, axis=-1)
+		Y = tf.math.l2_normalization(Y, axis=-1)
+		return tf.math.add(X,Y)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -165,14 +165,14 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	"""
 	def __init__(self, output_dim):
 		super().__init__()
-        self.output_dim = output_dim
+		self.output_dim = output_dim
 
-    def build(self, input_shape, **kwargs):
-    	self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+		initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
-    def call(self, input_data, **kwargs):
-    	output_embedding = tf.matmul(input_data, self.kernel)
+	def call(self, input_data, **kwargs):
+		output_embedding = tf.matmul(input_data, self.kernel)
 
 
 class concatenation_layer(tf.keras.layers.Layer):
