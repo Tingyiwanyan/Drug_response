@@ -53,7 +53,8 @@ class positionalencoding(tf.keras.layers.Layer):
 		#return self.dropout(X, **kwargs)
 
 		X = tf.math.l2_normalize(X, axis=-1)
-		self.P = tf.math.l2_normalize(self.P[:, :X.shape[1],:], axis=-1)
+		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :X.shape[1],:], axis=-1), 
+			dtype=tf.float32)
 
 		return tf.math.add(X,self.P)
 
