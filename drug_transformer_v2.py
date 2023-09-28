@@ -175,6 +175,8 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def call(self, input_data, **kwargs):
 		output_embedding = tf.matmul(input_data, self.kernel)
 
+		return output_embedding
+
 
 class concatenation_layer(tf.keras.layers.Layer):
 	"""
