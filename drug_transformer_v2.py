@@ -58,7 +58,7 @@ class positionalencoding(tf.keras.layers.Layer):
 		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
 			dtype=tf.float32)
 
-		return X + self.P
+		return tf.math.add(X, self.P)
 
 
 class position_wise_embedding(tf.keras.layers.Layer):
@@ -76,9 +76,12 @@ class position_wise_embedding(tf.keras.layers.Layer):
 	def build(self, input_shape, **kwargs):
 		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		b_init = tf.zeros_initializer()
+		self.b = tf.Variable(
+			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
 
 	def call(self, input_data, **kwargs):
-		output_embedding = tf.matmul(input_data, self.kernel)
+		output_embedding = tf.matmul(input_data, self.kernel) + self.b
 
 		return output_embedding
 
@@ -106,17 +109,27 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
+		b_init = tf.zeros_initializer()
+		self.b_key = tf.Variable(
+			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+
 		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		self.b_query = tf.Variable(
+			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
 
 		self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 			initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
+		self.b_value = tf.Variable(
+			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query)
-		keys = tf.matmul(keys, self.kernel_key)
-		values = tf.matmul(values, self.kernel_value)
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		values = tf.matmul(values, self.kernel_value) + self.b_value
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 		tf.cast(d, dtype=tf.float32))
@@ -207,17 +220,17 @@ class drug_transformer():
 	def __init__(self, num_hiddens, num_hiddens_fc):
 
 		self.masked_softmax = masked_softmax()
-		self.pos_encoding = positionalencoding(100,130)
-		self.position_wise_embedding = position_wise_embedding(100)
-		self.dotproductattention = dotproductattention(100)
+		self.pos_encoding = positionalencoding(50,130)
+		self.position_wise_embedding = position_wise_embedding(50)
+		self.dotproductattention = dotproductattention(50)
 		self.attention_embedding = attention_embedding()
 		self.residual_connection = residual_connection()
-		self.feed_forward_layer = feed_forward_layer(100)
+		self.feed_forward_layer = feed_forward_layer(50)
 		self.flattern = tf.keras.layers.Flatten()
 		self.projection = tf.keras.layers.Dense(1)
 		self.concatenation_layer = concatenation_layer()
 
-		self.feed_forward_encoder_layer = feed_forward_layer(500)
+		self.feed_forward_encoder_layer = feed_forward_layer(50)
 
 	def model_construction(self):
 		"""
