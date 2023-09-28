@@ -135,7 +135,7 @@ class attention_embedding(tf.keras.layers.Layer):
 
 	def call(self, att_weights, input_value, **kwargs):
 
-		return tf.matmul(att_weight, input_value)
+		return tf.matmul(att_weights, input_value)
 
 
 class residual_connection(tf.keras.layers.Layer):
