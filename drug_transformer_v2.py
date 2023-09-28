@@ -78,7 +78,7 @@ class position_wise_embedding(tf.keras.layers.Layer):
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 		b_init = tf.zeros_initializer()
 		self.b = tf.Variable(
-			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, input_data, **kwargs):
 		output_embedding = tf.matmul(input_data, self.kernel) + self.b
@@ -111,19 +111,19 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 		b_init = tf.zeros_initializer()
 		self.b_key = tf.Variable(
-			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
 		self.b_query = tf.Variable(
-			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 			initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
 		self.b_value = tf.Variable(
-			initial_value=b_init(shape=(input_shape[-1],), dtype="float32"), trainable=True)
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
