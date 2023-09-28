@@ -36,23 +36,23 @@ class masked_softmax(tf.keras.layers.Layer):
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
 
 class positionalencoding(tf.keras.layers.Layer):  
-    """Positional encoding."""
-    def __init__(self, num_hiddens, max_len=1000):
-        super().__init__()
-        #self.dropout = tf.keras.layers.Dropout(dropout)
-        # Create a long enough P
-        self.P = np.zeros((1, max_len, num_hiddens))
-        X = np.arange(max_len, dtype=np.float32).reshape(
-            -1,1)/np.power(10000, np.arange(
-            0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
-        self.P[:, :, 0::2] = np.sin(X)
-        self.P[:, :, 1::2] = np.cos(X)
+	"""Positional encoding."""
+	def __init__(self, num_hiddens, max_len=1000):
+		super().__init__()
+		#self.dropout = tf.keras.layers.Dropout(dropout)
+		# Create a long enough P
+		self.P = np.zeros((1, max_len, num_hiddens))
+		X = np.arange(max_len, dtype=np.float32).reshape(
+			-1,1)/np.power(10000, np.arange(
+				0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
+		self.P[:, :, 0::2] = np.sin(X)
+		self.P[:, :, 1::2] = np.cos(X)
 
-    def call(self, X, **kwargs):
-        #X = X + self.P[:, :X.shape[1], :]
-        #return self.dropout(X, **kwargs)
+	def call(self, X, **kwargs):
+		#X = X + self.P[:, :X.shape[1], :]
+		#return self.dropout(X, **kwargs)
 
-        X = tf.math.l2_normalize(X, axis=-1)
+		X = tf.math.l2_normalize(X, axis=-1)
 		self.P = tf.math.l2_normalize(self.P[:, :X.shape[1],:], axis=-1)
 
 		return tf.math.add(X,self.P)
