@@ -47,14 +47,13 @@ class positionalencoding(tf.keras.layers.Layer):
 				0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
 		self.P[:, :, 0::2] = np.sin(X)
 		self.P[:, :, 1::2] = np.cos(X)
-		self.shape_X = tf.shape(X)
-
+		
 	def call(self, X, **kwargs):
 		#X = X + self.P[:, :X.shape[1], :]
 		#return self.dropout(X, **kwargs)
-
+		shape_X = tf.shape(X)
 		X = tf.math.l2_normalize(X, axis=-1)
-		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.shape_X[1],:], axis=-1), 
+		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :shape_X[1],:], axis=-1), 
 			dtype=tf.float32)
 
 		return tf.math.add(X,self.P)
