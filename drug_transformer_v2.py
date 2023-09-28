@@ -42,11 +42,13 @@ class positionalencoding(tf.keras.layers.Layer):
 		#self.dropout = tf.keras.layers.Dropout(dropout)
 		# Create a long enough P
 		self.num_length = num_length
+		self.max_len = max_len
+		self.num_hiddens = num_hiddens
 	def call(self, X, **kwargs):
 		#X = X + self.P[:, :X.shape[1], :]
 		#return self.dropout(X, **kwargs)
-		self.P = np.zeros((1, max_len, num_hiddens))
-		XX = np.arange(max_len, dtype=np.float32).reshape(
+		self.P = np.zeros((1, self.max_len, self.num_hiddens))
+		XX = np.arange(self.max_len, dtype=np.float32).reshape(
 			-1,1)/np.power(10000, np.arange(
 				0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
 		self.P[:, :, 0::2] = np.sin(XX)
