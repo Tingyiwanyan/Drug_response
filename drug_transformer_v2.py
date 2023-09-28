@@ -37,7 +37,7 @@ class masked_softmax(tf.keras.layers.Layer):
 
 class positionalencoding(tf.keras.layers.Layer):  
 	"""Positional encoding."""
-	def __init__(self, num_hiddens, max_len=1000):
+	def __init__(self, num_hiddens, num_length, max_len=1000):
 		super().__init__()
 		#self.dropout = tf.keras.layers.Dropout(dropout)
 		# Create a long enough P
@@ -53,7 +53,7 @@ class positionalencoding(tf.keras.layers.Layer):
 		#return self.dropout(X, **kwargs)
 		shape_X = tf.shape(X)
 		X = tf.math.l2_normalize(X, axis=-1)
-		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :shape_X[1],:], axis=-1), 
+		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :num_length,:], axis=-1), 
 			dtype=tf.float32)
 
 		return tf.math.add(X,self.P)
@@ -205,7 +205,7 @@ class drug_transformer():
 	def __init__(self, num_hiddens, num_hiddens_fc):
 
 		self.masked_softmax = masked_softmax()
-		self.pos_encoding = positionalencoding(100)
+		self.pos_encoding = positionalencoding(100,130)
 		self.position_wise_embedding = position_wise_embedding(100)
 		self.dotproductattention = dotproductattention(100)
 		self.attention_embedding = attention_embedding()
