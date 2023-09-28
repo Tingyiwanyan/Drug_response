@@ -35,11 +35,11 @@ class masked_softmax(tf.keras.layers.Layer):
 
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
 
-class positionalEncoding(tf.keras.layers.Layer):  
+class positionalencoding(tf.keras.layers.Layer):  
     """Positional encoding."""
-    def __init__(self, num_hiddens, dropout, max_len=1000):
+    def __init__(self, num_hiddens, max_len=1000):
         super().__init__()
-        self.dropout = tf.keras.layers.Dropout(dropout)
+        #self.dropout = tf.keras.layers.Dropout(dropout)
         # Create a long enough P
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(max_len, dtype=np.float32).reshape(
@@ -49,8 +49,13 @@ class positionalEncoding(tf.keras.layers.Layer):
         self.P[:, :, 1::2] = np.cos(X)
 
     def call(self, X, **kwargs):
-        X = X + self.P[:, :X.shape[1], :]
-        return self.dropout(X, **kwargs)
+        #X = X + self.P[:, :X.shape[1], :]
+        #return self.dropout(X, **kwargs)
+
+        X = tf.math.l2_normalize(X, axis=-1)
+		self.P = tf.math.l2_normalize(self.P[:, :X.shape[1],:], axis=-1)
+
+		return tf.math.add(X,self.P)
 
 
 class position_wise_embedding(tf.keras.layers.Layer):
@@ -199,6 +204,7 @@ class drug_transformer():
 	def __init__(self, num_hiddens, num_hiddens_fc):
 
 		self.masked_softmax = masked_softmax()
+		self.pos_encoding = positionalencoding(100)
 		self.position_wise_embedding = position_wise_embedding(100)
 		self.dotproductattention = dotproductattention(100)
 		self.attention_embedding = attention_embedding()
@@ -219,6 +225,8 @@ class drug_transformer():
 		enc_valid_lens = Input(())
 
 		X = self.position_wise_embedding(X_input)
+
+		X = self.pos_encoding(X)
 
 		score, value = self.dotproductattention(X, X, X)
 
