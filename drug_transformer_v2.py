@@ -92,7 +92,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	def __init__(self, output_dim):
 		super().__init__()
 		self.output_dim = output_dim
-		self.masked_softmax = masked_softmax()
+		#self.masked_softmax = masked_softmax()
 
 	def build(self, input_shape):
 		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
@@ -113,8 +113,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 		tf.cast(d, dtype=tf.float32))
 
-		self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return self.attention_weights, values
+		#self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return scores, values
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
@@ -220,7 +220,9 @@ class drug_transformer():
 
 		X = self.position_wise_embedding(X_input)
 
-		att_score, value = self.dotproductattention(X, X, X)
+		score, value = self.dotproductattention(X, X, X)
+
+		att_score = self.masked_softmax(score)
 
 		att_embedding = self.attention_embedding(att_score, value)
 
