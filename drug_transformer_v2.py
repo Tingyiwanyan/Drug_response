@@ -56,7 +56,7 @@ class positionalencoding(tf.keras.layers.Layer):
 		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
 			dtype=tf.float32)
 
-		return tf.math.add(X,self.P)
+		return X + self.P
 
 
 class position_wise_embedding(tf.keras.layers.Layer):
