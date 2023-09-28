@@ -210,7 +210,7 @@ class drug_transformer():
 
 		self.feed_forward_encoder_layer = feed_forward_layer(500)
 
-	def model_construction(self, doc_valid_lens=None):
+	def model_construction(self):
 		"""
 		construct the transformer model
 		"""
@@ -222,7 +222,7 @@ class drug_transformer():
 
 		score, value = self.dotproductattention(X, X, X)
 
-		att_score = self.masked_softmax(score)
+		att_score = self.masked_softmax(score, enc_valid_lens)
 
 		att_embedding = self.attention_embedding(att_score, value)
 
