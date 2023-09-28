@@ -50,7 +50,7 @@ class positionalencoding(tf.keras.layers.Layer):
 		self.P = np.zeros((1, self.max_len, self.num_hiddens))
 		XX = np.arange(self.max_len, dtype=np.float32).reshape(
 			-1,1)/np.power(10000, np.arange(
-				0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
+				0, self.num_hiddens, 2, dtype=np.float32) / self.num_hiddens)
 		self.P[:, :, 0::2] = np.sin(XX)
 		self.P[:, :, 1::2] = np.cos(XX)
 		shape_X = tf.shape(X)
