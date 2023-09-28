@@ -146,8 +146,8 @@ class residual_connection(tf.keras.layers.Layer):
 		super().__init__()
 
 	def call(self, X, Y, **kwargs):
-		X = tf.math.l2_normalization(X, axis=-1)
-		Y = tf.math.l2_normalization(Y, axis=-1)
+		X = tf.math.l2_normalize(X, axis=-1)
+		Y = tf.math.l2_normalize(Y, axis=-1)
 		return tf.math.add(X,Y)
 
 
@@ -184,8 +184,8 @@ class concatenation_layer(tf.keras.layers.Layer):
 		super().__init__()
 
 	def call(self, X, Y, **kwargs):
-		X = tf.math.l2_normalization(X, axis=-1)
-		Y = tf.math.l2_normalization(Y, axis=-1)
+		X = tf.math.l2_normalize(X, axis=-1)
+		Y = tf.math.l2_normalize(Y, axis=-1)
 
 		return tf.concat([X,Y],axis=1)
 
