@@ -39,7 +39,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
             (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
 
 
-k = drug_transformer(200,50)
+k = drug_transformer()
 k.model_construction()
 k.model_compile()
 

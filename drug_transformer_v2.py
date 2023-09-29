@@ -58,7 +58,7 @@ class positionalencoding(tf.keras.layers.Layer):
 		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
 			dtype=tf.float32)
 
-		return tf.math.add(X, self.P)
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X, self.P), axis=-1), dtype=tf.float32)
 
 
 class position_wise_embedding(tf.keras.layers.Layer):
@@ -83,7 +83,7 @@ class position_wise_embedding(tf.keras.layers.Layer):
 	def call(self, input_data, **kwargs):
 		output_embedding = tf.matmul(input_data, self.kernel) + self.b
 
-		return output_embedding
+		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
@@ -132,7 +132,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		values = tf.matmul(values, self.kernel_value) + self.b_value
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-		tf.cast(d, dtype=tf.float32))
+			tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
 		return scores, values
@@ -156,7 +156,7 @@ class attention_embedding(tf.keras.layers.Layer):
 
 	def call(self, att_weights, input_value, **kwargs):
 
-		return tf.matmul(att_weights, input_value)
+		return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
 
 
 class residual_connection(tf.keras.layers.Layer):
@@ -169,7 +169,7 @@ class residual_connection(tf.keras.layers.Layer):
 	def call(self, X, Y, **kwargs):
 		X = tf.math.l2_normalize(X, axis=-1)
 		Y = tf.math.l2_normalize(Y, axis=-1)
-		return tf.math.add(X,Y)
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -192,11 +192,14 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def build(self, input_shape, **kwargs):
 		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
 		initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		b_init = tf.zeros_initializer()
+		self.b = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, input_data, **kwargs):
-		output_embedding = tf.matmul(input_data, self.kernel)
+		output_embedding = tf.matmul(input_data, self.kernel) + self.b
 
-		return output_embedding
+		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
 
 
 class concatenation_layer(tf.keras.layers.Layer):
@@ -210,27 +213,118 @@ class concatenation_layer(tf.keras.layers.Layer):
 		X = tf.math.l2_normalize(X, axis=-1)
 		Y = tf.math.l2_normalize(Y, axis=-1)
 
-		return tf.concat([X,Y],axis=1)
+		return tf.cast(tf.math.l2_normalize(tf.concat([X,Y],axis=1), axis=-1), dtype=tf.float32)
+
+
+class encoder_block(tf.keras.layers.Layer):
+	"""
+	Define self attention encoder block, add the position encoding
+	since drug smile sequence has the order information
+
+	Parameters:
+	-----------
+	num_hiddens: the hidden dimension for embedding matrix
+	seq_length: the length for input sequence
+
+	Returns:
+	-------
+	encoder_embedding: the encoder embedding output
+	att_score: the self attention score
+	"""
+	def __init__(self, num_hiddens, seq_length):
+		super().__init__()
+		self.masked_softmax = masked_softmax()
+		self.pos_encoding = positionalencoding(num_hiddens,130)
+		self.position_wise_embedding = position_wise_embedding(num_hiddens)
+		self.dotproductattention = dotproductattention(num_hiddens)
+		self.attention_embedding = attention_embedding()
+		self.residual_connection = residual_connection()
+
+	def call(self, X, enc_valid_lens, **kwargs):
+		X = self.position_wise_embedding(X)
+		X = self.pos_encoding(X)
+		score, value = self.dotproductattention(X, X, X)
+		att_score = self.masked_softmax(score, enc_valid_lens)
+		att_embedding = self.attention_embedding(att_score, value)
+		encoder_embedding = self.residual_connection(att_embedding, value)
+
+		return encoder_embedding, att_score
+
+
+class decoder_block(tf.keras.layers.Layer):
+	"""
+	Define self-attention & cross attention decoder block, since 
+	gene expression doesn't contain sequencing information, so 
+	we don't add position encoding in the embedding layer. 
+
+	Parameters:
+	-----------
+	num_hiddens_self: hidden embedding dimension for the self att block
+	num_hiddens_cross: hidden embedding dimension for the cross att block
+
+	Returns:
+	--------
+	cross_decoder_embedding: the decoder embedding output
+	self_att_score: the self att score in decoder self att block
+	cross_att_score: the cross att score in the decoder cross att block
+	"""
+	def __init__(self, num_hiddens_self, num_hiddens_cross):
+		super().__init__()
+		self.masked_softmax = masked_softmax()
+		self.position_wise_embedding = position_wise_embedding(num_hiddens_self)
+		self.self_dotproductattention = dotproductattention(num_hiddens_self)
+		self.self_att_embedding = attention_embedding()
+		self.self_residual_connection = residual_connection()
+
+		self.cross_att_dotproduct = dotproductattention(num_hiddens_cross)
+		self.cross_att_embedding = attention_embedding()
+		self.cross_residual_connection = residual_connection()
+		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_cross)
+
+	def call(self, X, encoder_output, **kwargs):
+		X = self.position_wise_embedding(X)
+		score, value = self.dotproductattention(X, X, X)
+		self_att_score = self.masked_softmax(score)
+		self_att_embedding = self.self_att_embedding(self_att_score, value)
+		self_encoder_embedding = self.self_residual_connection(self_att_embedding, value)
+
+		cross_score, cross_value = self.cross_att_dotproduct(self_encoder_embedding,encoder_output, 
+			encoder_output)
+		cross_att_score = self.masked_softmax(cross_score)
+		cross_att_embedding = self.cross_att_embedding(cross_att_score, cross_value)
+		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, cross_value)
+		cross_decoder_embedding = self.cross_position_wise_embedding(cross_decoder_embedding)
+
+		return cross_decoder_embedding, self_att_score, cross_att_score
+
 
 
 class drug_transformer():
 	"""
 	Implement the drug transformer model architecture
 	"""
-	def __init__(self, num_hiddens, num_hiddens_fc):
+	def __init__(self):
 
-		self.masked_softmax = masked_softmax()
-		self.pos_encoding = positionalencoding(50,130)
-		self.position_wise_embedding = position_wise_embedding(50)
-		self.dotproductattention = dotproductattention(50)
-		self.attention_embedding = attention_embedding()
-		self.residual_connection = residual_connection()
-		self.feed_forward_layer = feed_forward_layer(50)
+		"""
+		encoder block 1
+		"""
+		self.encoder_1 = encoder_block(23, 130)
+
+		"""
+		decoder block 1
+		"""
+		self.decoder_1 = decoder_block(23, 23)
+
+		"""
+		flattern layer, fully connected layer and final projection layer
+		"""
+		
 		self.flattern = tf.keras.layers.Flatten()
+		self.fc_layer = feed_forward_layer(50)
 		self.projection = tf.keras.layers.Dense(1)
-		self.concatenation_layer = concatenation_layer()
+		#self.concatenation_layer = concatenation_layer()
 
-		self.feed_forward_encoder_layer = feed_forward_layer(50)
+		#self.feed_forward_encoder_layer = feed_forward_layer(50)
 
 	def model_construction(self):
 		"""
@@ -240,27 +334,13 @@ class drug_transformer():
 		Y_input = Input((5842))
 		enc_valid_lens = Input(())
 
-		X = self.position_wise_embedding(X_input)
+		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
 
-		X = self.pos_encoding(X)
+		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y, X)
 
-		score, value = self.dotproductattention(X, X, X)
-
-		att_score = self.masked_softmax(score, enc_valid_lens)
-
-		att_embedding = self.attention_embedding(att_score, value)
-
-		encoder_embedding = self.residual_connection(att_embedding, value)
-
-		encoder_flattern = self.flattern(encoder_embedding)
-
-		encoder_flattern_ = self.feed_forward_encoder_layer(encoder_flattern)
-
-		decoder_embedding = self.feed_forward_layer(Y_input)
-
-		final_embedding = self.concatenation_layer(encoder_flattern_, decoder_embedding)
-
-		prediction = self.projection(final_embedding)
+		Y = self.flattern(Y)
+		Y = self.fc_layer(Y)
+		prediction = self.projection(Y)
 
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
