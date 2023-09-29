@@ -188,7 +188,7 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def __init__(self, output_dim):
 		super().__init__()
 		self.output_dim = output_dim
-		self.dropout = tf.keras.layers.Dropout(0.1)
+		self.dropout = tf.keras.layers.Dropout(0.2)
 
 	def build(self, input_shape, **kwargs):
 		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
@@ -309,7 +309,7 @@ class drug_transformer():
 		"""
 		encoder block 1
 		"""
-		self.encoder_1 = encoder_block(10, 130)
+		self.encoder_1 = encoder_block(20, 130)
 
 		"""
 		decoder block 1
@@ -321,7 +321,7 @@ class drug_transformer():
 		"""
 		
 		self.flattern = tf.keras.layers.Flatten()
-		self.fc_layer = feed_forward_layer(20)
+		self.fc_layer = feed_forward_layer(1)
 		self.projection = tf.keras.layers.Dense(1)
 		#self.concatenation_layer = concatenation_layer()
 
