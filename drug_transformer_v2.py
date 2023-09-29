@@ -308,12 +308,12 @@ class drug_transformer():
 		"""
 		encoder block 1
 		"""
-		self.encoder_1 = encoder_block(23, 130)
+		self.encoder_1 = encoder_block(50, 130)
 
 		"""
 		decoder block 1
 		"""
-		self.decoder_1 = decoder_block(23, 23)
+		self.decoder_1 = decoder_block(50, 23)
 
 		"""
 		flattern layer, fully connected layer and final projection layer
