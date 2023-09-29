@@ -234,7 +234,7 @@ class encoder_block(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens, seq_length):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
-		self.pos_encoding = positionalencoding(num_hiddens,130)
+		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
 		self.position_wise_embedding = position_wise_embedding(num_hiddens)
 		self.dotproductattention = dotproductattention(num_hiddens)
 		self.attention_embedding = attention_embedding()
@@ -268,18 +268,18 @@ class decoder_block(tf.keras.layers.Layer):
 	self_att_score: the self att score in decoder self att block
 	cross_att_score: the cross att score in the decoder cross att block
 	"""
-	def __init__(self, num_hiddens_self, num_hiddens_cross):
+	def __init__(self, num_hiddens):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
-		self.position_wise_embedding = position_wise_embedding(num_hiddens_self)
-		self.self_dotproductattention = dotproductattention(num_hiddens_self)
+		self.position_wise_embedding = position_wise_embedding(num_hiddens)
+		self.self_dotproductattention = dotproductattention(num_hiddens)
 		self.self_att_embedding = attention_embedding()
 		self.self_residual_connection = residual_connection()
 
-		self.cross_att_dotproduct = dotproductattention(num_hiddens_cross)
+		self.cross_att_dotproduct = dotproductattention(num_hiddens)
 		self.cross_att_embedding = attention_embedding()
 		self.cross_residual_connection = residual_connection()
-		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_cross)
+		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens)
 
 	def call(self, X, encoder_output, **kwargs):
 		X = self.position_wise_embedding(X)
@@ -313,7 +313,7 @@ class drug_transformer():
 		"""
 		decoder block 1
 		"""
-		self.decoder_1 = decoder_block(50, 23)
+		self.decoder_1 = decoder_block(50)
 
 		"""
 		flattern layer, fully connected layer and final projection layer
