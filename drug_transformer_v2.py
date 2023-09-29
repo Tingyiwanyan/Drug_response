@@ -336,7 +336,7 @@ class drug_transformer():
 
 		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
 
-		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y, X)
+		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X)
 
 		Y = self.flattern(Y)
 		Y = self.fc_layer(Y)
