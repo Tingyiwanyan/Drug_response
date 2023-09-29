@@ -269,7 +269,7 @@ class decoder_block(tf.keras.layers.Layer):
 	self_att_score: the self att score in decoder self att block
 	cross_att_score: the cross att score in the decoder cross att block
 	"""
-	def __init__(self, num_hiddens):
+	def __init__(self, num_hiddens, num_hiddens_output):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.position_wise_embedding = position_wise_embedding(num_hiddens)
@@ -280,7 +280,7 @@ class decoder_block(tf.keras.layers.Layer):
 		self.cross_att_dotproduct = dotproductattention(num_hiddens)
 		self.cross_att_embedding = attention_embedding()
 		self.cross_residual_connection = residual_connection()
-		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens)
+		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_output)
 
 	def call(self, X, encoder_output, **kwargs):
 		X = self.position_wise_embedding(X)
@@ -314,14 +314,14 @@ class drug_transformer():
 		"""
 		decoder block 1
 		"""
-		self.decoder_1 = decoder_block(10)
+		self.decoder_1 = decoder_block(20, 1)
 
 		"""
 		flattern layer, fully connected layer and final projection layer
 		"""
 		
 		self.flattern = tf.keras.layers.Flatten()
-		self.fc_layer = feed_forward_layer(1)
+		self.fc_layer = feed_forward_layer(20)
 		self.projection = tf.keras.layers.Dense(1)
 		#self.concatenation_layer = concatenation_layer()
 
