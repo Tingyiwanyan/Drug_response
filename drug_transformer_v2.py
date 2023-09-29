@@ -188,6 +188,7 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def __init__(self, output_dim):
 		super().__init__()
 		self.output_dim = output_dim
+		self.dropout = tf.keras.layers.Dropout(0.1)
 
 	def build(self, input_shape, **kwargs):
 		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
@@ -199,7 +200,7 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def call(self, input_data, **kwargs):
 		output_embedding = tf.matmul(input_data, self.kernel) + self.b
 
-		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
+		return self.dropout(tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32),**kwargs)
 
 
 class concatenation_layer(tf.keras.layers.Layer):
@@ -308,19 +309,19 @@ class drug_transformer():
 		"""
 		encoder block 1
 		"""
-		self.encoder_1 = encoder_block(20, 130)
+		self.encoder_1 = encoder_block(10, 130)
 
 		"""
 		decoder block 1
 		"""
-		self.decoder_1 = decoder_block(20)
+		self.decoder_1 = decoder_block(10)
 
 		"""
 		flattern layer, fully connected layer and final projection layer
 		"""
 		
 		self.flattern = tf.keras.layers.Flatten()
-		self.fc_layer = feed_forward_layer(50)
+		self.fc_layer = feed_forward_layer(20)
 		self.projection = tf.keras.layers.Dense(1)
 		#self.concatenation_layer = concatenation_layer()
 
