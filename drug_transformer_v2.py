@@ -292,7 +292,7 @@ class decoder_block(tf.keras.layers.Layer):
 			encoder_output)
 		cross_att_score = self.masked_softmax(cross_score)
 		cross_att_embedding = self.cross_att_embedding(cross_att_score, cross_value)
-		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, cross_value)
+		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, self_encoder_embedding)
 		cross_decoder_embedding = self.cross_position_wise_embedding(cross_decoder_embedding)
 
 		return cross_decoder_embedding, self_att_score, cross_att_score
