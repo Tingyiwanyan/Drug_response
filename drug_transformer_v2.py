@@ -11,7 +11,7 @@ class masked_softmax(tf.keras.layers.Layer):
 		super().__init__()
 		self.value = value
 
-	def call(self, X, valid_lens, **kwargs):
+	def call(self, X, valid_lens=None, **kwargs):
 		"""
 		Parameters:
 		-----------
