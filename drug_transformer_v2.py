@@ -331,7 +331,7 @@ class drug_transformer():
 		construct the transformer model
 		"""
 		X_input = Input((130, 56))
-		Y_input = Input((5842))
+		Y_input = Input((5842, 1))
 		enc_valid_lens = Input(())
 
 		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
