@@ -283,7 +283,7 @@ class decoder_block(tf.keras.layers.Layer):
 
 	def call(self, X, encoder_output, **kwargs):
 		X = self.position_wise_embedding(X)
-		score, value = self.dotproductattention(X, X, X)
+		score, value = self.self_dotproductattention(X, X, X)
 		self_att_score = self.masked_softmax(score)
 		self_att_embedding = self.self_att_embedding(self_att_score, value)
 		self_encoder_embedding = self.self_residual_connection(self_att_embedding, value)
