@@ -340,7 +340,7 @@ class drug_transformer():
 		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X)
 
 		Y = self.flattern(Y)
-		Y = self.fc_layer(Y)
+		#Y = self.fc_layer(Y)
 		prediction = self.projection(Y)
 
 
