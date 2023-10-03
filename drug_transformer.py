@@ -325,6 +325,12 @@ class drug_transformer():
 
 		#self.feed_forward_encoder_layer = feed_forward_layer(50)
 
+		"""
+		trying out simple position-wise embedding
+		"""
+		self.position_wise_embedding_encoder = position_wise_embedding(50)
+		self.position_wise_embedding_decoder = position_wise_embedding(50)
+
 	def model_construction(self):
 		"""
 		construct the transformer model
@@ -333,6 +339,7 @@ class drug_transformer():
 		Y_input = Input((5842, 1))
 		enc_valid_lens = Input(())
 
+		"""
 		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
 
 		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X, enc_valid_lens)
@@ -348,6 +355,20 @@ class drug_transformer():
 
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
+		"""
+
+		X = self.position_wise_embedding_encoder(X_input)
+		Y = self.position_wise_embedding_decoder(Y_input)
+
+		X = self.flattern(X)
+		Y = self.flattern(Y)
+
+		Y = self.concatenation_layer(X,Y)
+
+		Y = self.fc_layer(Y)
+		prediction = self.projection(Y)
+
+		self.model = Model(inputs=(X_input, Y_input), outputs=prediction)
 
 	#return model
 
