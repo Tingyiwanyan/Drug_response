@@ -401,10 +401,12 @@ class drug_transformer():
 		Y2 = self.pw_decoder_2_2(Y2)
 
 		X2 = self.flattern(X2)
+		X2 = self.fc_layer_encoder_2(X2)
 		Y2 = self.flattern(Y2)
 		Y2 = self.fc_layer_docoder_2(Y2)
 
 		X1 = self.flattern(X1)
+		X1 = self.fc_layer_encoder_1(X1)
 		Y1 = self.flattern(Y1)
 		Y1 = self.fc_layer_docoder_1(Y1)
 
