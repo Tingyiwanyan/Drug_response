@@ -9,12 +9,12 @@ from sklearn import linear_model
 #ic50_df = normalize_ic50_drug(drug_cellline_features_clean_df)
 #df_cell_line_drug_ic50_normalized = generate_df_normalized_ic50(drug_cellline_features_clean_df, ic50_df)
 
-"""
+
 reg = linear_model.Ridge()
 train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50_normalized_df)
 
 gene_expression_filtered.set_index('CCLE_ID',inplace=True)
-"""
+
 """
 cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
