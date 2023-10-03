@@ -51,7 +51,7 @@ k.model_construction()
 k.model_compile()
 
 
-history = k.model.fit(testing_drug_one_hot, testing_gene_expression, testing_drug_smile_length,testing_ic50,validation_split=0.2, epochs=1)
+history = k.model.fit((testing_drug_one_hot, testing_gene_expression, testing_drug_smile_length),testing_ic50,validation_split=0.2, epochs=1)
 #model = shallow_nn(cell_line_drug_feature.shape[1])
 
 #hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
