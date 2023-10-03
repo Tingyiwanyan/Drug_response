@@ -328,8 +328,29 @@ class drug_transformer():
 		"""
 		trying out simple position-wise embedding
 		"""
-		self.position_wise_embedding_encoder = position_wise_embedding(50)
-		self.position_wise_embedding_decoder = position_wise_embedding(50)
+		self.pw_encoder_1 = position_wise_embedding(50)
+		self.pw_decoder_1 = position_wise_embedding(50)
+
+		self.pw_encoder_1_2 = position_wise_embedding(1)
+		self.pw_decoder_1_2 = position_wise_embedding(1)
+
+		self.pw_encoder_2 = position_wise_embedding(50)
+		self.pw_decoder_2 = position_wise_embedding(50)
+
+		self.pw_encoder_2_2 = position_wise_embedding(1)
+		self.pw_decoder_2_2 = position_wise_embedding(1)
+
+		self.pw_encoder_3 = position_wise_embedding(50)
+		self.pw_decoder_3 = position_wise_embedding(50)
+
+		self.pw_encoder_3_2 = position_wise_embedding(1)
+		self.pw_decoder_3_2 = position_wise_embedding(1)
+
+		self.pw_encoder_4 = position_wise_embedding(50)
+		self.pw_decoder_4 = position_wise_embedding(50)
+
+		self.pw_encoder_4_2 = position_wise_embedding(1)
+		self.pw_decoder_4_2 = position_wise_embedding(1)
 
 	def model_construction(self):
 		"""
@@ -357,13 +378,26 @@ class drug_transformer():
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
 		"""
 
-		X = self.position_wise_embedding_encoder(X_input)
-		Y = self.position_wise_embedding_decoder(Y_input)
+		X1 = self.pw_encoder_1(X_input)
+		X1 = self.pw_encoder_1_2(X1)
+		Y1 = self.pw_decoder_1(Y_input)
+		Y1 = self.pw_decoder_1_2(Y1)
 
-		X = self.flattern(X)
-		Y = self.flattern(Y)
+		X2 = self.pw_encoder_2(X_input)
+		X2 = self.pw_encoder_2_2(X2)
+		Y2 = self.pw_decoder_2(Y_input)
+		Y2 = self.pw_decoder_2_2(Y2)
 
-		Y = self.concatenation_layer(X,Y)
+		X2 = self.flattern(X2)
+		Y2 = self.flattern(Y2)
+
+		X1 = self.flattern(X1)
+		Y1 = self.flattern(Y1)
+
+		Y1 = self.concatenation_layer(X1,Y1)
+		Y2 = self.concatenation_layer(X2,Y2)
+
+		Y = self.concatenation_layer(Y1,Y2)
 
 		Y = self.fc_layer(Y)
 		prediction = self.projection(Y)
