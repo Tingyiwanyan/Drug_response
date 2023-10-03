@@ -308,7 +308,7 @@ class drug_transformer():
 		"""
 		encoder block 1
 		"""
-		self.encoder_1 = encoder_block(10, 130)
+		self.encoder_1 = encoder_block(20, 130)
 
 		"""
 		decoder block 1
