@@ -342,7 +342,7 @@ class drug_transformer():
 		Y = self.flattern(Y)
 		#Y = self.fc_layer(Y)
 
-		Y = self.concatenate(X,Y)
+		Y = self.concatenation_layer(X,Y)
 		Y = self.fc_layer(Y)
 		prediction = self.projection(Y)
 
