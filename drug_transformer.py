@@ -400,15 +400,15 @@ class drug_transformer():
 		Y2 = self.pw_decoder_2(Y_input)
 		Y2 = self.pw_decoder_2_2(Y2)
 
-		X3 = self.pw_encoder_2(X_input)
-		X3 = self.pw_encoder_2_2(X3)
-		Y3 = self.pw_decoder_2(Y_input)
-		Y3 = self.pw_decoder_2_2(Y3)
+		X3 = self.pw_encoder_3(X_input)
+		X3 = self.pw_encoder_3_2(X3)
+		Y3 = self.pw_decoder_3(Y_input)
+		Y3 = self.pw_decoder_3_2(Y3)
 
 		X3 = self.flattern(X3)
 		#X2 = self.fc_layer_encoder_2(X2)
 		Y3 = self.flattern(Y3)
-		Y3 = self.fc_layer_docoder_2(Y3)
+		Y3 = self.fc_layer_docoder_3(Y3)
 
 		X2 = self.flattern(X2)
 		#X2 = self.fc_layer_encoder_2(X2)
