@@ -331,26 +331,34 @@ class drug_transformer():
 		self.pw_encoder_1 = position_wise_embedding(50)
 		self.pw_decoder_1 = position_wise_embedding(50)
 
-		self.pw_encoder_1_2 = position_wise_embedding(1)
-		self.pw_decoder_1_2 = position_wise_embedding(1)
+		self.pw_encoder_1_2 = position_wise_embedding(10)
+		self.pw_decoder_1_2 = position_wise_embedding(10)
+
+		self.fc_layer_docoder_1 = feed_forward_layer(200)
 
 		self.pw_encoder_2 = position_wise_embedding(50)
 		self.pw_decoder_2 = position_wise_embedding(50)
 
-		self.pw_encoder_2_2 = position_wise_embedding(1)
-		self.pw_decoder_2_2 = position_wise_embedding(1)
+		self.pw_encoder_2_2 = position_wise_embedding(10)
+		self.pw_decoder_2_2 = position_wise_embedding(10)
+
+		self.fc_layer_docoder_2 = feed_forward_layer(200)
 
 		self.pw_encoder_3 = position_wise_embedding(50)
 		self.pw_decoder_3 = position_wise_embedding(50)
 
-		self.pw_encoder_3_2 = position_wise_embedding(1)
-		self.pw_decoder_3_2 = position_wise_embedding(1)
+		self.pw_encoder_3_2 = position_wise_embedding(10)
+		self.pw_decoder_3_2 = position_wise_embedding(10)
+
+		self.fc_layer_docoder_3 = feed_forward_layer(200)
 
 		self.pw_encoder_4 = position_wise_embedding(50)
 		self.pw_decoder_4 = position_wise_embedding(50)
 
-		self.pw_encoder_4_2 = position_wise_embedding(1)
-		self.pw_decoder_4_2 = position_wise_embedding(1)
+		self.pw_encoder_4_2 = position_wise_embedding(10)
+		self.pw_decoder_4_2 = position_wise_embedding(10)
+
+		self.fc_layer_docoder_4 = feed_forward_layer(200)
 
 	def model_construction(self):
 		"""
@@ -390,9 +398,11 @@ class drug_transformer():
 
 		X2 = self.flattern(X2)
 		Y2 = self.flattern(Y2)
+		Y2 = self.fc_layer_docoder_2(Y2)
 
 		X1 = self.flattern(X1)
 		Y1 = self.flattern(Y1)
+		Y1 = self.fc_layer_docoder_1(Y1)
 
 		Y1 = self.concatenation_layer(X1,Y1)
 		Y2 = self.concatenation_layer(X2,Y2)
