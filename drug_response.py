@@ -44,6 +44,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 testing_gene_expression = np.ones((2000, 5842, 1))
 testing_drug_one_hot = np.ones((2000,130,56))
 testing_drug_smile_length = 50*np.ones((2000))
+testing_ic50 = np.ones((2000))
 
 k = drug_transformer()
 k.model_construction()
