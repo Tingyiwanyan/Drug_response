@@ -1,5 +1,5 @@
 import numpy as np
-from utils.process_data import *
+#from utils.process_data import *
 from base_line_models import *
 from drug_transformer_v2 import *
 import scipy.stats
@@ -9,11 +9,12 @@ import scipy.stats
 #ic50_df = normalize_ic50_drug(drug_cellline_features_clean_df)
 #df_cell_line_drug_ic50_normalized = generate_df_normalized_ic50(drug_cellline_features_clean_df, ic50_df)
 
+"""
 reg = linear_model.Ridge()
 train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50_normalized_df)
 
 gene_expression_filtered.set_index('CCLE_ID',inplace=True)
-
+"""
 """
 cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
@@ -21,7 +22,7 @@ cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunc
 	test_sample_num)
 """
 
-
+"""
 gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 
@@ -38,6 +39,11 @@ drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot
 train_dataset = tf.data.Dataset.from_tensor_slices(
             (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
 
+"""
+
+testing_gene_expression = np.ones((2000, 5842, 1))
+testing_drug_one_hot = np.ones((2000,130,56))
+testing_drug_smile_length = 50*np.ones((2000))
 
 k = drug_transformer()
 k.model_construction()
