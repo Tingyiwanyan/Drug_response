@@ -282,7 +282,7 @@ class decoder_block(tf.keras.layers.Layer):
 		self.cross_residual_connection = residual_connection()
 		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_output)
 
-	def call(self, X, encoder_output, **kwargs):
+	def call(self, X, encoder_output, enc_valid_lens, **kwargs):
 		X = self.position_wise_embedding(X)
 		score, value = self.self_dotproductattention(X, X, X)
 		self_att_score = self.masked_softmax(score)
@@ -291,13 +291,12 @@ class decoder_block(tf.keras.layers.Layer):
 
 		cross_score, cross_value = self.cross_att_dotproduct(self_encoder_embedding,encoder_output, 
 			encoder_output)
-		cross_att_score = self.masked_softmax(cross_score)
+		cross_att_score = self.masked_softmax(cross_score, enc_valid_lens)
 		cross_att_embedding = self.cross_att_embedding(cross_att_score, cross_value)
 		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, self_encoder_embedding)
 		cross_decoder_embedding = self.cross_position_wise_embedding(cross_decoder_embedding)
 
 		return cross_decoder_embedding, self_att_score, cross_att_score
-
 
 
 class drug_transformer():
@@ -309,21 +308,20 @@ class drug_transformer():
 		"""
 		encoder block 1
 		"""
-		self.encoder_1 = encoder_block(30, 130)
+		self.encoder_1 = encoder_block(10, 130)
 
 		"""
 		decoder block 1
 		"""
-		self.decoder_1 = decoder_block(30, 1)
+		self.decoder_1 = decoder_block(20, 1)
 
 		"""
 		flattern layer, fully connected layer and final projection layer
 		"""
-		
 		self.flattern = tf.keras.layers.Flatten()
 		self.fc_layer = feed_forward_layer(20)
 		self.projection = tf.keras.layers.Dense(1)
-		#self.concatenation_layer = concatenation_layer()
+		self.concatenation_layer = concatenation_layer()
 
 		#self.feed_forward_encoder_layer = feed_forward_layer(50)
 
@@ -337,10 +335,15 @@ class drug_transformer():
 
 		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
 
-		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X)
+		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X, enc_valid_lens)
+
+		X = self.flattern(X)
 
 		Y = self.flattern(Y)
 		#Y = self.fc_layer(Y)
+
+		Y = self.concatenate(X,Y)
+		Y = self.fc_layer(Y)
 		prediction = self.projection(Y)
 
 
