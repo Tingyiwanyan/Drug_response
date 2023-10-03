@@ -1,9 +1,9 @@
 import numpy as np
 #from utils.process_data import *
 from base_line_models import *
-from drug_transformer_v2 import *
+from drug_transformer import *
 import scipy.stats
-#from sklearn import linear_model
+from sklearn import linear_model
 
 
 #ic50_df = normalize_ic50_drug(drug_cellline_features_clean_df)

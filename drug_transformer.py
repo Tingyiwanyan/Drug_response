@@ -11,7 +11,7 @@ class masked_softmax(tf.keras.layers.Layer):
 		super().__init__()
 		self.value = value
 
-	def call(self, X, valid_lens, **kwargs):
+	def call(self, X, valid_lens=None, **kwargs):
 		"""
 		Parameters:
 		-----------
@@ -24,277 +24,329 @@ class masked_softmax(tf.keras.layers.Layer):
 			shape_X = tf.shape(X)
 			X = tf.reshape(X, shape=(-1, X.shape[-1]))
 			reshape_X = tf.shape(X)
-			print("x shape")
-			print(X.shape)
 			maxlen = X.shape[1]
 			mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
 			mask = tf.broadcast_to(mask, shape=reshape_X)
-			#mask = tf.expand_dims(mask, 1)
-			#mask = tf.broadcast_to(mask, shape=shape_X)
 
 			valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
 			mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
 
-			print("mask shape")
-			print(mask.shape)
-
-			print("valid_len shape")
-			print(valid_lens.shape)
-
 			X = tf.where(mask, X, self.value)
 
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
-			#return tf.nn.softmax(X, axis=-1)
+
+class positionalencoding(tf.keras.layers.Layer):  
+	"""Positional encoding."""
+	def __init__(self, num_hiddens, num_length, max_len=1000):
+		super().__init__()
+		#self.dropout = tf.keras.layers.Dropout(dropout)
+		# Create a long enough P
+		self.num_length = num_length
+		self.max_len = max_len
+		self.num_hiddens = num_hiddens
+	def call(self, X, **kwargs):
+		#X = X + self.P[:, :X.shape[1], :]
+		#return self.dropout(X, **kwargs)
+		self.P = np.zeros((1, self.max_len, self.num_hiddens))
+		XX = np.arange(self.max_len, dtype=np.float32).reshape(
+			-1,1)/np.power(10000, np.arange(
+				0, self.num_hiddens, 2, dtype=np.float32) / self.num_hiddens)
+		self.P[:, :, 0::2] = np.sin(XX)
+		self.P[:, :, 1::2] = np.cos(XX)
+		shape_X = tf.shape(X)
+		X = tf.math.l2_normalize(X, axis=-1)
+		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
+			dtype=tf.float32)
+
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X, self.P), axis=-1), dtype=tf.float32)
 
 
-#def masked_softmax(X, valid_lens, value=-1e6):
+class position_wise_embedding(tf.keras.layers.Layer):
 	"""
-	Apply masked softmax to attention matrix, note, this function adapts
-	only to encoder
+	Defome position wise embedding for sequence input embedding
 
 	Parameters:
 	-----------
-	X: input attention matrix, 3D tensor:[batch_size, query_seq_length, key_seq_length]
-	valid_lens: 1D tensor specifying the valid length for each attention matrix: [batch_size, ]
+	kernel: the embedding matrix
+	"""
+	def __init__(self, output_dim):
+		super().__init__()
+		self.output_dim = output_dim
+
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		b_init = tf.zeros_initializer()
+		self.b = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	def call(self, input_data, **kwargs):
+		output_embedding = tf.matmul(input_data, self.kernel) + self.b
+
+		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
+
+
+class dotproductattention(tf.keras.layers.Layer):  #@save
+	"""
+	Define scaled dot product layer
+
+	Parameters:
+	-----------
+	kernel_key: embedding matrix for key
+	kernel_value: embedding matrix for value
+	kernel_query: embedding matrix for query
 
 	Returns:
 	--------
-	masked softmax attention score matrix
+	attention_score: the scale dot product score
 	"""
-	"""
-	if valid_lens == None:
-		return tf.nn.softmax(X, axis=-1)
-	else:
-		shape_X = X.shape
-		X = tf.reshape(X, shape=(-1, X.shape[-1]))
-		maxlen = X.shape[1]
-		mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
-		#mask = tf.broadcast_to(mask, shape=(shape_X[0], shape_X[-1]))
-
-		valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
-		mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
-
-		X = tf.where(mask, X, value)
-
-		return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)#, X, mask
-	"""
-
-class PositionalEncoding(tf.keras.layers.Layer):  
-    """Positional encoding."""
-    def __init__(self, num_hiddens, dropout, max_len=1000):
-        super().__init__()
-        self.dropout = tf.keras.layers.Dropout(dropout)
-        # Create a long enough P
-        self.P = np.zeros((1, max_len, num_hiddens))
-        X = np.arange(max_len, dtype=np.float32).reshape(
-            -1,1)/np.power(10000, np.arange(
-            0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
-        self.P[:, :, 0::2] = np.sin(X)
-        self.P[:, :, 1::2] = np.cos(X)
-
-    def call(self, X, **kwargs):
-        X = X + self.P[:, :X.shape[1], :]
-        return self.dropout(X, **kwargs)
-
-class PositionWiseFFN(tf.keras.layers.Layer):  #@save
-    """The positionwise feed-forward network."""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
-        super().__init__()
-        self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
-        self.relu = tf.keras.layers.ReLU()
-        self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
-
-    def call(self, X):
-        return self.dense2(self.relu(self.dense1(X)))
-
-
-class AddNorm(tf.keras.layers.Layer):  #@save
-    """The residual connection followed by layer normalization."""
-    def __init__(self, dropout):
-        super().__init__()
-        self.dropout = tf.keras.layers.Dropout(dropout)
-        self.ln = tf.keras.layers.LayerNormalization()
-
-    def call(self, X, Y, **kwargs):
-        return self.ln(self.dropout(Y, **kwargs) + X)
-
-
-class DotProductAttention(tf.keras.layers.Layer):  #@save
-    """Scaled dot product attention."""
-    def __init__(self, dropout):
-        super().__init__()
-        self.dropout = tf.keras.layers.Dropout(dropout)
-        self.masked_softmax = masked_softmax()
-
-    def call(self, queries, keys, values, valid_lens=None, **kwargs):
-        d = queries.shape[-1]
-        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-            tf.cast(d, dtype=tf.float32))
-        print("im here")
-        #self.attention_weights = self.masked_softmax(scores, valid_lens)
-        return scores
-        #return self.attention_weights
-        #return tf.matmul(self.attention_weights, values)
-
-class MultiHeadAttention(tf.keras.layers.Layer):  
-	def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+	def __init__(self, output_dim):
 		super().__init__()
-		self.attention = DotProductAttention(dropout)
-		#self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
-		self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias, 
-			activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
+		self.output_dim = output_dim
+		#self.masked_softmax = masked_softmax()
 
-	def call(self, queries, keys, values, valid_lens, **kwargs):
+	def build(self, input_shape):
+		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
-	    queries = self.W_q(queries)
-	    #queries = self.pos_encoding(queries)
-	    keys = self.W_k(keys)
-	    #keys = self.pos_encoding(keys)
-	    values = self.W_v(values)
-	    #values = self.pos_encoding(values)
+		b_init = tf.zeros_initializer()
+		self.b_key = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	    #if valid_lens is not None:
-	        # On axis 0, copy the first item (scalar or vector) for num_heads
-	        # times, then copy the next item, and so on
-	        #valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
+		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 
-	    # Shape of output: (batch_size * num_heads, no. of queries,
-	    # num_hiddens / num_heads)
-	    output = self.attention(queries, keys, values, valid_lens, **kwargs)
+		self.b_query = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	    # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-	    #output_concat = self.transpose_output(output)
-	    return output
+		self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+			initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
+		self.b_value = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
-    """The Transformer encoder block."""
-    def __init__(self, num_hiddens, num_heads, dropout, bias=False):
-        super().__init__()
-        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,bias)
-        self.addnorm1 = AddNorm(dropout)        
-        self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
-        self.addnorm2 = AddNorm(dropout)
+	def call(self, queries, keys, values, valid_lens=None, **kwargs):
+		d = queries.shape[-1]
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		values = tf.matmul(values, self.kernel_value) + self.b_value
 
-    def call(self, X, valid_lens, **kwargs):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs),
-                          **kwargs)
-        #return self.addnorm2(Y, self.ffn(Y), **kwargs)
-        return Y
+		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+			tf.cast(d, dtype=tf.float32))
 
+		#self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return scores, values
 
-class TransformerDecoderBlock(tf.keras.layers.Layer):
-    # The i-th block in the Transformer decoder
-    def __init__(self, num_hiddens, num_heads, dropout):
-        super().__init__()
-        self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
-        self.addnorm1 = AddNorm(dropout)
-        self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
-        self.addnorm2 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(num_hiddens, num_hiddens)
-        self.addnorm3 = AddNorm(dropout)
+class attention_embedding(tf.keras.layers.Layer):
+	"""
+	Define attention embedding layer, perform dummy
+	attention multiplication with value input
 
-    def call(self, X, enc_outputs, enc_valid_lens, dec_valid_lens=None,**kwargs):
-        """
-        Parameters:
-        -----------
-        X: the decoder input sequence (query)
-        enc_outputs: the encoder output embedding (key & value)
+	Parameters:
+	-----------
+	att_weights: the attention score matrix
+	input_value: input value matrix
 
-        Returns:
-		--------
-		decoder embedding output
-        """
-        X2 = self.attention1(X, X, X, dec_valid_lens, **kwargs)
-        Y = self.addnorm1(X, X2, **kwargs)
-        # Encoder-decoder attention. Shape of enc_outputs:
-        # (batch_size, num_steps, num_hiddens)
-        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens,
-                             **kwargs)
-        Z = self.addnorm2(Y, Y2, **kwargs)
-        return self.addnorm3(Z, self.ffn(Z), **kwargs)
+	Returns:
+	--------
+	the attention embedding matrix
+	"""
+	def __init__(self):
+		super().__init__()
+
+	def call(self, att_weights, input_value, **kwargs):
+
+		return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
 
 
-class Drug_transformer():
+class residual_connection(tf.keras.layers.Layer):
+	"""
+	Define reidual connection layer
+	"""
+	def __init__(self):
+		super().__init__()
+
+	def call(self, X, Y, **kwargs):
+		X = tf.math.l2_normalize(X, axis=-1)
+		Y = tf.math.l2_normalize(Y, axis=-1)
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+
+
+class feed_forward_layer(tf.keras.layers.Layer):
+	"""
+	Define a dummy feed forward layer for intigrating 
+	gene expression data
+
+	Parameters:
+	-----------
+	kernel: the trainable kernel matrix
+
+	Returns:
+	--------
+	the embedding vector
+	"""
+	def __init__(self, output_dim):
+		super().__init__()
+		self.output_dim = output_dim
+		self.dropout = tf.keras.layers.Dropout(0.2)
+
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+		initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		b_init = tf.zeros_initializer()
+		self.b = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	def call(self, input_data, **kwargs):
+		output_embedding = tf.matmul(input_data, self.kernel) + self.b
+
+		return self.dropout(tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32),**kwargs)
+
+
+class concatenation_layer(tf.keras.layers.Layer):
+	"""
+	Define concatenation layer
+	"""
+	def __init__(self):
+		super().__init__()
+
+	def call(self, X, Y, **kwargs):
+		X = tf.math.l2_normalize(X, axis=-1)
+		Y = tf.math.l2_normalize(Y, axis=-1)
+
+		return tf.cast(tf.math.l2_normalize(tf.concat([X,Y],axis=1), axis=-1), dtype=tf.float32)
+
+
+class encoder_block(tf.keras.layers.Layer):
+	"""
+	Define self attention encoder block, add the position encoding
+	since drug smile sequence has the order information
+
+	Parameters:
+	-----------
+	num_hiddens: the hidden dimension for embedding matrix
+	seq_length: the length for input sequence
+
+	Returns:
+	-------
+	encoder_embedding: the encoder embedding output
+	att_score: the self attention score
+	"""
+	def __init__(self, num_hiddens, seq_length):
+		super().__init__()
+		self.masked_softmax = masked_softmax()
+		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
+		self.position_wise_embedding = position_wise_embedding(num_hiddens)
+		self.dotproductattention = dotproductattention(num_hiddens)
+		self.attention_embedding = attention_embedding()
+		self.residual_connection = residual_connection()
+
+	def call(self, X, enc_valid_lens, **kwargs):
+		X = self.position_wise_embedding(X)
+		X = self.pos_encoding(X)
+		score, value = self.dotproductattention(X, X, X)
+		att_score = self.masked_softmax(score, enc_valid_lens)
+		att_embedding = self.attention_embedding(att_score, value)
+		encoder_embedding = self.residual_connection(att_embedding, value)
+
+		return encoder_embedding, att_score
+
+
+class decoder_block(tf.keras.layers.Layer):
+	"""
+	Define self-attention & cross attention decoder block, since 
+	gene expression doesn't contain sequencing information, so 
+	we don't add position encoding in the embedding layer. 
+
+	Parameters:
+	-----------
+	num_hiddens_self: hidden embedding dimension for the self att block
+	num_hiddens_cross: hidden embedding dimension for the cross att block
+
+	Returns:
+	--------
+	cross_decoder_embedding: the decoder embedding output
+	self_att_score: the self att score in decoder self att block
+	cross_att_score: the cross att score in the decoder cross att block
+	"""
+	def __init__(self, num_hiddens, num_hiddens_output):
+		super().__init__()
+		self.masked_softmax = masked_softmax()
+		self.position_wise_embedding = position_wise_embedding(num_hiddens)
+		self.self_dotproductattention = dotproductattention(num_hiddens)
+		self.self_att_embedding = attention_embedding()
+		self.self_residual_connection = residual_connection()
+
+		self.cross_att_dotproduct = dotproductattention(num_hiddens)
+		self.cross_att_embedding = attention_embedding()
+		self.cross_residual_connection = residual_connection()
+		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_output)
+
+	def call(self, X, encoder_output, **kwargs):
+		X = self.position_wise_embedding(X)
+		score, value = self.self_dotproductattention(X, X, X)
+		self_att_score = self.masked_softmax(score)
+		self_att_embedding = self.self_att_embedding(self_att_score, value)
+		self_encoder_embedding = self.self_residual_connection(self_att_embedding, value)
+
+		cross_score, cross_value = self.cross_att_dotproduct(self_encoder_embedding,encoder_output, 
+			encoder_output)
+		cross_att_score = self.masked_softmax(cross_score)
+		cross_att_embedding = self.cross_att_embedding(cross_att_score, cross_value)
+		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, self_encoder_embedding)
+		cross_decoder_embedding = self.cross_position_wise_embedding(cross_decoder_embedding)
+
+		return cross_decoder_embedding, self_att_score, cross_att_score
+
+
+
+class drug_transformer():
 	"""
 	Implement the drug transformer model architecture
 	"""
-	def __init__(self, num_hiddens, num_hiddens_fc, num_head=1,drop_out=0.1):
+	def __init__(self):
+
+		"""
+		encoder block 1
+		"""
+		self.encoder_1 = encoder_block(30, 130)
+
+		"""
+		decoder block 1
+		"""
+		self.decoder_1 = decoder_block(30, 1)
+
+		"""
+		flattern layer, fully connected layer and final projection layer
+		"""
 		
-		self.trans_encoder = TransformerEncoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
-		self.trans_decoder = TransformerDecoderBlock(num_hiddens,num_heads=num_head,dropout=drop_out)
-
-		self.W_q = tf.keras.layers.Dense(num_hiddens)
-		self.W_k = tf.keras.layers.Dense(num_hiddens)
-		self.W_v = tf.keras.layers.Dense(num_hiddens)
-
-		self.attention = DotProductAttention(drop_out)
-
-		self.num_hiddens = num_hiddens
-		self.embedding_encoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-		self.embedding_decoder = tf.keras.layers.Dense(num_hiddens, use_bias=False, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-
-		self.fc_decoder = tf.keras.layers.Dense(num_hiddens_fc, use_bias=False, 
-        	activation= "relu",kernel_regularizer=regularizers.L2(1e-4))
-
 		self.flattern = tf.keras.layers.Flatten()
-
+		self.fc_layer = feed_forward_layer(20)
 		self.projection = tf.keras.layers.Dense(1)
+		#self.concatenation_layer = concatenation_layer()
 
-		self.pos_encoding = PositionalEncoding(num_hiddens, drop_out)
+		#self.feed_forward_encoder_layer = feed_forward_layer(50)
 
-	def model_construction(self, doc_valid_lens=None):
+	def model_construction(self):
 		"""
 		construct the transformer model
 		"""
 		X_input = Input((130, 56))
-		Y_input = Input((5842))
+		Y_input = Input((5842, 1))
 		enc_valid_lens = Input(())
 
-		queries = self.W_q(X_input)
-		keys = self.W_k(X_input)
-		values = self.W_v(X_input)
+		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
+
+		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X)
+
+		Y = self.flattern(Y)
+		#Y = self.fc_layer(Y)
+		prediction = self.projection(Y)
 
 
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
 
-		"""
-		drug smile sequence with position encoding
-		"""
-		#X = self.embedding_encoder(X_input)
-		#X = self.pos_encoding(X)
-		#X = self.trans_encoder(X, enc_valid_lens)
-
-		attention = self.attention(queries, keys, values, enc_valid_lens)
-
-		X = tf.matmul(attention, values)
-
-		X = tf.keras.layers.Add()([X, values])
-
-
-		intermediate_shape = tf.shape(X)
-		X = tf.reshape(X, shape=(intermediate_shape[0], intermediate_shape[1]*intermediate_shape[2]))
-
-		"""
-		Gene expression without position encoding
-		"""
-		Y = self.embedding_decoder(Y_input)
-
-		Y = tf.concat([X,Y],axis=1)
-		#Y = self.trans_decoder(Y, X, enc_valid_lens)
-
-		Y = self.fc_decoder(Y)
-		#Y = self.flattern(Y)
-		Y = self.projection(Y)
-
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
-
-		#return model
+	#return model
 
 	def model_compile(self):
 		"""
@@ -305,7 +357,12 @@ class Drug_transformer():
 
 
 
-		
+
+
+
+
+
+
 
 
 
