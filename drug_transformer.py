@@ -138,11 +138,11 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.keras.activations.sigmoid(tf.matmul(queries, self.kernel_query) + self.b_query)
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
-		keys = tf.keras.activations.sigmoid(tf.matmul(keys, self.kernel_key) + self.b_key)
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.keras.activations.relu(tf.matmul(values, self.kernel_value) + self.b_value)
+		values = tf.matmul(values, self.kernel_value) + self.b_value
 		#lvalues = self.kernel_value(values)
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
