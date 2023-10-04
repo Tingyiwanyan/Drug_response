@@ -134,7 +134,7 @@ def att_score_output(input_model):
 	"""
 	Generate intermediate attention score for examination
 	"""
-	att_layer = model.get_layer('dotproductattention')
+	att_layer = input_model.get_layer('dotproductattention')
 	att_output = Model(inputs=input_model.input, outputs = att_layer.output)
 
 	return att_output
