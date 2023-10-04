@@ -110,11 +110,11 @@ def base_drug_transformer():
 	score, value = dotproductattention1(X_input,X_input,X_input, enc_valid_lens)
 	att_score = masked_softmax_(score, enc_valid_lens)
 	att_embedding_ = att_embedding(att_score, value)
-	X = r_connection(value, att_embedding_)
+	#X = r_connection(value, att_embedding_)
 
 	Y = dense_2(Y_input)
 
-	X = flattern(X)
+	X = flattern(att_embedding_)
 	Y = flattern(Y)
 
 	Y = tf.concat([X,Y],axis=1)
