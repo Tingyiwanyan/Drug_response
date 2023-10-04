@@ -38,7 +38,7 @@ def shallow_nn(input_dim:float):
 
 def shallow_position_wise_nn():
 	"""
-	Testing baseline for single position-wise feed forward nn
+	Abalation study on testing baseline for single position-wise feed forward nn
 	"""
 	X_input = Input((130, 56))
 	Y_input = Input((5842, 1))
@@ -75,6 +75,61 @@ def shallow_position_wise_nn():
 	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 	return model
+
+
+def double_shallow_position_wise_nn():
+	"""
+	Abalation study on testing double head position wise nn
+	"""
+	X_input = Input((130, 56))
+	Y_input = Input((5842, 1))
+
+	dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_1_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_2_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_5 = tf.keras.layers.Dense(1)
+
+
+	flattern = tf.keras.layers.Flatten()
+
+	#concatenation_layer = concatenation_layer()
+
+	X = dense_1(X_input)
+	X2 = dense_1_1(X_input)
+	Y = dense_2(Y_input)
+	Y2 = dense_2_2(Y_input)
+
+	X = flattern(X)
+	X2 = flattern(X)
+	Y = flattern(Y)
+	Y2 = flattern(Y2)
+
+	X = tf.concat([X,X2],axis=1)
+	Y = tf.concat([Y,Y2],axis=1)
+	Y = tf.concat([X,Y],axis=1)
+
+	Y = dense_3(Y)
+	Y = dense_4(Y)
+	Y = dense_5(Y)
+
+	model = Model(inputs=(X_input, Y_input), outputs=Y)
+
+	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+	return model
+
+
+
+
 
 
 
