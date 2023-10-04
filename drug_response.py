@@ -15,14 +15,14 @@ train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50
 
 gene_expression_filtered.set_index('CCLE_ID',inplace=True)
 
-"""
+
 cell_line_drug_feature, ic50_list, drug_name_list = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	test_sample_num)
+
+
 """
-
-
 gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 
@@ -38,7 +38,7 @@ drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot
 
 train_dataset = tf.data.Dataset.from_tensor_slices(
             (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
-
+"""
 
 
 #testing_gene_expression = np.ones((2000, 5842, 1))
@@ -46,15 +46,15 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #testing_drug_smile_length = 50*np.ones((2000))
 #testing_ic50 = np.ones((2000))
 
-k = drug_transformer()
-k.model_construction()
-k.model_compile()
+#k = drug_transformer()
+#k.model_construction()
+#k.model_compile()
 
 
 #history = k.model.fit((testing_drug_one_hot, testing_gene_expression, testing_drug_smile_length),testing_ic50,batch_size=5, validation_split=0.2, epochs=1)
-#model = shallow_nn(cell_line_drug_feature.shape[1])
+model = shallow_nn(cell_line_drug_feature.shape[1])
 
-#hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
+hitory = model.fit(cell_line_drug_feature, ic50_list, validation_split=0.2, epochs=30)
 #cell_line_drug_feature, ic50_list = process_chunck_data(drug_cellline_features_ic50_normalized_df,0,5000)
 
 #cell_line_drug_feature_test, ic50_list_test = process_chunck_data(drug_cellline_features_ic50_normalized_df,10000,10899)
