@@ -56,7 +56,7 @@ def shallow_position_wise_nn():
 
 	flattern = tf.keras.layers.Flatten()
 
-	concatenation_layer = concatenation_layer()
+	#concatenation_layer = concatenation_layer()
 
 	X = dense_1(X_input)
 	Y = dense_2(Y_input)
@@ -64,7 +64,7 @@ def shallow_position_wise_nn():
 	X = flattern(X)
 	Y = flattern(Y)
 
-	Y = concatenation_layer(X,Y)
+	Y = tf.concat([X,Y],axis=1)
 
 	Y = dense_3(Y)
 	Y = dense_4(Y)
