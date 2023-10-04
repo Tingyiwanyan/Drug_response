@@ -7,6 +7,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+import tensorflow as tf
 
 epochs = 30
 
