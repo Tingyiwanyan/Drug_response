@@ -50,7 +50,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #k.model_construction()
 #k.model_compile()
 
-model = shallow_position_wise_nn()
+model = double_shallow_position_wise_nn()
 history = model.fit((drug_one_hot_encoding, gene_expression),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=30)
 
 
