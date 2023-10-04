@@ -51,7 +51,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #k.model_compile()
 
 model = base_drug_transformer()
-history = model.fit((drug_one_hot_encoding, gene_expression),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=30)
+history = model.fit((drug_one_hot_encoding, gene_expression, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=30)
 
 
 #history = k.model.fit((testing_drug_one_hot, testing_gene_expression, testing_drug_smile_length),testing_ic50,batch_size=5, validation_split=0.2, epochs=1)

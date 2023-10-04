@@ -141,7 +141,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#queries = tf.keras.activations.relu(tf.matmul(queries, self.kernel_query) + self.b_query)
 		queries = self.kernel_query(queries)
 		#keys = tf.keras.activations.relu(tf.matmul(keys, self.kernel_key) + self.b_key)
-		keys = self.kernel_keys(keys)
+		keys = self.kernel_key(keys)
 		#values = tf.keras.activations.relu(tf.matmul(values, self.kernel_value) + self.b_value)
 		values = self.kernel_value(values)
 
