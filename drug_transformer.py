@@ -81,7 +81,7 @@ class position_wise_embedding(tf.keras.layers.Layer):
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, input_data, **kwargs):
-		output_embedding = tf.matmul(input_data, self.kernel) + self.b
+		output_embedding = tf.keras.activations.relu(tf.matmul(input_data, self.kernel) + self.b)
 
 		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
 
@@ -127,9 +127,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
-		values = tf.matmul(values, self.kernel_value) + self.b_value
+		queries = tf.keras.activations.relu(tf.matmul(queries, self.kernel_query) + self.b_query)
+
+		keys = tf.keras.activations.relu(tf.matmul(keys, self.kernel_key) + self.b_key)
+		values = tf.keras.activations.relu(tf.matmul(values, self.kernel_value) + self.b_value)
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 			tf.cast(d, dtype=tf.float32))
@@ -188,7 +189,7 @@ class feed_forward_layer(tf.keras.layers.Layer):
 	def __init__(self, output_dim):
 		super().__init__()
 		self.output_dim = output_dim
-		self.dropout = tf.keras.layers.Dropout(0.2)
+		self.dropout = tf.keras.layers.Dropout(0.1)
 
 	def build(self, input_shape, **kwargs):
 		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
@@ -198,9 +199,10 @@ class feed_forward_layer(tf.keras.layers.Layer):
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, input_data, **kwargs):
-		output_embedding = tf.matmul(input_data, self.kernel) + self.b
+		output_embedding = tf.keras.activations.relu(tf.matmul(input_data, self.kernel) + self.b)
 
-		return self.dropout(tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32),**kwargs)
+		#return self.dropout(tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32),**kwargs)
+		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
 
 
 class concatenation_layer(tf.keras.layers.Layer):
