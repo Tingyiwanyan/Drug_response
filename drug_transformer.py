@@ -105,6 +105,16 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.output_dim = output_dim
 		#self.masked_softmax = masked_softmax()
 
+		self.kernel_key = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+		self.kernel_query = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+	"""
 	def build(self, input_shape):
 		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
@@ -124,13 +134,16 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 		self.b_value = tf.Variable(
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+	"""
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.keras.activations.relu(tf.matmul(queries, self.kernel_query) + self.b_query)
-
-		keys = tf.keras.activations.relu(tf.matmul(keys, self.kernel_key) + self.b_key)
-		values = tf.keras.activations.relu(tf.matmul(values, self.kernel_value) + self.b_value)
+		#queries = tf.keras.activations.relu(tf.matmul(queries, self.kernel_query) + self.b_query)
+		queries = self.kernel_query(queries)
+		#keys = tf.keras.activations.relu(tf.matmul(keys, self.kernel_key) + self.b_key)
+		keys = self.kernel_keys(keys)
+		#values = tf.keras.activations.relu(tf.matmul(values, self.kernel_value) + self.b_value)
+		values = self.kernel_value(values)
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 			tf.cast(d, dtype=tf.float32))
@@ -164,11 +177,11 @@ class residual_connection(tf.keras.layers.Layer):
 	"""
 	Define reidual connection layer
 	"""
-	def __init__(self):
+	def __init__(self):  
 		super().__init__()
 
 	def call(self, X, Y, **kwargs):
-		X = tf.math.l2_normalize(X, axis=-1)
+		#X = tf.math.l2_normalize(X, axis=-1)
 		Y = tf.math.l2_normalize(Y, axis=-1)
 		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
 

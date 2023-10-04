@@ -7,7 +7,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
-import tensorflow as tf
+from drug_transformer import *
 
 epochs = 30
 
@@ -75,6 +75,61 @@ def shallow_position_wise_nn():
 	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 	return model
+
+def base_drug_transformer():
+	"""
+	Abalation study on basic configuration transformer
+	"""
+	X_input = Input((130, 56))
+	Y_input = Input((5842, 1))
+	enc_valid_lens = Input(())
+
+	masked_softmax = masked_softmax()
+	dotproductattention1 = dotproductattention(50)
+
+	att_embedding = attention_embedding()
+	r_connection = residual_connection()
+
+	dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+	dense_5 = tf.keras.layers.Dense(1)
+
+
+	flattern = tf.keras.layers.Flatten()
+
+	#concatenation_layer = concatenation_layer()
+
+	X = dense_1(X_input)
+
+	score, value = dotproductattention(X,X,X, enc_valid_lens)
+	att_score = masked_softmax(score, enc_valid_lens)
+	att_embedding_ = att_embedding(att_score, value)
+	X = self.residual_connection(X, att_embedding_)
+
+	Y = dense_2(Y_input)
+
+	X = flattern(X)
+	Y = flattern(Y)
+
+	Y = tf.concat([X,Y],axis=1)
+
+	Y = dense_3(Y)
+	Y = dense_4(Y)
+	Y = dense_5(Y)
+
+	model = Model(inputs=(X_input, Y_input), outputs=Y)
+
+	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+	return model
+
+
 
 
 def double_shallow_position_wise_nn():
