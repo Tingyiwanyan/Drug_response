@@ -140,8 +140,6 @@ def att_score_output(input_model):
 	return att_output
 
 
-
-
 def double_shallow_position_wise_nn():
 	"""
 	Abalation study on testing double head position wise nn
