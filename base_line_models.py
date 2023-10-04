@@ -123,7 +123,7 @@ def base_drug_transformer():
 	Y = dense_4(Y)
 	Y = dense_5(Y)
 
-	model = Model(inputs=(X_input, Y_input), outputs=Y)
+	model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
 	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
