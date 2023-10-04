@@ -105,9 +105,9 @@ def base_drug_transformer():
 
 	#concatenation_layer = concatenation_layer()
 
-	X = dense_1(X_input)
+	#X = dense_1(X_input)
 
-	score, value = dotproductattention1(X,X,X, enc_valid_lens)
+	score, value = dotproductattention1(X_input,X_input,X_input, enc_valid_lens)
 	att_score = masked_softmax_(score, enc_valid_lens)
 	att_embedding_ = att_embedding(att_score, value)
 	X = r_connection(value, att_embedding_)
