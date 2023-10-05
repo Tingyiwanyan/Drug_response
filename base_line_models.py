@@ -100,10 +100,10 @@ def base_drug_transformer():
 
 	dense_5 = tf.keras.layers.Dense(1)
 
-	kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+	kernel_key = tf.keras.layers.Dense(50, activation='sigmoid', 
 		kernel_regularizer=regularizers.L2(1e-4))
 
-	kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+	kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 		kernel_regularizer=regularizers.L2(1e-4))
 
 	#kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
