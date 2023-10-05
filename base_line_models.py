@@ -100,6 +100,15 @@ def base_drug_transformer():
 
 	dense_5 = tf.keras.layers.Dense(1)
 
+	kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		kernel_regularizer=regularizers.L2(1e-4))
+
+	kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		kernel_regularizer=regularizers.L2(1e-4))
+
+	#kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+	#	kernel_regularizer=regularizers.L2(1e-4))
+
 
 	flattern = tf.keras.layers.Flatten()
 
@@ -107,7 +116,15 @@ def base_drug_transformer():
 
 	X = dense_1(X_input)
 
-	score, value = dotproductattention1(X,X,X, enc_valid_lens)
+	X_query = kernel_query(X)
+	X_key = kernel_key(X)
+
+	d = X.shape[-1]
+
+	scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
+		tf.cast(d, dtype=tf.float32))
+
+	#score, value = dotproductattention1(X,X,X, enc_valid_lens)
 	att_score = masked_softmax_(score, enc_valid_lens)
 	att_embedding_ = att_embedding(att_score, X)
 	#X = r_connection(value, att_embedding_)
