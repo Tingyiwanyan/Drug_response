@@ -90,7 +90,7 @@ def base_drug_transformer():
 	att_embedding = attention_embedding()
 	r_connection = residual_connection()
 
-	dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+	dense_1 = tf.keras.layers.Dense(50, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
 	dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
