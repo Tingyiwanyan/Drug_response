@@ -114,7 +114,7 @@ def base_drug_transformer():
 
 	Y = dense_2(Y_input)
 
-	X = flattern(X)
+	X = flattern(value)
 	Y = flattern(Y)
 
 	Y = tf.concat([X,Y],axis=1)
