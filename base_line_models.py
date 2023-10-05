@@ -131,7 +131,7 @@ def base_drug_transformer():
 	#score, value = dotproductattention1(X,X,X, enc_valid_lens)
 	att_score = masked_softmax_(scores, enc_valid_lens)
 	att_embedding_ = att_embedding(att_score, X)
-	#X = r_connection(X, att_embedding_)
+	X = r_connection(X, att_embedding_)
 
 	Y = dense_2(Y_input)
 
