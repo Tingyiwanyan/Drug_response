@@ -52,8 +52,8 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 
 model = base_drug_transformer()
 
-att_output_model = att_score_output(model)
-att_output_ = att_output_model.predict((drug_one_hot_encoding_test[0:10], gene_expression_test[0:10], np.array(drug_smile_length_test)[0:10]))
+#att_output_model = att_score_output(model)
+#att_output_ = att_output_model.predict((drug_one_hot_encoding_test[0:10], gene_expression_test[0:10], np.array(drug_smile_length_test)[0:10]))
 history = model.fit((drug_one_hot_encoding, gene_expression, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=5)
 
 
