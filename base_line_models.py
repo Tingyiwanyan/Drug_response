@@ -125,7 +125,7 @@ def base_drug_transformer():
 		tf.cast(d, dtype=tf.float32))
 
 	#score, value = dotproductattention1(X,X,X, enc_valid_lens)
-	att_score = masked_softmax_(score, enc_valid_lens)
+	att_score = masked_softmax_(scores, enc_valid_lens)
 	att_embedding_ = att_embedding(att_score, X)
 	#X = r_connection(value, att_embedding_)
 
