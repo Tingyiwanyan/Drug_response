@@ -111,7 +111,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='relu', 
 		#	kernel_regularizer=regularizers.L2(1e-4))
 
-		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
 
