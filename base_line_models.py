@@ -106,6 +106,8 @@ def base_drug_transformer():
 	kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 		kernel_regularizer=regularizers.L2(1e-4))
 
+	pos_encoding = positionalencoding(50,130)
+
 	#kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
 	#	kernel_regularizer=regularizers.L2(1e-4))
 
@@ -115,6 +117,8 @@ def base_drug_transformer():
 	#concatenation_layer = concatenation_layer()
 
 	X = dense_1(X_input)
+
+	X = pos_encoding(X)
 
 	X_query = kernel_query(X)
 	X_key = kernel_key(X)
