@@ -154,11 +154,17 @@ def base_drug_transformer():
 
 
 
-def att_score_output(input_model):
+def att_score_self_enco(input_model, name):
 	"""
 	Generate intermediate attention score for examination
 	"""
-	att_layer = input_model.get_layer('masked_softmax')
+	att_layer = input_model.get_layer(name)
+	att_output = Model(inputs=input_model.input, outputs = att_layer.output)
+
+	return att_output
+
+def att_score_self_doce(input_model, name):
+	att_layer = input_model.get_layer(name)
 	att_output = Model(inputs=input_model.input, outputs = att_layer.output)
 
 	return att_output

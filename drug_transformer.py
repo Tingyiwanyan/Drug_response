@@ -7,7 +7,7 @@ import keras.backend as K
 
 
 class masked_softmax(tf.keras.layers.Layer):
-	def __init__(self, value=-1e6):
+	def __init__(self, value=-1e7):
 		super().__init__()
 		self.value = value
 
@@ -321,9 +321,14 @@ class drug_transformer():
 	def __init__(self):
 
 		self.masked_softmax_ = masked_softmax()
+		self.masked_softmax_deco_self = masked_softmax()
+		self.masked_softmax_deco_cross =masked_softmax()
+
 		self.dotproductattention1 = dotproductattention(50)
 
-		self.dotproductattention_deco = dotproductattention(50)
+		self.dotproductattention_deco = dotproductattention(10)
+
+		self.dotproductattention_deco_cross = dotproductattention(10)
 
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
@@ -346,10 +351,6 @@ class drug_transformer():
 
 		self.pos_encoding = positionalencoding(50,130)
 
-		#kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
-
-
 		self.flattern = tf.keras.layers.Flatten()
 
 	def model_construction(self):
@@ -360,29 +361,36 @@ class drug_transformer():
 		Y_input = Input((5842, 1))
 		enc_valid_lens = Input(())
 
-		#concatenation_layer = concatenation_layer()
-
 		X = self.dense_1(X_input)
 
 		X = self.pos_encoding(X)
 
-		#X_query = kernel_query(X)
-		#X_key = kernel_key(X)
-		#d = X.shape[-1]
 
-		#scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
-		#	tf.cast(d, dtype=tf.float32))
-
+		"""
+		self attention for the encoder
+		"""
 		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
 		att_score = self.masked_softmax_(score, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 		X = self.r_connection(value, att_embedding_)
 
+
+		"""
+		self attention for the deocoder
+		"""
 		Y = self.dense_2(Y_input)
 		score_deco, value_deco = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco = self.masked_softmax_(score_deco)
+		att_score_deco = self.masked_softmax_deco_self(score_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 		Y = self.r_connection(value_deco, att_embedding_deco)
+
+		"""
+		cross attention for the deocoder
+		"""
+		score_deco_cross, value_deco_cross = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
+		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
+		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+		Y = self.r_connection(value_deco_cross, att_embedding_deco_cross)
 
 		X = self.flattern(X)
 		Y = self.flattern(Y)
