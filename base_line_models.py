@@ -120,22 +120,22 @@ def base_drug_transformer():
 
 	X = pos_encoding(X)
 
-	X_query = kernel_query(X)
-	X_key = kernel_key(X)
+	#X_query = kernel_query(X)
+	#X_key = kernel_key(X)
 
-	d = X.shape[-1]
+	#d = X.shape[-1]
 
-	scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
-		tf.cast(d, dtype=tf.float32))
+	#scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
+	#	tf.cast(d, dtype=tf.float32))
 
-	#score, value = dotproductattention1(X,X,X, enc_valid_lens)
+	score, value = dotproductattention1(X,X,X, enc_valid_lens)
 	att_score = masked_softmax_(scores, enc_valid_lens)
-	att_embedding_ = att_embedding(att_score, X)
-	X = r_connection(X, att_embedding_)
+	att_embedding_ = att_embedding(att_score, value)
+	#X = r_connection(X, att_embedding_)
 
 	Y = dense_2(Y_input)
 
-	X = flattern(X)
+	X = flattern(att_embedding_)
 	Y = flattern(Y)
 
 	Y = tf.concat([X,Y],axis=1)
