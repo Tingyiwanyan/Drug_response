@@ -324,7 +324,7 @@ class drug_transformer():
 		self.masked_softmax_deco_self = masked_softmax()
 		self.masked_softmax_deco_cross =masked_softmax()
 
-		self.dotproductattention1 = dotproductattention(50)
+		self.dotproductattention1 = dotproductattention(10)
 
 		self.dotproductattention_deco = dotproductattention(10)
 
