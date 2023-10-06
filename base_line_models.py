@@ -136,7 +136,6 @@ def base_drug_transformer():
 	X = r_connection(value, att_embedding_)
 
 	Y = dense_2(Y_input)
-	score, value = dotproductattention1(X,X,X, enc_valid_lens)
 
 	X = flattern(X)
 	Y = flattern(Y)

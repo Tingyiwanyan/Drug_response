@@ -368,7 +368,6 @@ class drug_transformer():
 
 		#X_query = kernel_query(X)
 		#X_key = kernel_key(X)
-
 		#d = X.shape[-1]
 
 		#scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
@@ -380,7 +379,10 @@ class drug_transformer():
 		X = self.r_connection(value, att_embedding_)
 
 		Y = self.dense_2(Y_input)
-		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
+		score_deco, value_deco = self.dotproductattention_deco(Y,Y,Y)
+		att_score_deco = self.masked_softmax_(score_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		Y = self.r_connection(value_deco, att_embedding_deco)
 
 		X = self.flattern(X)
 		Y = self.flattern(Y)
