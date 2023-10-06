@@ -111,8 +111,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
 		#	kernel_regularizer=regularizers.L2(1e-4))
 
-		#self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
-			#kernel_regularizer=regularizers.L2(1e-4))
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
 
 	
 	def build(self, input_shape):
@@ -129,11 +129,11 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.b_query = tf.Variable(
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-		self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-			initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
+		#self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+		#	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
-		self.b_value = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+		#self.b_value = tf.Variable(
+		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 	
 
 	def call(self, queries, keys, values, valid_lens=None, **kwargs):
@@ -142,8 +142,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#queries = self.kernel_query(queries)
 		keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.matmul(values, self.kernel_value) + self.b_value
-		#values = self.kernel_value(values)
+		#values = tf.matmul(values, self.kernel_value) + self.b_value
+		values = self.kernel_value(values)
 
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 			tf.cast(d, dtype=tf.float32))
