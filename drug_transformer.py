@@ -390,7 +390,7 @@ class drug_transformer():
 		score_deco_cross, value_deco_cross = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
 		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
 		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
-		Y = self.r_connection(value_deco_cross, att_embedding_deco_cross)
+		Y = self.r_connection(Y, att_embedding_deco_cross)
 
 		X = self.flattern(X)
 		Y = self.flattern(Y)
