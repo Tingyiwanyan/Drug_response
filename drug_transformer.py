@@ -320,64 +320,37 @@ class drug_transformer():
 	"""
 	def __init__(self):
 
-		"""
-		encoder block 1
-		"""
-		self.encoder_1 = encoder_block(20, 130)
+		self.masked_softmax_ = masked_softmax()
+		self.dotproductattention1 = dotproductattention(50)
 
-		"""
-		decoder block 1
-		"""
-		self.decoder_1 = decoder_block(20, 1)
+		self.dotproductattention_deco = dotproductattention(50)
 
-		"""
-		flattern layer, fully connected layer and final projection layer
-		"""
+		self.att_embedding = attention_embedding()
+		self.r_connection = residual_connection()
+
+		self.dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_5 = tf.keras.layers.Dense(1)
+
+		self.kernel_key = tf.keras.layers.Dense(50, activation='sigmoid', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+		self.pos_encoding = positionalencoding(50,130)
+
+		#kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+		#	kernel_regularizer=regularizers.L2(1e-4))
+
+
 		self.flattern = tf.keras.layers.Flatten()
-		self.fc_layer = feed_forward_layer(20)
-		self.projection = tf.keras.layers.Dense(1)
-		self.concatenation_layer = concatenation_layer()
-
-		#self.feed_forward_encoder_layer = feed_forward_layer(50)
-
-		"""
-		trying out simple position-wise embedding
-		"""
-		self.pw_encoder_1 = position_wise_embedding(50)
-		self.pw_decoder_1 = position_wise_embedding(50)
-
-		self.pw_encoder_1_2 = position_wise_embedding(1)
-		self.pw_decoder_1_2 = position_wise_embedding(1)
-
-		self.fc_layer_encoder_1 = feed_forward_layer(10)
-		self.fc_layer_docoder_1 = feed_forward_layer(10)
-
-		self.pw_encoder_2 = position_wise_embedding(50)
-		self.pw_decoder_2 = position_wise_embedding(50)
-
-		self.pw_encoder_2_2 = position_wise_embedding(1)
-		self.pw_decoder_2_2 = position_wise_embedding(1)
-
-		self.fc_layer_encoder_2 = feed_forward_layer(10)
-		self.fc_layer_docoder_2 = feed_forward_layer(10)
-
-		self.pw_encoder_3 = position_wise_embedding(50)
-		self.pw_decoder_3 = position_wise_embedding(50)
-
-		self.pw_encoder_3_2 = position_wise_embedding(1)
-		self.pw_decoder_3_2 = position_wise_embedding(1)
-
-		self.fc_layer_encoder_3 = feed_forward_layer(10)
-		self.fc_layer_docoder_3 = feed_forward_layer(10)
-
-		self.pw_encoder_4 = position_wise_embedding(50)
-		self.pw_decoder_4 = position_wise_embedding(50)
-
-		self.pw_encoder_4_2 = position_wise_embedding(1)
-		self.pw_decoder_4_2 = position_wise_embedding(1)
-
-		self.fc_layer_encoder_4 = feed_forward_layer(10)
-		self.fc_layer_docoder_4 = feed_forward_layer(10)
 
 	def model_construction(self):
 		"""
@@ -387,74 +360,43 @@ class drug_transformer():
 		Y_input = Input((5842, 1))
 		enc_valid_lens = Input(())
 
-		"""
-		X, att_encoder_1 = self.encoder_1(X_input, enc_valid_lens)
+		#concatenation_layer = concatenation_layer()
 
-		Y, att_self_decoder_1, att_cross_decoder_1 = self.decoder_1(Y_input, X, enc_valid_lens)
+		X = self.dense_1(X_input)
+
+		X = self.pos_encoding(X)
+
+		#X_query = kernel_query(X)
+		#X_key = kernel_key(X)
+
+		#d = X.shape[-1]
+
+		#scores = tf.matmul(X_query, X_key, transpose_b=True)/tf.math.sqrt(
+		#	tf.cast(d, dtype=tf.float32))
+
+		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
+		att_score = self.masked_softmax_(score, enc_valid_lens)
+		att_embedding_ = self.att_embedding(att_score, value)
+		X = self.r_connection(value, att_embedding_)
+
+		Y = self.dense_2(Y_input)
+		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
 
 		X = self.flattern(X)
+		Y = flattern(Y)
 
-		Y = self.flattern(Y)
-		#Y = self.fc_layer(Y)
+		Y = tf.concat([X,Y],axis=1)
 
-		Y = self.concatenation_layer(X,Y)
-		Y = self.fc_layer(Y)
-		prediction = self.projection(Y)
+		Y = dense_3(Y)
+		Y = dense_4(Y)
+		Y = dense_5(Y)
 
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=prediction)
-		"""
+		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
-		X1 = self.pw_encoder_1(X_input)
-		X1 = self.pw_encoder_1_2(X1)
-		Y1 = self.pw_decoder_1(Y_input)
-		Y1 = self.pw_decoder_1_2(Y1)
+		return self.model
 
-		X2 = self.pw_encoder_2(X_input)
-		X2 = self.pw_encoder_2_2(X2)
-		Y2 = self.pw_decoder_2(Y_input)
-		Y2 = self.pw_decoder_2_2(Y2)
-
-		X3 = self.pw_encoder_3(X_input)
-		X3 = self.pw_encoder_3_2(X3)
-		Y3 = self.pw_decoder_3(Y_input)
-		Y3 = self.pw_decoder_3_2(Y3)
-
-		X3 = self.flattern(X3)
-		#X2 = self.fc_layer_encoder_2(X2)
-		Y3 = self.flattern(Y3)
-		Y3 = self.fc_layer_docoder_3(Y3)
-
-		X2 = self.flattern(X2)
-		#X2 = self.fc_layer_encoder_2(X2)
-		Y2 = self.flattern(Y2)
-		Y2 = self.fc_layer_docoder_2(Y2)
-
-		X1 = self.flattern(X1)
-		#X1 = self.fc_layer_encoder_1(X1)
-		Y1 = self.flattern(Y1)
-		Y1 = self.fc_layer_docoder_1(Y1)
-
-		Y1 = self.concatenation_layer(X1,Y1)
-		Y2 = self.concatenation_layer(X2,Y2)
-		Y3 = self.concatenation_layer(X3,Y3)
-
-		Y = self.concatenation_layer(Y1,Y2)
-		Y = self.concatenation_layer(Y,Y3)
-
-		Y = self.fc_layer(Y)
-		prediction = self.projection(Y)
-
-		self.model = Model(inputs=(X_input, Y_input), outputs=prediction)
-
-	#return model
-
-	def model_compile(self):
-		"""
-		model compiling for training
-		"""
-		self.model.compile(loss= "mean_squared_error" , 
-			optimizer="adam", metrics=["mean_squared_error"])
 
 
 

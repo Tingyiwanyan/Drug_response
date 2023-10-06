@@ -87,6 +87,8 @@ def base_drug_transformer():
 	masked_softmax_ = masked_softmax()
 	dotproductattention1 = dotproductattention(50)
 
+	dotproductattention_deco = dotproductattention(50)
+
 	att_embedding = attention_embedding()
 	r_connection = residual_connection()
 
@@ -134,6 +136,7 @@ def base_drug_transformer():
 	X = r_connection(value, att_embedding_)
 
 	Y = dense_2(Y_input)
+	score, value = dotproductattention1(X,X,X, enc_valid_lens)
 
 	X = flattern(X)
 	Y = flattern(Y)
@@ -149,6 +152,7 @@ def base_drug_transformer():
 	model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 	return model
+
 
 
 def att_score_output(input_model):
