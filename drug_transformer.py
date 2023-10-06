@@ -383,13 +383,13 @@ class drug_transformer():
 		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
 
 		X = self.flattern(X)
-		Y = flattern(Y)
+		Y = self.flattern(Y)
 
 		Y = tf.concat([X,Y],axis=1)
 
-		Y = dense_3(Y)
-		Y = dense_4(Y)
-		Y = dense_5(Y)
+		Y = self.dense_3(Y)
+		Y = self.dense_4(Y)
+		Y = self.dense_5(Y)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
