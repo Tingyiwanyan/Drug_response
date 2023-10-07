@@ -46,11 +46,11 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #testing_drug_smile_length = 50*np.ones((2000))
 #testing_ic50 = np.ones((2000))
 
-#k = drug_transformer()
-#model = k.model_construction()
+k = drug_transformer()
+model = k.model_construction()
 #k.model_compile()
 
-model = base_drug_transformer()
+#model = base_drug_transformer()
 
 #att_output_model = att_score_output(model)
 #att_output_ = att_output_model.predict((drug_one_hot_encoding_test[0:10], gene_expression_test[0:10], np.array(drug_smile_length_test)[0:10]))
