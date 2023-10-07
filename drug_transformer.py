@@ -335,7 +335,7 @@ class drug_transformer():
 
 		self.dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -351,7 +351,8 @@ class drug_transformer():
 
 		self.pos_encoding = positionalencoding(50,130)
 
-		self.flattern = tf.keras.layers.Flatten()
+		self.flattern_enco = tf.keras.layers.Flatten()
+		self.falttern_deco = tf.keras.layers.Flatten()
 
 	def model_construction(self):
 		"""
@@ -392,8 +393,8 @@ class drug_transformer():
 		#att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 		#Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
-		X = self.flattern(X)
-		Y = self.flattern(Y)
+		X = self.flattern_enco(X)
+		Y = self.flattern_deco(Y)
 
 		Y = tf.concat([X,Y],axis=1)
 
