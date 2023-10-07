@@ -396,7 +396,7 @@ class drug_transformer():
 		X = self.flattern_enco(X)
 		Y = self.flattern_deco(Y)
 
-		#Y = tf.concat([X,Y],axis=1)
+		Y = tf.concat([X,Y],axis=1)
 
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
