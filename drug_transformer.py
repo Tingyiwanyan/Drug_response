@@ -149,7 +149,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values
+		return scores, values, queries
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
@@ -324,9 +324,9 @@ class drug_transformer():
 		self.masked_softmax_deco_self = masked_softmax()
 		self.masked_softmax_deco_cross =masked_softmax()
 
-		self.dotproductattention1 = dotproductattention(10)
+		self.dotproductattention1 = dotproductattention(50)
 
-		self.dotproductattention_deco = dotproductattention(10)
+		self.dotproductattention_deco = dotproductattention(5)
 
 		self.dotproductattention_deco_cross = dotproductattention(10)
 
@@ -369,7 +369,7 @@ class drug_transformer():
 		"""
 		self attention for the encoder
 		"""
-		score, value = self.dotproductattention1(X,X,X, enc_valid_lens)
+		score, value, query = self.dotproductattention1(X,X,X, enc_valid_lens)
 		att_score = self.masked_softmax_(score, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 		X = self.r_connection(value, att_embedding_)
@@ -379,7 +379,7 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 		Y = self.r_connection(value_deco, att_embedding_deco)
@@ -387,10 +387,10 @@ class drug_transformer():
 		"""
 		cross attention for the deocoder
 		"""
-		score_deco_cross, value_deco_cross = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
-		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
-		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
-		Y = self.r_connection(Y, att_embedding_deco_cross)
+		#score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
+		#att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
+		#att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+		#Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		X = self.flattern(X)
 		Y = self.flattern(Y)
