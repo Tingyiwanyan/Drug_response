@@ -393,10 +393,10 @@ class drug_transformer():
 		#att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 		#Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
-		X = self.flattern_enco(X)
-		Y = self.flattern_deco(att_embedding_deco)
+		Y = self.flattern_enco(X)
+		#Y = self.flattern_deco(att_embedding_deco)
 
-		Y = tf.concat([X,Y],axis=1)
+		#Y = tf.concat([X,Y],axis=1)
 
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
