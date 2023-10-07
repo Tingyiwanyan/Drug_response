@@ -379,10 +379,10 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
-		Y = self.r_connection(value_deco, att_embedding_deco)
+		#score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		#att_score_deco = self.masked_softmax_deco_self(score_deco)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		#Y = self.r_connection(value_deco, att_embedding_deco)
 
 		"""
 		cross attention for the deocoder
