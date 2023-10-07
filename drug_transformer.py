@@ -352,7 +352,7 @@ class drug_transformer():
 		self.pos_encoding = positionalencoding(50,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
-		self.falttern_deco = tf.keras.layers.Flatten()
+		self.flattern_deco = tf.keras.layers.Flatten()
 
 	def model_construction(self):
 		"""
