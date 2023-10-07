@@ -328,7 +328,7 @@ class drug_transformer():
 
 		self.dotproductattention_deco = dotproductattention(5)
 
-		self.dotproductattention_deco_cross = dotproductattention(10)
+		self.dotproductattention_deco_cross = dotproductattention(5)
 
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
@@ -380,9 +380,9 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		#score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
-		#att_score_deco = self.masked_softmax_deco_self(score_deco)
-		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		att_score_deco = self.masked_softmax_deco_self(score_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 		#Y = self.r_connection(value_deco, att_embedding_deco)
 
 		"""
@@ -394,7 +394,7 @@ class drug_transformer():
 		#Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		X = self.flattern_enco(X)
-		Y = self.flattern_deco(Y)
+		Y = self.flattern_deco(att_embedding_deco)
 
 		Y = tf.concat([X,Y],axis=1)
 
