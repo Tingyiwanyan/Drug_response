@@ -326,7 +326,7 @@ class drug_transformer():
 
 		self.dotproductattention1 = dotproductattention(50)
 
-		self.dotproductattention_deco = dotproductattention(10)
+		self.dotproductattention_deco = dotproductattention(5)
 
 		self.dotproductattention_deco_cross = dotproductattention(5)
 
