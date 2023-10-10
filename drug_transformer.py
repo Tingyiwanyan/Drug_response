@@ -41,7 +41,7 @@ class masked_softmax_selected(tf.keras.layers.Layer):
 	Algorithm: for the calculated dot product scores, first select
 	the customized number of attention slots for picking features
 	"""
-	def __init__(self, top_k = 100, value=-1e7):
+	def __init__(self, top_k = 10, value=-1e7):
 		super().__init__()
 		self.value = value
 		self.top_k = top_k
