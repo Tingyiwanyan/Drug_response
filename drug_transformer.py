@@ -19,7 +19,7 @@ class masked_softmax(tf.keras.layers.Layer):
 		"""
 		if valid_lens == None:
 			return tf.nn.softmax(X, axis=-1)
-			print("Im here")
+			#print("Im here")
 		else:
 			shape_X = tf.shape(X)
 			X = tf.reshape(X, shape=(-1, X.shape[-1]))
@@ -34,6 +34,42 @@ class masked_softmax(tf.keras.layers.Layer):
 			X = tf.where(mask, X, self.value)
 
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+
+class masked_softmax_selected(tf.keras.layers.Layer):
+	"""
+	Define selected maksed for softmax layer.
+	Algorithm: for the calculated dot product scores, first select
+	the customized number of attention slots for picking features
+	"""
+	def __init__(self, top_k = 100, value=-1e7):
+		super().__init__()
+		self.value = value
+		self.top_k = top_k
+
+	def call(self, X  **kwargs):
+		"""
+		Parameters:
+		-----------
+		X: 2D tensor specifying the attention score matrix (before softmax) [query_seq_length, key_seq_length]
+		"""
+		shape_X = tf.shape(X)
+		X = tf.reshape(X, shape=(-1, X.shape[-1]))
+		X_top_index = tf.math.top_k(X, k=self.top_k)[0]
+		reshape_X = tf.shape(X)
+		X_top_index = tf.broadcast_to(X_top_index, shape=reshap_X)
+
+		mask = tf.cast(X >= X_top_index)
+		#maxlen = X.shape[1]
+		#mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
+		#mask = tf.broadcast_to(mask, shape=reshape_X)
+
+		#valid_lens = tf.repeat(valid_lens, repeats = shape_X[1])
+		#mask = mask < tf.cast(valid_lens[:, None], dtype=tf.float32)
+
+		X = tf.where(mask, X, self.value)
+
+		return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+
 
 class positionalencoding(tf.keras.layers.Layer):  
 	"""Positional encoding."""
@@ -321,7 +357,7 @@ class drug_transformer():
 	def __init__(self):
 
 		self.masked_softmax_ = masked_softmax()
-		self.masked_softmax_deco_self = masked_softmax()
+		self.masked_softmax_deco_self = masked_softmax_selected()
 		self.masked_softmax_deco_cross =masked_softmax()
 
 		self.dotproductattention1 = dotproductattention(50)
