@@ -46,7 +46,7 @@ class masked_softmax_selected(tf.keras.layers.Layer):
 		self.value = value
 		self.top_k = top_k
 
-	def call(self, X  **kwargs):
+	def call(self, X, **kwargs):
 		"""
 		Parameters:
 		-----------
