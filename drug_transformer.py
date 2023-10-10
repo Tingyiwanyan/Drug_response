@@ -60,7 +60,7 @@ class masked_softmax_selected(tf.keras.layers.Layer):
 		reshape_X = tf.shape(X)
 		X_top_index = tf.broadcast_to(X_top_index, shape=reshape_X)
 
-		mask = tf.cast(X >= X_top_index)
+		mask = tf.cast(X >= X_top_index, dtype=tf.float32)
 		#maxlen = X.shape[1]
 		#mask = tf.range(start=0, limit=shape_X[-1], dtype=tf.float32)[None,:]
 		#mask = tf.broadcast_to(mask, shape=reshape_X)
