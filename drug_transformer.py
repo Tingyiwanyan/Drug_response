@@ -362,7 +362,7 @@ class drug_transformer():
 		self.masked_softmax_deco_self = masked_softmax_selected()
 		self.masked_softmax_deco_cross =masked_softmax()
 
-		self.dotproductattention1 = dotproductattention(50)
+		self.dotproductattention1 = dotproductattention(10)
 
 		self.dotproductattention_deco = dotproductattention(5)
 
@@ -371,7 +371,7 @@ class drug_transformer():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
