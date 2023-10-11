@@ -410,10 +410,10 @@ class drug_transformer():
 		"""
 		self attention for the encoder
 		"""
-		#score, value, query = self.dotproductattention1(X,X,X, enc_valid_lens)
-		#att_score = self.masked_softmax_(score, enc_valid_lens)
-		#att_embedding_ = self.att_embedding(att_score, value)
-		#X = self.r_connection(value, att_embedding_)
+		score, value, query = self.dotproductattention1(X,X,X, enc_valid_lens)
+		att_score = self.masked_softmax_(score, enc_valid_lens)
+		att_embedding_ = self.att_embedding(att_score, value)
+		X = self.r_connection(value, att_embedding_)
 
 
 		"""
