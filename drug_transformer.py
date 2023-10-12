@@ -444,8 +444,8 @@ class drug_transformer():
 		att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
 		att_embedding_2 = self.att_embedding(att_score2, value2)
 
-		att_embedding_ = tf.concat([att_embedding_, att_embedding_2], axis=-1)
-		value = tf.concat([value,value2],axis=-1)
+		#att_embedding_ = tf.concat([att_embedding_, att_embedding_2], axis=-1)
+		#value = tf.concat([value,value2],axis=-1)
 
 
 		X = self.r_connection(value, att_embedding_)
@@ -463,8 +463,8 @@ class drug_transformer():
 		att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
 		att_embedding_deco2 = self.att_embedding(att_score_deco2, value_deco2)
 
-		att_embedding_deco = tf.concat([att_embedding_deco, att_embedding_deco2],axis=-1)
-		value_deco = tf.concat([value_deco, value_deco2],axis=-1)
+		#att_embedding_deco = tf.concat([att_embedding_deco, att_embedding_deco2],axis=-1)
+		#value_deco = tf.concat([value_deco, value_deco2],axis=-1)
 
 
 		Y = self.r_connection(value_deco, att_embedding_deco)
@@ -480,8 +480,8 @@ class drug_transformer():
 		att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2)
 		att_embedding_deco_cross2 = self.att_embedding(att_score_deco_cross2, value_deco_cross2)
 
-		att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
-		query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
+		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
+		#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
 		Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
