@@ -359,8 +359,11 @@ class drug_transformer():
 	def __init__(self):
 
 		self.masked_softmax_ = masked_softmax()
+		self.masked_softmax_2 = masked_softmax()
 		self.masked_softmax_deco_self = masked_softmax()
-		self.masked_softmax_deco_cross =masked_softmax()
+		self.masked_softmax_deco_self2 = masked_softmax()
+		self.masked_softmax_deco_cross = masked_softmax()
+		self.masked_softmax_deco_cross2 = masked_softmax()
 
 		"""
 		1st head attention
@@ -437,8 +440,8 @@ class drug_transformer():
 		att_score = self.masked_softmax_(score, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 
-		score2, value2, query2 = self.dotproductattention1(X,X,X, enc_valid_lens)
-		att_score2 = self.masked_softmax_(score2, enc_valid_lens)
+		score2, value2, query2 = self.dotproductattention2(X,X,X, enc_valid_lens)
+		att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
 		att_embedding_2 = self.att_embedding(att_score2, value2)
 
 		att_embedding_ = tf.concat([att_embedding_, att_embedding_2], axis=-1)
@@ -456,8 +459,8 @@ class drug_transformer():
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
-		score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco2 = self.masked_softmax_deco_self(score_deco2)
+		score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
+		att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
 		att_embedding_deco2 = self.att_embedding(att_score_deco2, value_deco2)
 
 		att_embedding_deco = tf.concat([att_embedding_deco, att_embedding_deco2],axis=-1)
@@ -473,8 +476,8 @@ class drug_transformer():
 		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
 		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
-		score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
-		att_score_deco_cross2 = self.masked_softmax_deco_cross(score_deco_cross2)
+		score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X, enc_valid_lens)
+		att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2)
 		att_embedding_deco_cross2 = self.att_embedding(att_score_deco_cross2, value_deco_cross2)
 
 		att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
