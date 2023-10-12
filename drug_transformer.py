@@ -36,6 +36,76 @@ class masked_softmax(tf.keras.layers.Layer):
 			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
 
 
+class masked_softmax_sliding_window(tf.keras.layers.Layer):
+	"""
+	Assign sliding window mask
+
+	Parameters:
+	-----------
+	top_k: sliding window size
+	step_size: sliding window step size
+	"""
+	def __init__(self, top_k = 100, value=-1e7, maxval=5842, step_size=1):
+		super().__init__()
+		self.value = value
+		self.top_k = top_k
+		self.maxval = maxval
+		self.step_size = step_size
+
+	def call(self, X, **kwargs):
+		"""
+		Parameters:
+		-----------
+		X: 2D tensor specifying the attention score matrix (before softmax) [query_seq_length, key_seq_length]
+		"""
+		shape_X = tf.shape(X)
+		mask = tf.zeros((shape_X[1],shape_X[-1]), dtype=bool)
+
+		select_mask = tf.ones((shape_X[1]*self.top_k), dtype=bool)
+
+		gene_indices = tf.range(start=0, limit=shape_X[1], dtype=tf.dtypes.int32)
+		gene_indices = tf.repeat(gene_indices, repeats = self.top_k)
+
+		slide_single = tf.range(start=0, limit=self.top_k, dtype=tf.dtypes.int32)
+		slide_window = tf.expand_dims(slide_single, axis=0)
+		slide_window = tf.broadcast_to(slide_window, shape=(shape_X[1], self.top_k))
+
+		max_value_step = self.maxval - self.top_k
+		step_ = tf.range(start=0, limit=max_value_step, delta=self.step_size)
+		pad_size = self.maxval - tf.shape(step_)[0]
+
+		pad_window = tf.constant(step_[-1],shape=(pad_size,))
+
+		step_ = tf.concat([step_, pad_window], axis=-1)
+
+		step_ = tf.expand_dims(step_, axis=1)
+		step_ = tf.broadcast_to(step_, shape=(shape_X[1], self.top_k))
+
+		slide_window_indices = tf.math.add(slide_window, step_)
+
+		slide_window_indices = tf.reshape(slide_window_indices, shape=(shape_X[1]*self.top_k))
+
+
+		#random_indices = tf.random.uniform(shape=[shape_X[1]*self.top_k], minval=0, maxval=self.maxval, dtype=tf.dtypes.int32)
+
+		gene_indices = tf.stack([gene_indices, random_indices],axis=-1)
+
+		mask = tf.tensor_scatter_nd_update(mask, gene_indices, select_mask)
+		mask = tf.expand_dims(mask, axis=0) 
+		mask = tf.broadcast_to(mask, shape=shape_X)
+
+		X = tf.reshape(X, shape=(-1, X.shape[-1]))
+		mask = tf.reshape(mask, shape=(-1, X.shape[-1]))
+		reshape_X = tf.shape(X)
+
+
+		X_slide_window = tf.where(mask, X, self.value)
+
+		mask = tf.reshape(mask, shape=shape_X)
+
+
+		return tf.nn.softmax(tf.reshape(X_slide_window, shape=shape_X), axis=-1)
+
 class masked_softmax_random(tf.keras.layers.Layer):
 	"""
 	Assign random mask to attentions(query->key)
@@ -80,9 +150,13 @@ class masked_softmax_random(tf.keras.layers.Layer):
 		reshape_X = tf.shape(X)
 
 
-		X = tf.where(mask, X, self.value)
+		X_random = tf.where(mask, X, self.value)
 
-		return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+		mask = tf.reshape(mask, shape=shape_X)
+
+
+		return tf.nn.softmax(tf.reshape(X_random, shape=shape_X), axis=-1), 
+		tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1), mask
 
 class masked_softmax_selected(tf.keras.layers.Layer):
 	"""
@@ -409,7 +483,7 @@ class drug_transformer():
 
 		self.masked_softmax_ = masked_softmax()
 		self.masked_softmax_2 = masked_softmax()
-		self.masked_softmax_deco_self = masked_softmax_random()
+		self.masked_softmax_deco_self = masked_softmax_sliding_window()
 		self.masked_softmax_deco_self2 = masked_softmax()
 		self.masked_softmax_deco_cross = masked_softmax()
 		self.masked_softmax_deco_cross2 = masked_softmax()
