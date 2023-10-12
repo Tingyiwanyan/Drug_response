@@ -45,6 +45,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #testing_drug_one_hot = np.ones((2000,130,56))
 #testing_drug_smile_length = 50*np.ones((2000))
 #testing_ic50 = np.ones((2000))
+inital_model = tf.keras.saving.load_model('single_head.tf')
 
 k = drug_transformer()
 model = k.model_construction()
