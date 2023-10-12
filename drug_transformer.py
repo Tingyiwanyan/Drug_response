@@ -467,7 +467,7 @@ class drug_transformer():
 		#value_deco = tf.concat([value_deco, value_deco2],axis=-1)
 
 
-		Y = self.r_connection(value_deco, att_embedding_deco)
+		#Y = self.r_connection(value_deco, att_embedding_deco)
 
 		"""
 		cross attention for the deocoder
