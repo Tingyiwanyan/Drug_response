@@ -39,7 +39,7 @@ class masked_softmax(tf.keras.layers.Layer):
 class masked_softmax_random(tf.keras.layers.Layer):
 	"""
 	Assign random mask to attentions(query->key)
-	Algorith: for each query token, select random corresponded key tokens,
+	Algorithm: for each query token, select random corresponded key tokens,
 	then assign mask to those tokens.
 
 	Parameters:
@@ -62,7 +62,7 @@ class masked_softmax_random(tf.keras.layers.Layer):
 		shape_X = tf.shape(X)
 		mask = tf.zeros((shape_X[1],shape_X[-1]), dtype=bool)
 
-		select_mask = tf.ones((shape_X[1]), dtype=bool)
+		select_mask = tf.ones((shape_X[1]*self.top_k), dtype=bool)
 
 		gene_indices = tf.range(start=0, limit=shape_X[1], dtype=tf.dtypes.int32)
 		gene_indices = tf.repeat(gene_indices, repeats = self.top_k)
