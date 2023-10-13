@@ -85,7 +85,7 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 
 		slide_window_indices = tf.math.add(slide_window, step_)
 
-		slide_window_indices = tf.reshape(slide_window_indices, shape=(shape_X[1]*self.top_k))
+		slide_window_indices = tf.reshape(slide_window_indices, shape=(shape_X[1]*self.top_k,))
 
 
 		#random_indices = tf.random.uniform(shape=[shape_X[1]*self.top_k], minval=0, maxval=self.maxval, dtype=tf.dtypes.int32)
