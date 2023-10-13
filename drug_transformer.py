@@ -81,7 +81,7 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 		step_ = tf.concat([step_, pad_window], axis=-1)
 
 		step_ = tf.expand_dims(step_, axis=1)
-		step_ = tf.broadcast_to(step_, shape=(shape_X[1], self.top_k))
+		step_ = tf.cast(tf.broadcast_to(step_, shape=(shape_X[1], self.top_k)),tf.int32)
 
 		slide_window_indices = tf.math.add(slide_window, step_)
 
