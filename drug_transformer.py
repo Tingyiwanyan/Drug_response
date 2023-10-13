@@ -71,8 +71,8 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 		slide_window = tf.broadcast_to(slide_window, shape=(shape_X[1], self.top_k))
 
 		max_value_step = self.maxval - self.top_k
-		step_ = tf.range(start=0, limit=max_value_step, delta=self.step_size)
-		pad_size = self.maxval - tf.shape(step_)[0]
+		step_ = tf.cast(tf.range(start=0, limit=max_value_step, delta=self.step_size), dtype=tf.float32)
+		pad_size = tf.cast(self.maxval - tf.shape(step_)[0], dtype=tf.float32)
 
 		#pad_window = tf.constant(step_[-1],shape=(pad_size,))
 
