@@ -90,7 +90,7 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 
 		#random_indices = tf.random.uniform(shape=[shape_X[1]*self.top_k], minval=0, maxval=self.maxval, dtype=tf.dtypes.int32)
 
-		gene_indices = tf.stack([gene_indices, random_indices],axis=-1)
+		gene_indices = tf.stack([gene_indices, slide_window_indices],axis=-1)
 
 		mask = tf.tensor_scatter_nd_update(mask, gene_indices, select_mask)
 		mask = tf.expand_dims(mask, axis=0) 
