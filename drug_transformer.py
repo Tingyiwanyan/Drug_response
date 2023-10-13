@@ -74,7 +74,9 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 		step_ = tf.range(start=0, limit=max_value_step, delta=self.step_size)
 		pad_size = self.maxval - tf.shape(step_)[0]
 
-		pad_window = tf.constant(step_[-1],shape=(pad_size,))
+		#pad_window = tf.constant(step_[-1],shape=(pad_size,))
+
+		pad_window = tf.ones(shape=(pad_size,))*step_[-1]
 
 		step_ = tf.concat([step_, pad_window], axis=-1)
 
