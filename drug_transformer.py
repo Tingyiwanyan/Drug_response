@@ -252,6 +252,71 @@ class position_wise_embedding(tf.keras.layers.Layer):
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
 	Define scaled dot product layer
+
+	Parameters:
+	-----------
+	kernel_key: embedding matrix for key
+	kernel_value: embedding matrix for value
+	kernel_query: embedding matrix for query
+
+	Returns:
+	--------
+	attention_score: the scale dot product score
+	"""
+	def __init__(self, output_dim):
+		super().__init__()
+		self.output_dim = output_dim
+		#self.masked_softmax = masked_softmax()
+
+		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		#	kernel_regularizer=regularizers.L2(1e-4))
+
+		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		#	kernel_regularizer=regularizers.L2(1e-4))
+ 
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+	
+	def build(self, input_shape):
+		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		b_init = tf.zeros_initializer()
+		self.b_key = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		self.b_query = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+
+		#self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+		#	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
+
+		#self.b_value = tf.Variable(
+		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+	
+
+	def call(self, queries, keys, values, valid_lens=None, **kwargs):
+		d = queries.shape[-1]
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		#queries = self.kernel_query(queries)
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		#keys = self.kernel_key(keys)
+		#values = tf.matmul(values, self.kernel_value) + self.b_value
+		values = self.kernel_value(values)
+		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+			tf.cast(d, dtype=tf.float32))
+
+		#self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return scores, values, queries
+
+class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
+	"""
+	Define scaled dot product layer
 	Adding Linformer algorithms for reduce the gene-gene
 	self-attention computation to linear time:
 	https://arxiv.org/abs/2006.04768
@@ -268,11 +333,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, project_dim=200, if_linear=False):
+	def __init__(self, output_dim, project_dim=200):
 		super().__init__()
 		self.output_dim = output_dim
 		self.project_dim = project_dim
-		self.if_linear = False
 		#self.masked_softmax = masked_softmax()
 
 		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
@@ -320,13 +384,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
-		if self.if_linear == False:
-			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-				tf.cast(d, dtype=tf.float32))
-		else:
-			projected_keys = tf.matmul(self.kernel_projection_e, keys)
-			scores = tf.matmul(tf.matmul(queries, projected_keys, transpose_b=True), 
-				self.kernel_projection_f)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
+		
+		projected_keys = tf.matmul(self.kernel_projection_e, keys)
+		scores = tf.matmul(tf.matmul(queries, projected_keys, transpose_b=True), 
+			self.kernel_projection_f)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
 		return scores, values, queries
@@ -512,7 +573,7 @@ class drug_transformer():
 		"""
 		self.dotproductattention1 = dotproductattention(10)
 
-		self.dotproductattention_deco = dotproductattention(10, if_linear=True)
+		self.dotproductattention_deco = dotproductattention_linformer(10)
 
 		self.dotproductattention_deco_cross = dotproductattention(10)
 
