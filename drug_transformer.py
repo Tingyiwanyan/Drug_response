@@ -333,7 +333,7 @@ class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, project_dim=10):
+	def __init__(self, output_dim, project_dim=5):
 		super().__init__()
 		self.output_dim = output_dim
 		self.project_dim = project_dim
