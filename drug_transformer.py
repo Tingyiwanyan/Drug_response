@@ -252,20 +252,26 @@ class position_wise_embedding(tf.keras.layers.Layer):
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
 	Define scaled dot product layer
+	Adding Linformer algorithms for reduce the gene-gene
+	self-attention computation to linear time:
+	https://arxiv.org/abs/2006.04768
 
 	Parameters:
 	-----------
 	kernel_key: embedding matrix for key
 	kernel_value: embedding matrix for value
 	kernel_query: embedding matrix for query
+	kernel_projection_e: the linear projection matrix for keys
+	kernel_projection_f: the linear projection matrix for values
 
 	Returns:
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim):
+	def __init__(self, output_dim, project_dim=200):
 		super().__init__()
 		self.output_dim = output_dim
+		self.project_dim = project_dim
 		#self.masked_softmax = masked_softmax()
 
 		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
@@ -273,7 +279,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
 		#	kernel_regularizer=regularizers.L2(1e-4))
-
+ 
 		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
@@ -292,6 +298,12 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.b_query = tf.Variable(
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
+		self.kernel_projection_e = self.add_weight(name = 'kernel_quary', shape = (self.project_dim, input_shape[1]),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		self.kernel_projection_f = self.add_weight(name = 'kernel_quary', shape = (self.project_dim, input_shape[1]),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
 		#self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 		#	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
 
@@ -299,7 +311,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 	
 
-	def call(self, queries, keys, values, valid_lens=None, **kwargs):
+	def call(self, queries, keys, values, valid_lens=None, if_linear=None, **kwargs):
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
@@ -307,9 +319,13 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
-
-		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-			tf.cast(d, dtype=tf.float32))
+		if not if_linear == None:
+			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+				tf.cast(d, dtype=tf.float32))
+		else:
+			projected_keys = tf.matmul(self.kernel_projection_e, keys)
+			scores = tf.matmul(tf.matmul(queries, projected_keys, transpose_b=True), 
+				self.kernel_projection_f)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
 		return scores, values, queries
@@ -485,7 +501,7 @@ class drug_transformer():
 
 		self.masked_softmax_ = masked_softmax()
 		self.masked_softmax_2 = masked_softmax()
-		self.masked_softmax_deco_self = masked_softmax_sliding_window()
+		self.masked_softmax_deco_self = masked_softmax()
 		self.masked_softmax_deco_self2 = masked_softmax()
 		self.masked_softmax_deco_cross = masked_softmax()
 		self.masked_softmax_deco_cross2 = masked_softmax()
@@ -561,11 +577,11 @@ class drug_transformer():
 		"""
 		self attention for the encoder
 		"""
-		score, value, query = self.dotproductattention1(X,X,X, enc_valid_lens)
+		score, value, query = self.dotproductattention1(X,X,X)
 		att_score = self.masked_softmax_(score, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 
-		score2, value2, query2 = self.dotproductattention2(X,X,X, enc_valid_lens)
+		score2, value2, query2 = self.dotproductattention2(X,X,X)
 		att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
 		att_embedding_2 = self.att_embedding(att_score2, value2)
 
@@ -580,7 +596,7 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y, if_linear=True)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
