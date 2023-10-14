@@ -385,13 +385,13 @@ class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
 
-		values = tf.matmul(self.kernel_projection_f, values)
+		values_linformer = tf.matmul(self.kernel_projection_f, values)
 		
 		projected_keys = tf.matmul(self.kernel_projection_e, keys)
 		scores = tf.matmul(queries, projected_keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries
+		return scores, values, queries, values_linformer
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
@@ -659,9 +659,9 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
 
 		score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
 		att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
