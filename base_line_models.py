@@ -81,7 +81,7 @@ def base_drug_transformer():
 	Abalation study on basic configuration transformer
 	"""
 	X_input = Input((130, 56))
-	Y_input = Input((5842, 1))
+	Y_input = Input((5843, 1))
 	enc_valid_lens = Input(())
 
 	masked_softmax_ = masked_softmax()
@@ -175,7 +175,7 @@ def double_shallow_position_wise_nn():
 	Abalation study on testing double head position wise nn
 	"""
 	X_input = Input((130, 56))
-	Y_input = Input((5842, 1))
+	Y_input = Input((5843, 1))
 
 	dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
