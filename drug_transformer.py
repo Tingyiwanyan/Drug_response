@@ -384,10 +384,11 @@ class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
+
+		values = tf.matmul(self.kernel_projection_f, values)
 		
 		projected_keys = tf.matmul(self.kernel_projection_e, keys)
-		scores = tf.matmul(tf.matmul(queries, projected_keys, transpose_b=True), 
-			self.kernel_projection_f)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
+		scores = tf.matmul(queries, projected_keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
 		return scores, values, queries
