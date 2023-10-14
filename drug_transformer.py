@@ -268,10 +268,11 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, project_dim=200):
+	def __init__(self, output_dim, project_dim=200, if_linear=False):
 		super().__init__()
 		self.output_dim = output_dim
 		self.project_dim = project_dim
+		self.if_linear = False
 		#self.masked_softmax = masked_softmax()
 
 		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
@@ -311,7 +312,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 	
 
-	def call(self, queries, keys, values, valid_lens=None, if_linear=None, **kwargs):
+	def call(self, queries, keys, values, valid_lens=None, **kwargs):
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
@@ -319,7 +320,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
-		if not if_linear == None:
+		if self.if_linear == False:
 			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 				tf.cast(d, dtype=tf.float32))
 		else:
@@ -511,7 +512,7 @@ class drug_transformer():
 		"""
 		self.dotproductattention1 = dotproductattention(10)
 
-		self.dotproductattention_deco = dotproductattention(10)
+		self.dotproductattention_deco = dotproductattention(10, if_linear=True)
 
 		self.dotproductattention_deco_cross = dotproductattention(10)
 
@@ -596,7 +597,7 @@ class drug_transformer():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y, if_linear=True)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
@@ -613,12 +614,12 @@ class drug_transformer():
 		"""
 		cross attention for the deocoder
 		"""
-		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X, enc_valid_lens)
-		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross)
+		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
+		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
 		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
-		score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X, enc_valid_lens)
-		att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2)
+		score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X)
+		att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2, enc_valid_lens)
 		att_embedding_deco_cross2 = self.att_embedding(att_score_deco_cross2, value_deco_cross2)
 
 		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
