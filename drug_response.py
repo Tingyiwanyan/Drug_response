@@ -23,21 +23,21 @@ cell_line_drug_feature_test, ic50_list_test, drug_name_list_test = process_chunc
 """
 
 
-gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+gene_expression, drug_one_hot_encoding, ic50_list, drug_name_list,drug_smile_length, CCLE_name = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	train_sample_num)
 
 gene_expression = tf.reshape(gene_expression,[gene_expression.shape[0],gene_expression.shape[1],1])
 drug_one_hot_encoding = tf.reshape(drug_one_hot_encoding,[drug_one_hot_encoding.shape[0],130,56])
 
-gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list_test,drug_smile_length_test = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
+gene_expression_test, drug_one_hot_encoding_test, ic50_list_test, drug_name_list_test,drug_smile_length_test, CCLE_name_test = process_chunck_data_transformer(drug_cellline_features_ic50_normalized_df, gene_expression_filtered,
 	test_sample_num)
 
 gene_expression_test = tf.reshape(gene_expression_test,[gene_expression_test.shape[0],gene_expression_test.shape[1],1])
 drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot_encoding_test.shape[0],130,56])
 
 
-train_dataset = tf.data.Dataset.from_tensor_slices(
-            (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
+#train_dataset = tf.data.Dataset.from_tensor_slices(
+#            (gene_expression, drug_one_hot_encoding, drug_smile_length, np.array(ic50_list)))
 
 
 
@@ -45,7 +45,7 @@ train_dataset = tf.data.Dataset.from_tensor_slices(
 #testing_drug_one_hot = np.ones((2000,130,56))
 #testing_drug_smile_length = 50*np.ones((2000))
 #testing_ic50 = np.ones((2000))
-inital_model = tf.keras.saving.load_model('single_head.tf')
+#inital_model = tf.keras.saving.load_model('single_head.tf')
 
 k = drug_transformer()
 model = k.model_construction()

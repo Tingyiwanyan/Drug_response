@@ -45,7 +45,7 @@ class masked_softmax_sliding_window(tf.keras.layers.Layer):
 	top_k: sliding window size
 	step_size: sliding window step size
 	"""
-	def __init__(self, top_k = 200, value=-1e7, maxval=5842, step_size=30):
+	def __init__(self, top_k = 200, value=-1e7, maxval=5843, step_size=30):
 		super().__init__()
 		self.value = value
 		self.top_k = top_k
@@ -119,7 +119,7 @@ class masked_softmax_random(tf.keras.layers.Layer):
 	top_k: customized variable indicating how many random tokens to be selected
 	value: the negative infinity value in order to make softmax probability zero
 	"""
-	def __init__(self, top_k = 100, value=-1e7, maxval=5842):
+	def __init__(self, top_k = 100, value=-1e7, maxval=5843):
 		super().__init__()
 		self.value = value
 		self.top_k = top_k
@@ -564,7 +564,7 @@ class drug_transformer():
 		construct the transformer model
 		"""
 		X_input = Input((130, 56))
-		Y_input = Input((5842, 1))
+		Y_input = Input((5843, 1))
 		enc_valid_lens = Input(())
 
 		X = self.dense_1(X_input)
