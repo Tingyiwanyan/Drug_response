@@ -589,7 +589,7 @@ class drug_transformer():
 		1st head attention
 		"""
 		self.encoder_1 = encoder_block(10,130)
-		self.decoder_self_1 = decoder_self_block(20)
+		self.decoder_self_1 = decoder_self_block(10)
 		self.decoder_cross_1 = decoder_cross_block(10)
 
 		"""
@@ -613,17 +613,17 @@ class drug_transformer():
 		"""
 		multi head transformer
 		"""
-		X_, encoder_att_score = self.encoder_1(X, enc_valid_lens)
-		X_2, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
+		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
+		X, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
 
-		X = tf.concat([X_,X_2],axis=-1)
+		#X = tf.concat([X_,X_2],axis=-1)
 
-		Y_, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
-		Y_2, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
+		Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
+		Y, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
 
-		Y, att_score_deco_cross = self.decoder_cross_1(Y_, X, enc_valid_lens)
+		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
 
 		Y = self.flattern_deco(Y)
 
