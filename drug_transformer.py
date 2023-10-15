@@ -537,7 +537,8 @@ class decoder_self_block(tf.keras.layers.Layer):
 		#score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
 		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
 		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
 
