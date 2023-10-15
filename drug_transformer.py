@@ -528,22 +528,22 @@ class decoder_self_block(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens):
 		super().__init__()
 		self.masked_softmax_deco_self = masked_softmax()
-		#self.dotproductattention_deco = dotproductattention_linformer(num_hiddens)
-		self.dotproductattention_deco = dotproductattention(num_hiddens)
+		self.dotproductattention_deco = dotproductattention_linformer(num_hiddens)
+		#self.dotproductattention_deco = dotproductattention(num_hiddens)
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
 	def call(self, Y, **kwargs):
-		#score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
+		#score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
 		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
 
-		#return self_deco_embedding, att_score_deco, kernel_projection_f
-		return self_deco_embedding, att_score_deco
+		return self_deco_embedding, att_score_deco, kernel_projection_f
+		#return self_deco_embedding, att_score_deco
 
 class decoder_cross_block(tf.keras.layers.Layer):
 	"""
@@ -593,7 +593,8 @@ class drug_transformer():
 		1st head attention
 		"""
 		self.encoder_1 = encoder_block(20,130)
-		self.decoder_self_1 = decoder_self_block(20)
+		self.decoder_self_1 = encoder_block(20,130)
+		#self.decoder_self_1 = decoder_self_block(20)
 		self.decoder_cross_1 = decoder_cross_block(20)
 
 		"""
@@ -623,7 +624,7 @@ class drug_transformer():
 		#X = tf.concat([X_,X_2],axis=-1)
 
 		#Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
-		Y, att_score_deco = self.decoder_self_1(Y)
+		Y, att_score_deco = self.decoder_self_1(Y, enc_valid_lens)
 		#Y, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
