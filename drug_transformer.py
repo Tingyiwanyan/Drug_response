@@ -572,9 +572,9 @@ class drug_transformer():
 	"""
 	def __init__(self):
 
-		self.dense_1 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -614,12 +614,12 @@ class drug_transformer():
 		multi head transformer
 		"""
 		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
-		X, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
+		#X, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
 
 		#X = tf.concat([X_,X_2],axis=-1)
 
 		Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
-		Y, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
+		#Y, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
 
