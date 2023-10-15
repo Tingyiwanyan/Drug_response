@@ -589,8 +589,8 @@ class drug_transformer():
 		1st head attention
 		"""
 		self.encoder_1 = encoder_block(10,130)
-		self.decoder_self_1 = decoder_self_block(10)
-		self.decoder_cross_1 = decoder_cross_block(10)
+		self.decoder_self_1 = decoder_self_block(20)
+		self.decoder_cross_1 = decoder_cross_block(20)
 
 		"""
 		2nd head attention
@@ -621,7 +621,7 @@ class drug_transformer():
 		Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
 		Y_2, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
-		Y = tf.concat([Y,Y_2],axis=-1)
+		#Y = tf.concat([Y,Y_2],axis=-1)
 
 		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
 
