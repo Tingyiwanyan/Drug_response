@@ -616,12 +616,12 @@ class drug_transformer():
 		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
 		X_2, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
 
-		#X = tf.concat([X,X_2],axis=-1)
+		X = tf.concat([X,X_2],axis=-1)
 
 		Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
 		Y_2, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
-		#Y = tf.concat([Y,Y_2],axis=-1)
+		Y = tf.concat([Y,Y_2],axis=-1)
 
 		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
 
