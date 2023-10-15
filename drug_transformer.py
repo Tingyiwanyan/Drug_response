@@ -623,7 +623,7 @@ class drug_transformer():
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
 
-		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
+		Y, att_score_deco_cross = self.decoder_cross_1(Y_, X, enc_valid_lens)
 
 		Y = self.flattern_deco(Y)
 
