@@ -333,7 +333,7 @@ class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, project_dim=10):
+	def __init__(self, output_dim, project_dim=200):
 		super().__init__()
 		self.output_dim = output_dim
 		self.project_dim = project_dim
@@ -391,7 +391,7 @@ class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 		scores = tf.matmul(queries, projected_keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries, values_linformer
+		return scores, values, queries, values_linformer, self.kernel_projection_f
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
@@ -493,32 +493,31 @@ class encoder_block(tf.keras.layers.Layer):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
-		self.position_wise_embedding = position_wise_embedding(num_hiddens)
 		self.dotproductattention = dotproductattention(num_hiddens)
-		self.attention_embedding = attention_embedding()
-		self.residual_connection = residual_connection()
+		self.att_embedding = attention_embedding()
+		self.r_connection = residual_connection()
 
 	def call(self, X, enc_valid_lens, **kwargs):
-		X = self.position_wise_embedding(X)
 		X = self.pos_encoding(X)
-		score, value = self.dotproductattention(X, X, X)
-		att_score = self.masked_softmax(score, enc_valid_lens)
-		att_embedding = self.attention_embedding(att_score, value)
-		encoder_embedding = self.residual_connection(att_embedding, value)
+		score, value, query = self.dotproductattention(X,X,X)
+		att_score = self.masked_softmax_(score, enc_valid_lens)
+		att_embedding_ = self.att_embedding(att_score, value)
+
+		encoder_embedding = self.r_connection(value, att_embedding_)
 
 		return encoder_embedding, att_score
 
 
-class decoder_block(tf.keras.layers.Layer):
+class decoder_self_block(tf.keras.layers.Layer):
 	"""
-	Define self-attention & cross attention decoder block, since 
+	Define self-attention decoder block, since 
 	gene expression doesn't contain sequencing information, so 
 	we don't add position encoding in the embedding layer. 
+	Use Linformer for the attention operation
 
 	Parameters:
 	-----------
 	num_hiddens_self: hidden embedding dimension for the self att block
-	num_hiddens_cross: hidden embedding dimension for the cross att block
 
 	Returns:
 	--------
@@ -526,37 +525,111 @@ class decoder_block(tf.keras.layers.Layer):
 	self_att_score: the self att score in decoder self att block
 	cross_att_score: the cross att score in the decoder cross att block
 	"""
-	def __init__(self, num_hiddens, num_hiddens_output):
+	def __init__(self, num_hiddens):
 		super().__init__()
-		self.masked_softmax = masked_softmax()
-		self.position_wise_embedding = position_wise_embedding(num_hiddens)
-		self.self_dotproductattention = dotproductattention(num_hiddens)
-		self.self_att_embedding = attention_embedding()
-		self.self_residual_connection = residual_connection()
+		self.masked_softmax_deco_self = masked_softmax()
+		self.dotproductattention_deco = dotproductattention_linformer(num_hiddens)
+		self.att_embedding = attention_embedding()
+		self.r_connection = residual_connection()
 
-		self.cross_att_dotproduct = dotproductattention(num_hiddens)
-		self.cross_att_embedding = attention_embedding()
-		self.cross_residual_connection = residual_connection()
-		self.cross_position_wise_embedding = position_wise_embedding(num_hiddens_output)
+	def call(self, Y, **kwargs):
+		score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
+		att_score_deco = self.masked_softmax_deco_self(score_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
 
-	def call(self, X, encoder_output, enc_valid_lens, **kwargs):
-		X = self.position_wise_embedding(X)
-		score, value = self.self_dotproductattention(X, X, X)
-		self_att_score = self.masked_softmax(score)
-		self_att_embedding = self.self_att_embedding(self_att_score, value)
-		self_encoder_embedding = self.self_residual_connection(self_att_embedding, value)
+		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
 
-		cross_score, cross_value = self.cross_att_dotproduct(self_encoder_embedding,encoder_output, 
-			encoder_output)
-		cross_att_score = self.masked_softmax(cross_score, enc_valid_lens)
-		cross_att_embedding = self.cross_att_embedding(cross_att_score, cross_value)
-		cross_decoder_embedding = self.cross_residual_connection(cross_att_embedding, self_encoder_embedding)
-		cross_decoder_embedding = self.cross_position_wise_embedding(cross_decoder_embedding)
+		return self_deco_embedding, att_score_deco, kernel_projection_f
 
-		return cross_decoder_embedding, self_att_score, cross_att_score
+class decoder_cross_block(tf.keras.layers.Layer):
+	"""
+	Define decoder cross attention 
+	"""
+	def __init__(self, num_hiddens):
+		super().__init__()
+		self.masked_softmax_deco_cross = masked_softmax()
+		self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
+		self.att_embedding = attention_embedding()
+		self.r_connection = residual_connection()
+
+	def call(self, Y, X, enc_valid_lens, **kwargs):
+		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
+		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
+		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+
+
+		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
+		#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
+
+		cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
+
+		return cross_embedding, att_score_deco_cross
 
 
 class drug_transformer():
+	"""
+	Implimentation of drug transformer
+	"""
+	def __init__(self):
+
+		self.dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_5 = tf.keras.layers.Dense(1)
+
+		self.flattern_enco = tf.keras.layers.Flatten()
+		self.flattern_deco = tf.keras.layers.Flatten()
+
+		"""
+		1st head attention
+		"""
+		self.encoder_1 = encoder_block(50,130)
+		self.decoder_self_1 = decoder_self_block(50)
+		self.decoder_cross_1 = decoder_cross_block(50)
+
+	def model_construction(self):
+		"""
+		construct the transformer model
+		"""
+		X_input = Input((130, 56))
+		Y_input = Input((5843, 1))
+		enc_valid_lens = Input(())
+
+		X = self.dense_1(X_input)
+		Y = self.dense_2(Y_input)
+
+		"""
+		one head transformer
+		"""
+		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
+
+		Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
+
+		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
+
+		Y = self.flattern_deco(Y)
+
+		#Y = tf.concat([X,Y],axis=1)
+
+		Y = self.dense_3(Y)
+		Y = self.dense_4(Y)
+		Y = self.dense_5(Y)
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
+
+		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+		return self.model
+
+
+
+
+class drug_transformer_():
 	"""
 	Implement the drug transformer model architecture
 	"""
@@ -634,7 +707,7 @@ class drug_transformer():
 
 		X = self.pos_encoding(X)
 
-		Y = self.dense_2(Y_input)
+		#Y = self.dense_2(Y_input)
 
 
 		"""
