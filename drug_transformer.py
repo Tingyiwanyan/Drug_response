@@ -576,9 +576,9 @@ class drug_transformer():
 	"""
 	def __init__(self):
 
-		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -592,10 +592,10 @@ class drug_transformer():
 		"""
 		1st head attention
 		"""
-		self.encoder_1 = encoder_block(20,130)
+		self.encoder_1 = encoder_block(10,130)
 		#self.decoder_self_1 = encoder_block(20,130)
-		self.decoder_self_1 = decoder_self_block(20)
-		self.decoder_cross_1 = decoder_cross_block(20)
+		self.decoder_self_1 = decoder_self_block(10)
+		self.decoder_cross_1 = decoder_cross_block(10)
 
 		"""
 		2nd head attention
