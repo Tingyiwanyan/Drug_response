@@ -593,8 +593,8 @@ class drug_transformer():
 		1st head attention
 		"""
 		self.encoder_1 = encoder_block(20,130)
-		self.decoder_self_1 = encoder_block(20,130)
-		#self.decoder_self_1 = decoder_self_block(20)
+		#self.decoder_self_1 = encoder_block(20,130)
+		self.decoder_self_1 = decoder_self_block(20,130)
 		self.decoder_cross_1 = decoder_cross_block(20)
 
 		"""
