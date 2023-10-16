@@ -497,7 +497,7 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-	def call(self, X, enc_valid_lens, **kwargs):
+	def call(self, X, enc_valid_lens=None, **kwargs):
 		X = self.pos_encoding(X)
 		score, value, query = self.dotproductattention(X,X,X)
 		att_score = self.masked_softmax(score, enc_valid_lens)
@@ -528,22 +528,22 @@ class decoder_self_block(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens):
 		super().__init__()
 		self.masked_softmax_deco_self = masked_softmax()
-		self.dotproductattention_deco = dotproductattention_linformer(num_hiddens)
+		self.dotproductattention_deco = dotproductattention(num_hiddens)
 		#self.dotproductattention_deco = dotproductattention(num_hiddens)
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-	def call(self, Y, **kwargs):
-		score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
-		#score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
-		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+	def call(self, Y, enc_valid_lens=None, **kwargs):
+		#score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		att_score_deco = self.masked_softmax_deco_self(score_deco, enc_valid_lens)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
 		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
 
-		return self_deco_embedding, att_score_deco, kernel_projection_f
-		#return self_deco_embedding, att_score_deco
+		#return self_deco_embedding, att_score_deco, kernel_projection_f
+		return self_deco_embedding, att_score_deco
 
 class decoder_cross_block(tf.keras.layers.Layer):
 	"""
