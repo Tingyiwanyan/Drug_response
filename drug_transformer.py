@@ -363,7 +363,7 @@ class dotproductattention_column(tf.keras.layers.Layer):  #@save
 		self.b_query = tf.Variable(
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	def call(self, queries, keys, values, start_=0 **kwargs):
+	def call(self, queries, keys, values, start_=0, **kwargs):
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
