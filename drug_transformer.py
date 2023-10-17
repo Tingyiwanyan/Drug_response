@@ -736,7 +736,7 @@ class drug_transformer_():
 		"""
 		self.dotproductattention1 = dotproductattention(10)
 
-		self.dotproductattention_deco = dotproductattention_linformer(10)
+		self.dotproductattention_deco = dotproductattention_column(10)
 
 		self.dotproductattention_deco_cross = dotproductattention(10)
 
@@ -821,13 +821,14 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
+		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
+		#att_score_deco = self.masked_softmax_deco_self(score_deco)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
-		score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
-		att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
-		att_embedding_deco2 = self.att_embedding(att_score_deco2, value_deco2)
+		#score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
+		#att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
+		#att_embedding_deco2 = self.att_embedding(att_score_deco2, value_deco2)
 
 		#att_embedding_deco = tf.concat([att_embedding_deco, att_embedding_deco2],axis=-1)
 		#value_deco = tf.concat([value_deco, value_deco2],axis=-1)
