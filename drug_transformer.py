@@ -363,15 +363,15 @@ class dotproductattention_column(tf.keras.layers.Layer):  #@save
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, queries, keys, values, start_=0, **kwargs):
+		indices_ = tf.range(start=start_, limit=self.column_limit)
 		d = queries.shape[-1]
+		keys = tf.gather(keys, indices=indices_, axis=1)
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
 		keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
-		indices_ = tf.range(start=start_, limit=self.column_limit)
-		keys = tf.gather(keys, indices=indices_, axis=1)
 		values_ = tf.gather(values, indices=indices_, axis=1)
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 			tf.cast(d, dtype=tf.float32))
@@ -570,6 +570,7 @@ class encoder_block(tf.keras.layers.Layer):
 		att_embedding_ = self.att_embedding(att_score, value)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
+		#encoder_embedding = value
 
 		return encoder_embedding, att_score
 
@@ -606,7 +607,8 @@ class decoder_self_block(tf.keras.layers.Layer):
 		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
 		att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
-		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
+		#self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
+		self_deco_embedding = value_deco
 
 		#return self_deco_embedding, att_score_deco, kernel_projection_f
 		return self_deco_embedding, att_score_deco
