@@ -314,6 +314,72 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
 		return scores, values, queries
 
+class dotproductattention_column(tf.keras.layers.Layer):  #@save
+	"""
+	Define scaled dot product layer
+	Adding Linformer algorithms for reduce the gene-gene
+	self-attention computation to linear time:
+	https://arxiv.org/abs/2006.04768
+
+	Parameters:
+	-----------
+	kernel_key: embedding matrix for key
+	kernel_value: embedding matrix for value
+	kernel_query: embedding matrix for query
+	kernel_projection_e: the linear projection matrix for keys
+	kernel_projection_f: the linear projection matrix for values
+
+	Returns:
+	--------
+	attention_score: the scale dot product score
+	"""
+	def __init__(self, output_dim, column_limit=200):
+		super().__init__()
+		self.output_dim = output_dim
+		self.project_dim = project_dim
+		self.column_limit = column_limit
+		#self.masked_softmax = masked_softmax()
+
+		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		#	kernel_regularizer=regularizers.L2(1e-4))
+
+		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		#	kernel_regularizer=regularizers.L2(1e-4))
+ 
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
+	def build(self, input_shape):
+		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		b_init = tf.zeros_initializer()
+		self.b_key = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		self.b_query = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	def call(self, queries, keys, values, start_=0 **kwargs):
+		d = queries.shape[-1]
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		#queries = self.kernel_query(queries)
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		#keys = self.kernel_key(keys)
+		#values = tf.matmul(values, self.kernel_value) + self.b_value
+		values = self.kernel_value(values)
+		indices_ = tf.range(start=start_, limit=self.column_limit)
+		keys = tf.gather(keys, indices=indices_, axis=1)
+		values_ = tf.gather(values, indices=indices_, axis=1)
+		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+			tf.cast(d, dtype=tf.float32))
+
+		#self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return scores, values, queries, values_
+
 class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 	"""
 	Define scaled dot product layer
@@ -528,17 +594,17 @@ class decoder_self_block(tf.keras.layers.Layer):
 	def __init__(self, num_hiddens):
 		super().__init__()
 		self.masked_softmax_deco_self = masked_softmax()
-		self.dotproductattention_deco = dotproductattention(num_hiddens)
+		self.dotproductattention_deco = dotproductattention_column(num_hiddens)
 		#self.dotproductattention_deco = dotproductattention(num_hiddens)
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
 	def call(self, Y, enc_valid_lens=None, **kwargs):
 		#score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
 		att_score_deco = self.masked_softmax_deco_self(score_deco, enc_valid_lens)
 		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
 		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
 
