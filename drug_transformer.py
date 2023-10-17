@@ -336,7 +336,6 @@ class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	def __init__(self, output_dim, column_limit=200):
 		super().__init__()
 		self.output_dim = output_dim
-		self.project_dim = project_dim
 		self.column_limit = column_limit
 		#self.masked_softmax = masked_softmax()
 
