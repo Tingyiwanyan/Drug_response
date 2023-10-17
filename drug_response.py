@@ -47,7 +47,7 @@ drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot
 #testing_ic50 = np.ones((2000))
 #inital_model = tf.keras.saving.load_model('single_head.tf')
 
-k = drug_transformer()
+k = drug_transformer_()
 model = k.model_construction()
 #k.model_compile()
 
