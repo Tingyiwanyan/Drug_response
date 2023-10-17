@@ -489,9 +489,9 @@ class residual_connection(tf.keras.layers.Layer):
 
 	def call(self, X, Y, **kwargs):
 		#X = tf.math.l2_normalize(X, axis=-1)
-		Y = tf.math.l2_normalize(Y, axis=-1)
-		#return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
-		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+		#Y = tf.math.l2_normalize(Y, axis=-1)
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -822,7 +822,7 @@ class drug_transformer_():
 		"""
 		Y = self.dense_2(Y_input)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
+		#score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
 		#att_score_deco = self.masked_softmax_deco_self(score_deco)
 		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
@@ -835,7 +835,7 @@ class drug_transformer_():
 
 
 		#Y = self.r_connection(value_deco, att_embedding_deco)
-		Y = value_deco
+		#Y = value_deco
 
 		"""
 		cross attention for the deocoder
