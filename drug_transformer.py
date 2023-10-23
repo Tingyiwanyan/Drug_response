@@ -863,8 +863,8 @@ class drug_transformer_():
 		print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
 		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
-		#att_score_deco = self.masked_softmax_deco_self(score_deco)
-		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
+		att_score_deco = self.masked_softmax_deco_self(score_deco)
+		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
 		#score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
 		#att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
@@ -874,7 +874,7 @@ class drug_transformer_():
 		#value_deco = tf.concat([value_deco, value_deco2],axis=-1)
 
 
-		#Y = self.r_connection(value_deco, att_embedding_deco)
+		Y = self.r_connection(value_deco, att_embedding_deco)
 		#Y = value_deco
 
 		"""
