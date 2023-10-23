@@ -811,9 +811,9 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_1 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(200, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -829,7 +829,7 @@ class drug_transformer_():
 		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.pos_encoding = positionalencoding(100,130)
+		self.pos_encoding = positionalencoding(50,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
