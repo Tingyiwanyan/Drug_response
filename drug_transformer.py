@@ -278,10 +278,11 @@ class feature_selection_layer(tf.keras.layers.Layer):
 
 	def call(self, input_data, **kwargs):
 		output_score = tf.matmul(input_data, self.kernel)
+		shape_score = tf.shape(output_score)
 		print(output_score.shape)
 		#output_score = tf.reduce_mean(output_score, axis=0)
 		output_score = tf.nn.softmax(output_score,axis=1)
-		output_score = tf.squeeze(output_score)
+		output_score = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
 		print(output_score.shape)
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
 		print(top_indices.shape)
