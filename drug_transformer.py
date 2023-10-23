@@ -282,8 +282,8 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#print(output_score.shape)
 		#output_score = tf.reduce_mean(output_score, axis=0)
 		output_score = tf.nn.softmax(output_score,axis=1)
-		output_embedding = tf.cast(tf.math.l2_normalize(tf.math.multiply(input_data, output_score)), dtype=tf.float32)
-		#output_embedding = tf.math.reduce_mean(output_embedding, axis=1)
+		output_embedding = tf.math.multiply(input_data, output_score)
+		output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_mean(output_embedding, axis=1)), dtype=tf.float32)
 		output_score = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
 		#print(output_score.shape)
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
@@ -777,11 +777,11 @@ class drug_transformer_():
 		"""
 		1st head attention
 		"""
-		self.dotproductattention1 = dotproductattention(20)
+		self.dotproductattention1 = dotproductattention(100)
 
-		self.dotproductattention_deco = dotproductattention_column(20)
+		self.dotproductattention_deco = dotproductattention_column(100)
 
-		self.dotproductattention_deco_cross = dotproductattention(20)
+		self.dotproductattention_deco_cross = dotproductattention(100)
 
 		"""
 		2nd head attention
@@ -806,9 +806,9 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -822,7 +822,7 @@ class drug_transformer_():
 		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.pos_encoding = positionalencoding(20,130)
+		self.pos_encoding = positionalencoding(100,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
@@ -861,12 +861,12 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		top_indices, output_score, Y = self.feature_selction(Y)
+		#top_indices, output_score, Y = self.feature_selction(Y)
 		#print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
-		att_score_deco = self.masked_softmax_deco_self(score_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
+		#score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
+		#att_score_deco = self.masked_softmax_deco_self(score_deco)
+		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco)
 
 		#score_deco2, value_deco2, query_deco2 = self.dotproductattention_deco2(Y,Y,Y)
 		#att_score_deco2 = self.masked_softmax_deco_self2(score_deco2)
@@ -876,7 +876,7 @@ class drug_transformer_():
 		#value_deco = tf.concat([value_deco, value_deco2],axis=-1)
 
 
-		Y = self.r_connection(value_deco, att_embedding_deco)
+		#Y = self.r_connection(value_deco, att_embedding_deco)
 		#Y = value_deco
 
 		"""
@@ -897,11 +897,13 @@ class drug_transformer_():
 
 
 		#X = self.flattern_enco(X)
-		Y = self.flattern_deco(Y)
+		#Y = self.flattern_deco(Y)
+		Y = self.dense_3(Y)
+		top_indices, output_score, Y = self.feature_selction(Y)
 
 		#Y = tf.concat([X,Y],axis=1)
 
-		Y = self.dense_3(Y)
+		#Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 		Y = self.dense_5(Y)
 
