@@ -226,7 +226,7 @@ class positionalencoding(tf.keras.layers.Layer):
 
 class position_wise_embedding(tf.keras.layers.Layer):
 	"""
-	Defome position wise embedding for sequence input embedding
+	Define position wise embedding for sequence input embedding
 
 	Parameters:
 	-----------
@@ -247,6 +247,42 @@ class position_wise_embedding(tf.keras.layers.Layer):
 		output_embedding = tf.keras.activations.relu(tf.matmul(input_data, self.kernel) + self.b)
 
 		return tf.cast(tf.math.l2_normalize(output_embedding, axis=-1), dtype=tf.float32)
+
+class feature_selection_layer(tf.keras.layers.Layer):
+	"""
+	Define feature selection layer using greedy trainable 
+	feature selection:
+	https://openreview.net/pdf?id=TTLLGx3eet
+	the output dimension is one, and input through a softmax layer 
+	for representing the selection probability.
+
+	Parameters:
+	-----------
+	select_dim: the feature dimensions to be selected.
+
+	Returns:
+	--------
+	select_indices: the selected feature indices.
+	"""
+	def __init__(self, select_dim=200):
+		super().__init__()
+		self.select_dim = select_dim
+		self.output_dim = 1
+
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		#b_init = tf.zeros_initializer()
+		#self.b = tf.Variable(
+		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	def call(self, input_data, **kwargs):
+		output_score = tf.keras.activations.relu(tf.matmul(input_data, self.kernel))
+		#output_score = tf.reduce_mean(output_score, axis=0)
+		output_score = tf.nn.softmax(tf.squeeze(output_score))
+		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
+
+		return top_indicies, output_score
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
@@ -317,29 +353,25 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
 	Define scaled dot product layer
-	Adding Linformer algorithms for reduce the gene-gene
-	self-attention computation to linear time:
-	https://arxiv.org/abs/2006.04768
+	for column-wise specific gene self-attention
 
 	Parameters:
 	-----------
 	kernel_key: embedding matrix for key
 	kernel_value: embedding matrix for value
 	kernel_query: embedding matrix for query
-	kernel_projection_e: the linear projection matrix for keys
-	kernel_projection_f: the linear projection matrix for values
 
 	Returns:
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, column_limit=200):
+	def __init__(self, output_dim):#, column_limit=200):
 		super().__init__()
 		self.output_dim = output_dim
 		self.column_limit = column_limit
 		#self.masked_softmax = masked_softmax()
 
-		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+		#self.kernel_key = tf.keras.layers.D ense(output_dim, activation='sigmoid', 
 		#	kernel_regularizer=regularizers.L2(1e-4))
 
 		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
@@ -362,22 +394,24 @@ class dotproductattention_column(tf.keras.layers.Layer):  #@save
 		self.b_query = tf.Variable(
 			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	def call(self, queries, keys, values, start_=0, **kwargs):
-		indices_ = tf.range(start=start_, limit=self.column_limit)
+	def call(self, queries, keys, values, indices_, **kwargs):
+		#indices_ = tf.range(start=start_, limit=self.column_limit)
+		keys = tf.gather(keys, indices=indices_, axis=1)
+		queries = tf.gather(queries, indices=indices_, axis=1)
+		values = tf.gather(values, indices=indices_, axis=1)
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
 		keys = tf.matmul(keys, self.kernel_key) + self.b_key
-		keys = tf.gather(keys, indices=indices_, axis=1)
 		#keys = self.kernel_key(keys)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		values = self.kernel_value(values)
-		values_ = tf.gather(values, indices=indices_, axis=1)
+		#values_ = tf.gather(values, indices=indices_, axis=1)
 		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
 			tf.cast(d, dtype=tf.float32))
 
 		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries, values_
+		return scores, values, queries#, values_
 
 class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
 	"""
@@ -731,14 +765,16 @@ class drug_transformer_():
 		self.masked_softmax_deco_cross = masked_softmax()
 		self.masked_softmax_deco_cross2 = masked_softmax()
 
+		self.feature_selction = feature_selection_layer()
+
 		"""
 		1st head attention
 		"""
-		self.dotproductattention1 = dotproductattention(10)
+		self.dotproductattention1 = dotproductattention(20)
 
-		self.dotproductattention_deco = dotproductattention_column(10)
+		self.dotproductattention_deco = dotproductattention_column(20)
 
-		self.dotproductattention_deco_cross = dotproductattention(10)
+		self.dotproductattention_deco_cross = dotproductattention(20)
 
 		"""
 		2nd head attention
@@ -796,9 +832,6 @@ class drug_transformer_():
 
 		X = self.pos_encoding(X)
 
-		#Y = self.dense_2(Y_input)
-
-
 		"""
 		self attention for the encoder
 		"""
@@ -806,9 +839,9 @@ class drug_transformer_():
 		att_score = self.masked_softmax_(score, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 
-		score2, value2, query2 = self.dotproductattention2(X,X,X)
-		att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
-		att_embedding_2 = self.att_embedding(att_score2, value2)
+		#score2, value2, query2 = self.dotproductattention2(X,X,X)
+		#att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
+		#att_embedding_2 = self.att_embedding(att_score2, value2)
 
 		#att_embedding_ = tf.concat([att_embedding_, att_embedding_2], axis=-1)
 		#value = tf.concat([value,value2],axis=-1)
@@ -821,8 +854,9 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
+		top_indicies, output_score = self.feature_selction(Y)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
-		#score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indicies)
 		#att_score_deco = self.masked_softmax_deco_self(score_deco)
 		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
@@ -844,9 +878,9 @@ class drug_transformer_():
 		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
 		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
-		score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X)
-		att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2, enc_valid_lens)
-		att_embedding_deco_cross2 = self.att_embedding(att_score_deco_cross2, value_deco_cross2)
+		#score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X)
+		#att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2, enc_valid_lens)
+		#att_embedding_deco_cross2 = self.att_embedding(att_score_deco_cross2, value_deco_cross2)
 
 		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
 		#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
