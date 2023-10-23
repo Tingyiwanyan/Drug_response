@@ -282,7 +282,7 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		output_score = tf.nn.softmax(tf.squeeze(output_score))
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
 
-		return top_indices, output_score
+		return tf.cast(top_indices, tf.int32), output_score
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
@@ -396,9 +396,9 @@ class dotproductattention_column(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, indices_, **kwargs):
 		#indices_ = tf.range(start=start_, limit=self.column_limit)
-		keys = tf.gather(keys, indices=indices_, axis=1)
-		queries = tf.gather(queries, indices=indices_, axis=1)
-		values = tf.gather(values, indices=indices_, axis=1)
+		keys = tf.gather(keys, indices=indices_, batch_dims=1)
+		queries = tf.gather(queries, indices=indices_, batch_dims=1)
+		values = tf.gather(values, indices=indices_, batch_dims=1)
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		#queries = self.kernel_query(queries)
@@ -855,6 +855,7 @@ class drug_transformer_():
 		"""
 		Y = self.dense_2(Y_input)
 		top_indices, output_score = self.feature_selction(Y)
+		print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
 		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
 		#att_score_deco = self.masked_softmax_deco_self(score_deco)
