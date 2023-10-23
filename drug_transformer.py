@@ -281,8 +281,9 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		shape_score = tf.shape(output_score)
 		#print(output_score.shape)
 		#output_score = tf.reduce_mean(output_score, axis=0)
-		output_score = tf.cast(tf.math.l2_normalize(tf.nn.softmax(output_score,axis=1)), dtype=tf.float32)
-		output_embedding = tf.math.multiply(input_data, output_score)
+		output_score = tf.nn.softmax(output_score,axis=1)
+		output_embedding = tf.cast(tf.math.l2_normalize(tf.math.multiply(input_data, output_score)), dtype=tf.float32)
+		#output_embedding = tf.math.reduce_mean(output_embedding, axis=1)
 		output_score = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
 		#print(output_score.shape)
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
@@ -861,7 +862,7 @@ class drug_transformer_():
 		"""
 		Y = self.dense_2(Y_input)
 		top_indices, output_score, Y = self.feature_selction(Y)
-		print(top_indices.shape)
+		#print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
 		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
 		att_score_deco = self.masked_softmax_deco_self(score_deco)
