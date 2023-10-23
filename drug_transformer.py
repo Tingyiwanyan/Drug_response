@@ -829,7 +829,7 @@ class drug_transformer_():
 		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.pos_encoding = positionalencoding(50,130)
+		self.pos_encoding = positionalencoding(100,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
