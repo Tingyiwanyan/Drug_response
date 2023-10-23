@@ -286,12 +286,12 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#print(output_score.shape)
 		top_indices = tf.math.top_k(output_score__, k=self.select_dim).indices
 		#print(top_indices.shape)
-		output_embedding = tf.gather(output_embedding, indices=top_indices_, batch_dims=1)
-		output_score_ = tf.gather(output_score, indices=top_indices_, batch_dims=1)
+		output_embedding = tf.gather(input_data, indices=top_indices, batch_dims=1)
+		output_score_ = tf.gather(output_score, indices=top_indices, batch_dims=1)
 		output_score_ = tf.nn.softmax(output_score_,axis=1)
 		shape_score_ = tf.shape(output_score_)
 		#output_score_ = tf.reshape(output_score_, shape = [shape_score_[0],shape_score_[1]])
-		output_embedding = tf.math.multiply(input_data, output_score_)
+		output_embedding = tf.math.multiply(output_embedding, output_score_)
 		output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_sum(output_embedding, axis=1)), dtype=tf.float32)
 
 		return tf.cast(top_indices, tf.int32), output_score, output_embedding
