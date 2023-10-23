@@ -267,10 +267,10 @@ class feature_selection_layer(tf.keras.layers.Layer):
 	def __init__(self, select_dim=200):
 		super().__init__()
 		self.select_dim = select_dim
-		self.output_dim = 1
+		#self.output_dim = 1
 
 	def build(self, input_shape, **kwargs):
-		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], self.output_dim),
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1],),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
 		#b_init = tf.zeros_initializer()
 		#self.b = tf.Variable(
@@ -279,8 +279,8 @@ class feature_selection_layer(tf.keras.layers.Layer):
 	def call(self, input_data, **kwargs):
 		output_score = tf.keras.activations.relu(tf.matmul(input_data, self.kernel))
 		#output_score = tf.reduce_mean(output_score, axis=0)
-		output_score = tf.nn.softmax(tf.squeeze(output_score))
-		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
+		output_score = tf.nn.softmax(output_score,axis=1)
+		top_indices = tf.math.top_k(output_score, k=self.select_dim, axis=1).indices
 
 		return tf.cast(top_indices, tf.int32), output_score
 
