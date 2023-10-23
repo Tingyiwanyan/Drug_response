@@ -282,7 +282,7 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		output_score = tf.nn.softmax(tf.squeeze(output_score))
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
 
-		return top_indicies, output_score
+		return top_indices, output_score
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
@@ -799,9 +799,9 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_1 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -854,9 +854,9 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		top_indicies, output_score = self.feature_selction(Y)
+		top_indices, output_score = self.feature_selction(Y)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indicies)
+		score_deco, value_deco, query_deco = self.dotproductattention_deco(Y,Y,Y,top_indices)
 		#att_score_deco = self.masked_softmax_deco_self(score_deco)
 		#att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
 
