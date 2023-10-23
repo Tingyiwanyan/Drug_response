@@ -777,11 +777,11 @@ class drug_transformer_():
 		"""
 		1st head attention
 		"""
-		self.dotproductattention1 = dotproductattention(100)
+		self.dotproductattention1 = dotproductattention(20)
 
-		self.dotproductattention_deco = dotproductattention_column(100)
+		self.dotproductattention_deco = dotproductattention_column(20)
 
-		self.dotproductattention_deco_cross = dotproductattention(100)
+		self.dotproductattention_deco_cross = dotproductattention(20)
 
 		"""
 		2nd head attention
@@ -806,11 +806,11 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_1 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_3 = tf.keras.layers.Dense(200, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -822,7 +822,7 @@ class drug_transformer_():
 		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.pos_encoding = positionalencoding(100,130)
+		self.pos_encoding = positionalencoding(20,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
