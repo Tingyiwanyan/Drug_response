@@ -925,7 +925,7 @@ class drug_transformer_():
 		Y = self.dense_6(Y)
 		Y = self.flattern_deco(Y)
 		#Y = self.dense_5(Y)
-		Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=1)
+		Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
