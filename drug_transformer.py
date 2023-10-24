@@ -819,7 +819,7 @@ class drug_transformer_():
 
 		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L1(1e-1))
 
 		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -850,8 +850,8 @@ class drug_transformer_():
 		self attention for the encoder
 		"""
 		score, value, query = self.dotproductattention1(X,X,X)
-		att_score = self.masked_softmax_(score, enc_valid_lens)
-		att_embedding_ = self.att_embedding(att_score, value)
+		#att_score = self.masked_softmax_(score, enc_valid_lens)
+		#att_embedding_ = self.att_embedding(att_score, value)
 
 		#score2, value2, query2 = self.dotproductattention2(X,X,X)
 		#att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
@@ -861,7 +861,8 @@ class drug_transformer_():
 		#value = tf.concat([value,value2],axis=-1)
 
 
-		X = self.r_connection(value, att_embedding_)
+		#X = self.r_connection(value, att_embedding_)
+		X = value
 
 
 		"""
