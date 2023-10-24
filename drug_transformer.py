@@ -782,11 +782,14 @@ class drug_transformer_():
 		"""
 		1st head attention
 		"""
-		self.dotproductattention1 = dotproductattention(20)
+		self.dotproductattention1 = dotproductattention(30)
 
-		self.dotproductattention_deco = dotproductattention_column(20)
+		self.dotproductattention_deco = dotproductattention_column(30)
 
-		self.dotproductattention_deco_cross = dotproductattention(20)
+		self.dotproductattention_deco_cross = dotproductattention(30)
+
+
+		self.decoder_cross_1 = decoder_cross_block(30)
 
 		"""
 		2nd head attention
@@ -796,6 +799,9 @@ class drug_transformer_():
 		self.dotproductattention_deco2 = dotproductattention(10)
 
 		self.dotproductattention_deco_cross2 = dotproductattention(10)
+
+		self.decoder_cross_2 = decoder_cross_block(30)
+
 
 		"""
 		3rd head attention
@@ -811,7 +817,7 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_0 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_0 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_1 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -819,11 +825,11 @@ class drug_transformer_():
 
 		self.dense_3 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_4 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L2(1e-3))
+		self.dense_5 = tf.keras.layers.Dense(1)#,  kernel_regularizer=regularizers.L2(1e-3))
 
-		self.dense_6 = tf.keras.layers.Dense(10, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_7 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -833,7 +839,7 @@ class drug_transformer_():
 		self.kernel_query = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.pos_encoding = positionalencoding(20,130)
+		self.pos_encoding = positionalencoding(30,130)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
@@ -848,7 +854,7 @@ class drug_transformer_():
 		enc_valid_lens = Input(())
 
 		X = self.dense_0(X_input)
-		X = self.dense_1(X)
+		#X = self.dense_1(X)
 
 		X = self.pos_encoding(X)
 
@@ -898,9 +904,9 @@ class drug_transformer_():
 		"""
 		cross attention for the deocoder
 		"""
-		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
-		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
-		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+		#score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
+		#att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
+		#att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
 		#score_deco_cross2, value_deco_cross2, query_deco_cross2 = self.dotproductattention_deco_cross2(Y,X,X)
 		#att_score_deco_cross2 = self.masked_softmax_deco_cross2(score_deco_cross2, enc_valid_lens)
@@ -909,8 +915,11 @@ class drug_transformer_():
 		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
 		#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
-		Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
+		#Y = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
+		Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens)
+		Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens)
+		Y = tf.concat([Y1,Y2],axis=-1)
 
 		#X = self.flattern_enco(X)
 		#Y = self.flattern_deco(Y)
@@ -925,6 +934,7 @@ class drug_transformer_():
 
 		score = self.feature_selection(Y)
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
+		Y = self.dense_4(Y)
 		Y = self.dense_6(Y)
 		Y = tf.math.multiply(score, Y)
 
