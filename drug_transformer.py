@@ -819,7 +819,7 @@ class drug_transformer_():
 
 		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_5 = tf.keras.layers.Dense(1)
+		self.dense_5 = tf.keras.layers.Dense(1, kernel_regularizer=regularizers.L1(1e-2))
 
 		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
