@@ -291,11 +291,11 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#output_score_ = tf.nn.softmax(output_score_,axis=1)
 		#shape_score_ = tf.shape(output_score_)
 		#output_score_ = tf.reshape(output_score_, shape = [shape_score_[0],shape_score_[1]])
-		output_embedding = tf.math.multiply(output_embedding, output_score_)
-		output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_sum(output_embedding, axis=1)), dtype=tf.float32)
+		#output_embedding = tf.math.multiply(output_embedding, output_score_)
+		#output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_sum(output_embedding, axis=1)), dtype=tf.float32)
 
-		return tf.cast(top_indices, tf.int32), output_score, output_embedding
-
+		#return tf.cast(top_indices, tf.int32), output_score, output_embedding
+		return output_score
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
@@ -777,7 +777,7 @@ class drug_transformer_():
 		self.masked_softmax_deco_cross = masked_softmax()
 		self.masked_softmax_deco_cross2 = masked_softmax()
 
-		self.feature_selction = feature_selection_layer()
+		self.feature_selection = feature_selection_layer()
 
 		"""
 		1st head attention
@@ -919,13 +919,16 @@ class drug_transformer_():
 		#Y = tf.concat([X,Y],axis=1)
 
 		#Y = self.dense_3(Y)
-		Y = self.dense_4(Y)
-		score = self.dense_7(Y)
-		score = self.flattern_score(score)
-		Y = self.dense_6(Y)
+		#Y = self.dense_4(Y)
+		#Y = self.dense_6(Y)
+
+		score = self.feature_selection(Y)
+
+		Y = tf.math.multiple(score, Y)
+
 		Y = self.flattern_deco(Y)
-		#Y = self.dense_5(Y)
-		Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
+		Y = self.dense_5(Y)
+		#Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
 
