@@ -282,9 +282,9 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#print(output_score.shape)
 		#output_score = tf.reduce_mean(output_score, axis=0)
 		output_score = tf.nn.softmax(output_score,axis=1)
-		output_score = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
+		output_score_ = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
 		#print(output_score.shape)
-		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
+		top_indices = tf.math.top_k(output_score_, k=self.select_dim).indices
 		#print(top_indices.shape)
 		#output_embedding = tf.gather(input_data, indices=top_indices, batch_dims=1)
 		#output_score_ = tf.gather(output_score, indices=top_indices, batch_dims=1)
@@ -295,7 +295,7 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_sum(output_embedding, axis=1)), dtype=tf.float32)
 
 		#return tf.cast(top_indices, tf.int32), output_score, output_embedding
-		return tf.expand_dims(output_score, axis=0), top_indices
+		return output_score, top_indices
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
