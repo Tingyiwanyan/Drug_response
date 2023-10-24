@@ -282,7 +282,7 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#print(output_score.shape)
 		#output_score = tf.reduce_mean(output_score, axis=0)
 		output_score = tf.nn.softmax(output_score,axis=1)
-		#output_score__ = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
+		output_score = tf.reshape(output_score,shape=[shape_score[0],shape_score[1]])
 		#print(output_score.shape)
 		top_indices = tf.math.top_k(output_score, k=self.select_dim).indices
 		#print(top_indices.shape)
@@ -821,7 +821,7 @@ class drug_transformer_():
 
 		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L2(1e-3))
+		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_6 = tf.keras.layers.Dense(20, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
