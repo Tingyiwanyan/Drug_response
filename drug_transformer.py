@@ -924,7 +924,7 @@ class drug_transformer_():
 
 		score = self.feature_selection(Y)
 
-		Y = tf.math.multiple(score, Y)
+		Y = tf.math.multiply(score, Y)
 
 		Y = self.flattern_deco(Y)
 		Y = self.dense_5(Y)
