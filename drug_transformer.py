@@ -923,10 +923,11 @@ class drug_transformer_():
 		#Y = self.dense_6(Y)
 
 		score = self.feature_selection(Y)
+		Y = self.dense_6(Y)
 
 		Y = tf.math.multiply(score, Y)
 
-		Y = self.flattern_deco(Y)
+		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.dense_5(Y)
 		#Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
 
