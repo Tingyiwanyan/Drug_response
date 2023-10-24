@@ -817,11 +817,11 @@ class drug_transformer_():
 
 		self.dense_2 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_3 = tf.keras.layers.Dense(200, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_3 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_4 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L1(1e-4))
+		self.dense_5 = tf.keras.layers.Dense(1,  kernel_regularizer=regularizers.L1(1e-3))
 
 		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -916,7 +916,7 @@ class drug_transformer_():
 		#Y = tf.concat([X,Y],axis=1)
 
 		#Y = self.dense_3(Y)
-		#Y = self.dense_4(Y)
+		Y = self.dense_4(Y)
 		Y = self.dense_6(Y)
 		Y = self.flattern_deco(Y)
 		Y = self.dense_5(Y)
