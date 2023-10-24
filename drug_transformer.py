@@ -295,7 +295,7 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#output_embedding = tf.cast(tf.math.l2_normalize(tf.math.reduce_sum(output_embedding, axis=1)), dtype=tf.float32)
 
 		#return tf.cast(top_indices, tf.int32), output_score, output_embedding
-		return tf.expand_dims(output_score 0), top_indices
+		return tf.expand_dims(output_score, axis=0), top_indices
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
