@@ -892,8 +892,8 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
-		Y_ = self.dense_22(Y_input)
-		Y = tf.concat([Y,Y_],axis=-1)
+		#Y_ = self.dense_22(Y_input)
+		#Y = tf.concat([Y,Y_],axis=-1)
 		#top_indices, output_score, Y = self.feature_selction(Y)
 		#print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
