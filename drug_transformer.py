@@ -847,6 +847,8 @@ class drug_transformer_():
 		self.flattern_deco = tf.keras.layers.Flatten()
 		self.flattern_score = tf.keras.layers.Flatten()
 
+		self.correlation_metric = 
+
 	def model_construction(self):
 		"""
 		construct the transformer model
@@ -865,9 +867,9 @@ class drug_transformer_():
 		"""
 		self attention for the encoder
 		"""
-		#score, value, query = self.dotproductattention1(X,X,X)
-		#att_score = self.masked_softmax_(score, enc_valid_lens)
-		#att_embedding_ = self.att_embedding(att_score, value)
+		score, value, query = self.dotproductattention1(X,X,X)
+		att_score = self.masked_softmax_(score, enc_valid_lens)
+		att_embedding_ = self.att_embedding(att_score, value)
 
 		#score2, value2, query2 = self.dotproductattention2(X,X,X)
 		#att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
@@ -877,7 +879,7 @@ class drug_transformer_():
 		#value = tf.concat([value,value2],axis=-1)
 
 
-		#X = self.r_connection(value, att_embedding_)
+		X = self.r_connection(value, att_embedding_)
 		#X = value
 
 
