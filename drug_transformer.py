@@ -828,6 +828,7 @@ class drug_transformer_():
 		self.dense_1 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_2 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_22 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -860,9 +861,11 @@ class drug_transformer_():
 		enc_valid_lens = Input(())
 
 		X = self.dense_0(X_input)
-		#X = self.dense_1(X)
+		X_ = self.dense_1(X_input)
 
 		X = self.pos_encoding(X)
+		X_ = self.pos_encoding(X_)
+		X = tf.concat([X,X_],axis=-1)
 
 		#X = self.dense_1(X)
 
@@ -889,6 +892,8 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
+		Y_ = self.dense_22(Y_input)
+		Y = tf.concat([Y,Y_],axis=-1)
 		#top_indices, output_score, Y = self.feature_selction(Y)
 		#print(top_indices.shape)
 		#score_deco, value_deco, query_deco, value_linformer_deco = self.dotproductattention_deco(Y,Y,Y)
@@ -926,10 +931,10 @@ class drug_transformer_():
 		Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens)
 		Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens)
 		Y3, att_score_deco_cross3 = self.decoder_cross_3(Y, X, enc_valid_lens)
-		Y4, att_score_deco_cross4 = self.decoder_cross_4(Y, X, enc_valid_lens)
-		Y5, att_score_deco_cross5 = self.decoder_cross_5(Y, X, enc_valid_lens)
-		Y6, att_score_deco_cross6 = self.decoder_cross_6(Y, X, enc_valid_lens)
-		Y = tf.concat([Y1,Y2,Y3,Y4,Y5,Y6],axis=-1)
+		#Y4, att_score_deco_cross4 = self.decoder_cross_4(Y, X, enc_valid_lens)
+		#Y5, att_score_deco_cross5 = self.decoder_cross_5(Y, X, enc_valid_lens)
+		#Y6, att_score_deco_cross6 = self.decoder_cross_6(Y, X, enc_valid_lens)
+		Y = tf.concat([Y1,Y2,Y3],axis=-1)
 		#Y = tf.concat([Y1,Y2],axis=-1)
 
 		#X = self.flattern_enco(X)
