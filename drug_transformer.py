@@ -814,6 +814,10 @@ class drug_transformer_():
 
 		self.decoder_cross_3 = decoder_cross_block(30)
 
+		self.decoder_cross_4 = decoder_cross_block(30)
+		self.decoder_cross_5 = decoder_cross_block(30)
+		self.decoder_cross_6 = decoder_cross_block(30)
+
 
 
 		self.att_embedding = attention_embedding()
@@ -922,7 +926,10 @@ class drug_transformer_():
 		Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens)
 		Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens)
 		Y3, att_score_deco_cross3 = self.decoder_cross_3(Y, X, enc_valid_lens)
-		Y = tf.concat([Y1,Y2,Y3],axis=-1)
+		Y4, att_score_deco_cross4 = self.decoder_cross_4(Y, X, enc_valid_lens)
+		Y5, att_score_deco_cross5 = self.decoder_cross_5(Y, X, enc_valid_lens)
+		Y6, att_score_deco_cross6 = self.decoder_cross_6(Y, X, enc_valid_lens)
+		Y = tf.concat([Y1,Y2,Y3,Y4,Y5,Y6],axis=-1)
 		#Y = tf.concat([Y1,Y2],axis=-1)
 
 		#X = self.flattern_enco(X)
@@ -936,11 +943,11 @@ class drug_transformer_():
 		#Y = self.dense_4(Y)
 		#Y = self.dense_6(Y)
 
-		#score = self.feature_selection(Y)
+		score = self.feature_selection(Y)
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
-		score = self.feature_selection(Y)
+		#score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
 		Y = tf.math.multiply(score, Y)
 
