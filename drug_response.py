@@ -59,7 +59,7 @@ model.summary()
 for i in range(20):
 	history = model.fit((drug_one_hot_encoding, gene_expression, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=5)
 	ic50_predict = model.predict((drug_one_hot_encoding_test, gene_expression_test, np.array(drug_smile_length_test)))
-	print("correlation is: %f" %scipy.stats.pearsonr(np.array(ic50_list_test),ic50_predict[:,0])[0])
+	print("%i th correlation is: %f" %((i+1)*5, scipy.stats.pearsonr(np.array(ic50_list_test),ic50_predict[:,0])[0]))
 
 
 #history = k.model.fit((testing_drug_one_hot, testing_gene_expression, testing_drug_smile_length),testing_ic50,batch_size=5, validation_split=0.2, epochs=1)
