@@ -847,8 +847,6 @@ class drug_transformer_():
 		self.flattern_deco = tf.keras.layers.Flatten()
 		self.flattern_score = tf.keras.layers.Flatten()
 
-		self.correlation_metric = 
-
 	def model_construction(self):
 		"""
 		construct the transformer model
