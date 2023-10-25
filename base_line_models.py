@@ -153,6 +153,17 @@ def base_drug_transformer():
 	return model
 
 
+def model_save(input_model, name):
+	"""
+	save current model, name with a tf at last
+	"""
+	tf.keras.saving.save_model(model,name)
+
+def model_load(name):
+	"""
+	load model
+	"""
+	return tf.keras.saving.load_model(name)
 
 def att_score_self_enco(input_model, name):
 	"""

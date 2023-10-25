@@ -940,6 +940,7 @@ class drug_transformer_():
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
+		score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
 		Y = tf.math.multiply(score, Y)
 
