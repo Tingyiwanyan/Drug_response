@@ -55,7 +55,7 @@ model = k.model_construction()
 
 #att_output_model = att_score_output(model)
 #att_output_ = att_output_model.predict((drug_one_hot_encoding_test[0:10], gene_expression_test[0:10], np.array(drug_smile_length_test)[0:10]))
-for i in range(20)
+for i in range(20):
 	history = model.fit((drug_one_hot_encoding, gene_expression, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=5)
 	ic50_predict = model.predict((drug_one_hot_encoding_test, gene_expression_test, np.array(drug_smile_length_test)))
 	print("correlation is: " + scipy.stats.pearsonr(np.array(ic50_list_test),ic50_predict[:,0])[0])
