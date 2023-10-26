@@ -861,11 +861,11 @@ class drug_transformer_():
 		enc_valid_lens = Input(())
 
 		X = self.dense_0(X_input)
-		X_ = self.dense_1(X_input)
+		#X_ = self.dense_1(X_input)
 
 		X = self.pos_encoding(X)
-		X_ = self.pos_encoding(X_)
-		X = tf.concat([X,X_],axis=-1)
+		#X_ = self.pos_encoding(X_)
+		#X = tf.concat([X,X_],axis=-1)
 
 		#X = self.dense_1(X)
 
@@ -948,13 +948,13 @@ class drug_transformer_():
 		#Y = self.dense_4(Y)
 		#Y = self.dense_6(Y)
 
-		score = self.feature_selection(Y)
+		#score = self.feature_selection(Y)
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 		#score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
-		Y = tf.math.multiply(score, Y)
+		#Y = tf.math.multiply(score, Y)
 
 		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.dense_5(Y)
