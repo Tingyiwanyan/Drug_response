@@ -467,7 +467,7 @@ def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFram
 	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
 	#cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
 
-	return gene_expression_array, drug_one_hot_encoding_array, ic50_list, drug_name_list,drug_smile_length, CCLE_names
+	return gene_expression_array, drug_one_hot_encoding_array, ic50_list, drug_name_list,drug_smile_length, CCLE_names, drug_smile_list
 
 
 def train_test_split(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):

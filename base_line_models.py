@@ -152,6 +152,18 @@ def base_drug_transformer():
 
 	return model
 
+def return_drug_gene(CCLE_name_test, drug_name_list_test, gene_expression_test, drug_one_hot_encoding_test, drug_smile_length_test):
+    lung_index = []
+    for i in range(2180):
+        #print(np.array(CCLE_name_test)[i][-4:])
+        if np.array(CCLE_name_test)[i][-4:] == "LUNG":
+            lung_index.append(i)
+    drug_name_lung = [drug_name_list_test[i] for i in lung_index]
+    CCLE_name_test_lung = [CCLE_name_test[i] for i in lung_index]
+    drug_one_hot_encoding_test_lung = [drug_one_hot_encoding_test[i] for i in lung_index]
+    gene_expression_test_lung = [gene_expression_test[i] for i in lung_index]
+    drug_smilt_length_test_lung = [drug_smile_length_test[i] for i in lung_index]
+    return np.array(drug_one_hot_encoding_test_lung),np.array(gene_expression_test_lung), np.array(drug_smile_length_test), drug_name_lung, CCLE_name_test_lung
 
 def model_save(input_model, name):
 	"""
