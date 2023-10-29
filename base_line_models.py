@@ -165,6 +165,35 @@ def return_drug_gene(CCLE_name_test, drug_name_list_test, gene_expression_test, 
     drug_smilt_length_test_lung = [drug_smile_length_test[i] for i in lung_index]
     return np.array(drug_one_hot_encoding_test_lung),np.array(gene_expression_test_lung), np.array(drug_smile_length_test), drug_name_lung, CCLE_name_test_lung
 
+
+def return_gene_drug_target(index, model, gene_names, drug_lung, gene_lung, drug_lung_length,CCLE_name_lung, drug_name_lung,drug_smile_lung, ic50_lung,top_gene=100):
+    """
+    return the gene drug targeting cross attention matrix
+    """
+    feature_select_score_model = att_score_self_enco(model,"feature_selection_layer")
+    feature_select_score = feature_select_score_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+    
+    cross_att_model = att_score_self_enco(model, "decoder_cross_block")
+    cross_att_model1 = att_score_self_enco(model, "decoder_cross_block_1")
+    cross_att_model2 = att_score_self_enco(model, "decoder_cross_block_2")
+    cross_att_score = cross_att_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+    cross_att_score1 = cross_att_model1.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+    cross_att_score2 = cross_att_model2.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+    
+    top_genes_score, top_genes_index = tf.math.top_k(feature_select_score[index][:,0], k=top_gene)
+    drug_scores = np.array([cross_att_score[1][index][i] for i in top_genes_index])
+    drug_scores2 = np.array([cross_att_score1[1][index][i] for i in top_genes_index])
+    drug_scores3 = np.array([cross_att_score2[1][index][i] for i in top_genes_index])
+    top_gene_names = np.array([gene_names[i] for i in top_genes_index])
+    
+    CCLE_name = CCLE_name_lung[index]
+    drug_name = drug_name_lung[index]
+    drug_smile = drug_smile_lung[index]
+    ic50_value = ic50_lung[index]
+    
+    return drug_scores, drug_scores2, drug_scores3, top_gene_names, drug_smile, CCLE_name, drug_name, ic50_value, top_genes_score
+    
+
 def model_save(input_model, name):
 	"""
 	save current model, name with a tf at last
