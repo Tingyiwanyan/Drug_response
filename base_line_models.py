@@ -219,9 +219,9 @@ def return_gene_drug_target_all(model, gene_names, drug_lung, gene_lung, drug_lu
 		drug_scores2 = np.array([cross_att_score1[1][index][i] for i in top_genes_index])
 		drug_scores3 = np.array([cross_att_score2[1][index][i] for i in top_genes_index])
 		top_gene_names = np.array([gene_names[i] for i in top_genes_index])
-		target_drug_name_list.append(drug_name_lung[i])
-		target_top_gene_name_list.append(top_gene_names[i])
-		target_cell_line_name_list.append(CCLE_name_lung[i])
+		target_drug_name_list.append(drug_name_lung[index])
+		target_top_gene_name_list.append(top_gene_names[index])
+		target_cell_line_name_list.append(CCLE_name_lung[index])
 
 
 	return target_drug_name_list, target_cell_line_name_list, target_top_gene_name_list
