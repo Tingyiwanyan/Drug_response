@@ -206,25 +206,25 @@ def return_gene_drug_target_all(model, gene_names, drug_lung, gene_lung, drug_lu
     cross_att_score = cross_att_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
     cross_att_score1 = cross_att_model1.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
     cross_att_score2 = cross_att_model2.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
-    
-    target_drug_name_list = []
+       
+	target_drug_name_list = []
 	target_top_gene_name_list = []
 	target_cell_line_name_list = []
 
 	test_length = len(CCLE_name_lung)
 	for i in range(test_length):
-	    print(i)
-	    top_genes_score, top_genes_index = tf.math.top_k(feature_select_score[i][:,0], k=top_gene)
-    	drug_scores = np.array([cross_att_score[1][index][i] for i in top_genes_index])
-    	drug_scores2 = np.array([cross_att_score1[1][index][i] for i in top_genes_index])
-    	drug_scores3 = np.array([cross_att_score2[1][index][i] for i in top_genes_index])
-    	top_gene_names = np.array([gene_names[i] for i in top_genes_index])
-	    target_drug_name_list.append(drug_name_lung[i])
-	    target_top_gene_name_list.append(top_gene_names[i])
-	    target_cell_line_name_list.append(CCLE_name_lung[i])
+		print(i)
+		top_genes_score, top_genes_index = tf.math.top_k(feature_select_score[i][:,0], k=top_gene)
+		drug_scores = np.array([cross_att_score[1][index][i] for i in top_genes_index])
+		drug_scores2 = np.array([cross_att_score1[1][index][i] for i in top_genes_index])
+		drug_scores3 = np.array([cross_att_score2[1][index][i] for i in top_genes_index])
+		top_gene_names = np.array([gene_names[i] for i in top_genes_index])
+		target_drug_name_list.append(drug_name_lung[i])
+		target_top_gene_name_list.append(top_gene_names[i])
+		target_cell_line_name_list.append(CCLE_name_lung[i])
 
-    
-    return target_drug_name_list, target_cell_line_name_list, target_top_gene_name_list
+
+	return target_drug_name_list, target_cell_line_name_list, target_top_gene_name_list
 
     
 
