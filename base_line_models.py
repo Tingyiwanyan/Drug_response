@@ -194,19 +194,19 @@ def return_gene_drug_target(index, model, gene_names, drug_lung, gene_lung, drug
     return drug_scores, drug_scores2, drug_scores3, top_gene_names, drug_smile, CCLE_name, drug_name, ic50_value, feature_select_score
 
 def return_gene_drug_target_all(model, gene_names, drug_lung, gene_lung, drug_lung_length,CCLE_name_lung, drug_name_lung,drug_smile_lung, ic50_lung,top_gene=300):
-    """
-    return the gene drug targeting cross attention matrix
-    """
-    feature_select_score_model = att_score_self_enco(model,"feature_selection_layer")
-    feature_select_score = feature_select_score_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
-    
-    cross_att_model = att_score_self_enco(model, "decoder_cross_block")
-    cross_att_model1 = att_score_self_enco(model, "decoder_cross_block_1")
-    cross_att_model2 = att_score_self_enco(model, "decoder_cross_block_2")
-    cross_att_score = cross_att_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
-    cross_att_score1 = cross_att_model1.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
-    cross_att_score2 = cross_att_model2.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
-       
+	"""
+	return the gene drug targeting cross attention matrix
+	"""
+	feature_select_score_model = att_score_self_enco(model,"feature_selection_layer")
+	feature_select_score = feature_select_score_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+
+	cross_att_model = att_score_self_enco(model, "decoder_cross_block")
+	cross_att_model1 = att_score_self_enco(model, "decoder_cross_block_1")
+	cross_att_model2 = att_score_self_enco(model, "decoder_cross_block_2")
+	cross_att_score = cross_att_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+	cross_att_score1 = cross_att_model1.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+	cross_att_score2 = cross_att_model2.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
+
 	target_drug_name_list = []
 	target_top_gene_name_list = []
 	target_cell_line_name_list = []
