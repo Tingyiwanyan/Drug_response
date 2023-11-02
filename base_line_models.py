@@ -212,9 +212,9 @@ def return_gene_drug_target_all(model, gene_names, drug_lung, gene_lung, drug_lu
 	target_cell_line_name_list = []
 
 	test_length = len(CCLE_name_lung)
-	for i in range(test_length):
-		print(i)
-		top_genes_score, top_genes_index = tf.math.top_k(feature_select_score[i][:,0], k=top_gene)
+	for index in range(test_length):
+		print(index)
+		top_genes_score, top_genes_index = tf.math.top_k(feature_select_score[index][:,0], k=top_gene)
 		drug_scores = np.array([cross_att_score[1][index][i] for i in top_genes_index])
 		drug_scores2 = np.array([cross_att_score1[1][index][i] for i in top_genes_index])
 		drug_scores3 = np.array([cross_att_score2[1][index][i] for i in top_genes_index])
