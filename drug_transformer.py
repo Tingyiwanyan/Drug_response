@@ -977,6 +977,8 @@ class drug_transformer_():
 
 		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
 
+		print(att_score_global)
+
 		#score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
 		#Y = tf.math.multiply(score, Y)
