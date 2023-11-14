@@ -297,6 +297,43 @@ class feature_selection_layer(tf.keras.layers.Layer):
 		#return tf.cast(top_indices, tf.int32), output_score, output_embedding
 		return output_score
 
+class feature_selection_layer_global_drug(tf.keras.layers.Layer):
+	"""
+	Define feature selection layer using greedy trainable 
+	feature selection:
+	https://openreview.net/pdf?id=TTLLGx3eet
+	the output dimension is one, and input through a softmax layer 
+	for representing the selection probability.
+
+	Parameters:
+	-----------
+	select_dim: the feature dimensions to be selected.
+
+	Returns:
+	--------
+	select_indices: the selected feature indices.
+	"""
+	def __init__(self, select_dim=200):
+		super().__init__()
+		self.select_dim = select_dim
+		#self.output_dim = 1
+
+	def build(self, input_shape, **kwargs):
+		self.kernel = self.add_weight(name = 'kernel', shape = (input_shape[-1], 5843),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+		#b_init = tf.zeros_initializer()
+		#self.b = tf.Variable(
+		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	def call(self, input_data, **kwargs):
+		output_score = tf.matmul(input_data, self.kernel)
+		shape_score = tf.shape(output_score)
+		#print(output_score.shape)
+		#output_score = tf.reduce_mean(output_score, axis=0)
+		output_score = tf.nn.softmax(output_score,axis=-1)
+		return output_score
+
+
 class dotproductattention(tf.keras.layers.Layer):  #@save
 	"""
 	Define scaled dot product layer
@@ -777,7 +814,7 @@ class drug_transformer_():
 		self.masked_softmax_deco_cross = masked_softmax()
 		self.masked_softmax_deco_cross2 = masked_softmax()
 
-		self.feature_selection = feature_selection_layer()
+		self.feature_selection = feature_selection_layer_global_drug()
 
 		"""
 		global decoder
@@ -839,7 +876,7 @@ class drug_transformer_():
 
 		self.dense_4 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_8 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_8 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_5 = tf.keras.layers.Dense(1)#,  kernel_regularizer=regularizers.L2(1e-3))
 
@@ -887,7 +924,9 @@ class drug_transformer_():
 		X_global = tf.expand_dims(X_global, axis=1)
 		print(X_global)
 
-		X_global = self.dense_8(X_global)
+		#X_global = self.dense_8(X_global)
+
+		X_global = self.feature_selection(X_global)
 		print(X_global)
 
 		"""
@@ -981,10 +1020,10 @@ class drug_transformer_():
 		self.check_Y = Y
 		self.check_X_global = X_global
 
-		XX, att_score_global = self.decoder_global(X_global, Y)
-		self.check_att_score = att_score_global
+		#XX, att_score_global = self.decoder_global(X_global, Y)
+		#self.check_att_score = att_score_global
 
-		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
+		att_score_global = tf.transpose(X_global, perm=[0,2,1])
 
 		#print(att_score_global)
 
