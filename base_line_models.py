@@ -226,7 +226,7 @@ def return_gene_drug_target_all(model, gene_names, drug_lung, gene_lung, drug_lu
 	#feature_select_score_model = att_score_self_enco(model,"feature_selection_layer")
 	#feature_select_score = feature_select_score_model.predict((drug_lung, gene_lung, np.array(drug_lung_length)))
 
-	linear_regression_parameters = model.layers[-1].get_wrights()[0][:,0]
+	linear_regression_parameters = model.layers[-1].get_weights()[0][:,0]
 	linear_regression_weights = tf.expand_dims(linear_regression_weights,axis=0)
 
 	feature_select_score_model = att_score_self_enco(model,"tf.math.l2_normalize")

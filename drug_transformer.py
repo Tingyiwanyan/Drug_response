@@ -670,7 +670,7 @@ class decoder_cross_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-	def call(self, Y, X, enc_valid_lens, **kwargs):
+	def call(self, Y, X, enc_valid_lens=None, **kwargs):
 		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
 		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
 		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
@@ -780,6 +780,11 @@ class drug_transformer_():
 		self.feature_selection = feature_selection_layer()
 
 		"""
+		global decoder
+		"""
+		self.decoder_global = decoder_cross_block(30)
+
+		"""
 		1st head attention
 		"""
 		self.dotproductattention1 = dotproductattention(30)
@@ -834,6 +839,8 @@ class drug_transformer_():
 
 		self.dense_4 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
+		self.dense_8 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
 		self.dense_5 = tf.keras.layers.Dense(1)#,  kernel_regularizer=regularizers.L2(1e-3))
 
 		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
@@ -851,6 +858,7 @@ class drug_transformer_():
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
 		self.flattern_score = tf.keras.layers.Flatten()
+		self.flattern_global = tf.keras.layers.Flatten()
 
 	def model_construction(self):
 		"""
@@ -869,12 +877,20 @@ class drug_transformer_():
 
 		#X = self.dense_1(X)
 
+		X_global = self.dense_7(X)
+
+		X_globale = self.flattern_global(X_global)
+
+		X_global = self.dense_8(X_global)
+
+		X_global = tf.expand_dims(X_global, axis=1)
+
 		"""
 		self attention for the encoder
 		"""
-		score, value, query = self.dotproductattention1(X,X,X)
-		att_score = self.masked_softmax_(score, enc_valid_lens)
-		att_embedding_ = self.att_embedding(att_score, value)
+		#score, value, query = self.dotproductattention1(X,X,X)
+		#att_score = self.masked_softmax_(score, enc_valid_lens)
+		#att_embedding_ = self.att_embedding(att_score, value)
 
 		#score2, value2, query2 = self.dotproductattention2(X,X,X)
 		#att_score2 = self.masked_softmax_2(score2, enc_valid_lens)
@@ -884,7 +900,7 @@ class drug_transformer_():
 		#value = tf.concat([value,value2],axis=-1)
 
 
-		X = self.r_connection(value, att_embedding_)
+		#X = self.r_connection(value, att_embedding_)
 		#X = value
 
 
@@ -930,12 +946,16 @@ class drug_transformer_():
 
 		Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens)
 		Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens)
-		#Y3, att_score_deco_cross3 = self.decoder_cross_3(Y, X, enc_valid_lens)
+		Y3, att_score_deco_cross3 = self.decoder_cross_3(Y, X, enc_valid_lens)
 		#Y4, att_score_deco_cross4 = self.decoder_cross_4(Y, X, enc_valid_lens)
 		#Y5, att_score_deco_cross5 = self.decoder_cross_5(Y, X, enc_valid_lens)
 		#Y6, att_score_deco_cross6 = self.decoder_cross_6(Y, X, enc_valid_lens)
-		#Y = tf.concat([Y1,Y2,Y3],axis=-1)
-		Y = tf.concat([Y1,Y2],axis=-1)
+
+		#Y1 = tf.math.multiply(Y1, att_score_global)
+		#Y2 = tf.math.multiply(Y2, att_score_global)
+		#Y3 = tf.math.multiply(Y3, att_score_global)
+		Y = tf.concat([Y1,Y2,Y3],axis=-1)
+		#Y = tf.concat([Y1,Y2],axis=-1)
 
 		#X = self.flattern_enco(X)
 		#Y = self.flattern_deco(Y)
@@ -952,9 +972,15 @@ class drug_transformer_():
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
+
+		XX, att_score_global = self.decoder_global(X_global, Y)
+
+		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
+
 		#score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
 		#Y = tf.math.multiply(score, Y)
+		Y = tf.math.multiply(att_score_global, Y)
 
 		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.dense_5(Y)
