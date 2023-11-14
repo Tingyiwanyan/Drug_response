@@ -883,7 +883,7 @@ class drug_transformer_():
 
 		X_global = self.dense_8(X_global)
 
-		X_global = tf.expand_dims(X_global, axis=1)
+		#X_global = tf.expand_dims(X_global, axis=1)
 
 		"""
 		self attention for the encoder
