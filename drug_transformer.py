@@ -881,7 +881,7 @@ class drug_transformer_():
 
 		print(X_global)
 
-		X_globale = self.flattern_global(X_global)
+		X_global = self.flattern_global(X_global)
 		print(X_global)
 
 		X_global = tf.expand_dims(X_global, axis=1)
