@@ -973,11 +973,15 @@ class drug_transformer_():
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 
+		self.check_Y = Y
+		self.check_X_global = X_global
+
 		XX, att_score_global = self.decoder_global(X_global, Y)
+		self.check_att_score = att_score_global
 
 		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
 
-		print(att_score_global)
+		#print(att_score_global)
 
 		#score = self.feature_selection(Y)
 		Y = self.dense_6(Y)
