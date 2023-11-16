@@ -198,7 +198,7 @@ def normalize_min_max(inputs: list)->list:
 	#max = np.max(inputs)
 	#min = np.min(inputs)
 
-	q_output = quantile_normalization(np.array(inputs))
+	q_output = quantile_normalization(np.array(inputs), 30)
 	max = np.max(q_output)
 	min = np.min(q_output)
 
