@@ -504,7 +504,7 @@ def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFram
 	drug_smile_length = []
 	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
 	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
-	gene_expression_list = [gene_expression_filtered.iloc[i].values for i in CCLE_names]
+	gene_expression_list = [gene_expression_filtered.loc[i].values for i in CCLE_names]
 	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
 	drug_smile_list = [list(drug_cellline_features_clean_df['drug_compound_smile'])[i] for i in index_array]
 	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
