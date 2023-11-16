@@ -132,6 +132,56 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 
 	return gene_expression
 
+def quantile_normalization(input_array, quantile_num=4):
+    """
+    Perform quantile normalization
+    
+    Parameters:
+    -----------
+    input_array: one dimensional input array
+    quntile_num: the quantile numer to divide the input array
+    
+    Rerutns:
+    --------
+    quantile normalized array
+    """
+    output_array = np.zeros(shape=input_array.shape)
+    quantile_percent = 1/quantile_num
+    index_quantile_groups = []
+    avarage_values = []
+    quantile_values = []
+    for i in range(quantile_num):
+        quantile_percent_ = (i+1)*quantile_percent
+        if quantile_percent_ > 1:
+            quantile_percent_ = 1
+        quantile_value = np.quantile(input_array, quantile_percent_)
+        quantile_values.append(quantile_value)
+        
+    for i in range(quantile_num):
+        single_quantile_group = []
+        single_index = []
+        for j in range(input_array.shape[0]):
+            if i == 0:
+                if input_array[j] <= quantile_values[i]:
+                    single_quantile_group.append(input_array[j])
+                    single_index.append(j)
+            else:
+                if input_array[j] > quantile_values[i-1] and input_array[j] <= quantile_values[i]:
+                    single_quantile_group.append(input_array[j])
+                    single_index.append(j)
+        #whole_quantile_groups.append(single_quantile_group)
+        mean_ = np.median(single_quantile_group)
+        avarage_values.append(mean_)
+        index_quantile_groups.append(single_index)
+    
+    for i in range(quantile_num):
+        single_index_ = index_quantile_groups[i]
+        replace_value = avarage_values[i]
+        for j in single_index_:
+            output_array[j] = replace_value 
+        
+    return output_array#, avarage_values, index_quantile_groups, quantile_values
+
 def normalize_min_max(inputs: list)->list:
 	"""
 	normalize ic50 values through the list
@@ -163,7 +213,8 @@ def normalize_min_max_array(inputs: np.array)-> np.array:
 	--------
 	min max normalized array of data
 	"""
-	inputs_list = list(inputs)
+	q_output = quantile_normalization(inputs)
+	inputs_list = list(q_output)
 	normalized_list = list(map(normalize_min_max, inputs_list))
 
 	return np.array(normalized_list)
