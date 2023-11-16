@@ -194,10 +194,16 @@ def normalize_min_max(inputs: list)->list:
 	--------
 	normalized ic50 values
 	"""
-	max = np.max(inputs)
-	min = np.min(inputs)
 
-	normalized_ic50 = [(x-min)/(max-min) for x in inputs]
+	#max = np.max(inputs)
+	#min = np.min(inputs)
+
+	q_output = quantile_normalization(np.array(inputs))
+	max = np.max(q_output)
+	min = np.min(q_output)
+
+	#normalized_ic50 = [(x-min)/(max-min) for x in inputs]
+	normalized_ic50 = [(x-min)/(max-min) for x in q_output]
 
 	return normalized_ic50
 
@@ -213,8 +219,8 @@ def normalize_min_max_array(inputs: np.array)-> np.array:
 	--------
 	min max normalized array of data
 	"""
-	q_output = quantile_normalization(inputs)
-	inputs_list = list(q_output)
+	#q_output = quantile_normalization(inputs)
+	inputs_list = list(inputs)
 	normalized_list = list(map(normalize_min_max, inputs_list))
 
 	return np.array(normalized_list)
@@ -419,7 +425,7 @@ def convert_to_list(text_data: str)-> list:
 
 	return text_data
 
-def genereate_data_feature(gene_expressions: list, drug_one_hot_encodings: list, 
+def genereate_data_feature(gene_expressions:list, drug_one_hot_encodings: list, 
 	ic50s: list):
 	"""
 	generate model acceptable data features
@@ -498,7 +504,7 @@ def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFram
 	drug_smile_length = []
 	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
 	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
-	gene_expression_list = [list(gene_expression_filtered.loc[i][:]) for i in CCLE_names]
+	gene_expression_list = [gene_expression_filtered.iloc[i].values for i in CCLE_names]
 	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
 	drug_smile_list = [list(drug_cellline_features_clean_df['drug_compound_smile'])[i] for i in index_array]
 	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
