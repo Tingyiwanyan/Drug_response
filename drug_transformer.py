@@ -805,7 +805,15 @@ class drug_transformer_():
 	"""
 	Implement the drug transformer model architecture
 	"""
-	def __init__(self):
+	def __init__(self, gene_expression_vocab):
+
+		self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
+		self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
+
+		self.input_gene_expression_names = tf.constant(gene_expression_vocab)
+		self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)
+
+		self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
 
 		self.masked_softmax_ = masked_softmax()
 		self.masked_softmax_2 = masked_softmax()
@@ -874,15 +882,17 @@ class drug_transformer_():
 
 		self.dense_3 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_4 = tf.keras.layers.Dense(20, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_4 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_8 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_8 = tf.keras.layers.Dense(30 activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_5 = tf.keras.layers.Dense(1)#,  kernel_regularizer=regularizers.L2(1e-3))
 
 		self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_7 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_9 = tf.keras.layers.Dense(60 activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.kernel_key = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
@@ -905,6 +915,17 @@ class drug_transformer_():
 		Y_input = Input((5843, 1))
 		enc_valid_lens = Input(())
 
+		shape_input = tf.shape(X_input)
+
+		gene_expression_input = tf.broadcast_to(tf.expand_dims(self.input_gene_expression_one_hot, axis=0),shape=(shape_input[0],5843,5843))
+
+		"""
+		Degine the one-hot gene expression input
+		"""
+		#gene_expression_input = Input((5843,5843))
+
+		gene_expression_ = self.dense_8(gene_expression_input)
+
 		X = self.dense_0(X_input)
 		#X_ = self.dense_1(X_input)
 
@@ -924,10 +945,10 @@ class drug_transformer_():
 		X_global = tf.expand_dims(X_global, axis=1)
 		print(X_global)
 
-		#X_global = self.dense_8(X_global)
+		X_global = self.dense_9(X_global)
 
-		X_global = self.feature_selection(X_global)
-		print(X_global)
+		#X_global = self.feature_selection(X_global)
+		#print(X_global)
 
 		"""
 		self attention for the encoder
@@ -1017,13 +1038,16 @@ class drug_transformer_():
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 
+		Y = tf.concat([Y, gene_expression_])
+
 		self.check_Y = Y
 		self.check_X_global = X_global
 
-		#XX, att_score_global = self.decoder_global(X_global, Y)
-		#self.check_att_score = att_score_global
+		XX, att_score_global = self.decoder_global(X_global, Y)
+		self.check_att_score = att_score_global
 
-		att_score_global = tf.transpose(X_global, perm=[0,2,1])
+		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
+		#att_score_global = tf.transpose(X_global, perm=[0,2,1])
 
 		#print(att_score_global)
 
