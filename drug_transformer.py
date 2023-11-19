@@ -811,7 +811,7 @@ class drug_transformer_():
 		self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
 
 		self.input_gene_expression_names = tf.constant(gene_expression_vocab)
-		self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)
+		self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
 
 		self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
 
