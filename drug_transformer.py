@@ -945,7 +945,7 @@ class drug_transformer_():
 		X_global = tf.expand_dims(X_global, axis=1)
 		print(X_global)
 
-		X_global = self.dense_9(X_global)
+		#X_global = self.dense_9(X_global)
 
 		X_global = self.feature_selection(X_global)
 		print(X_global)
