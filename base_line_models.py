@@ -268,7 +268,7 @@ def model_save(input_model, name):
 	"""
 	save current model, name with a tf at last
 	"""
-	tf.keras.saving.save_model(model,name)
+	tf.keras.saving.save_model(input_model,name)
 
 def model_load(name):
 	"""

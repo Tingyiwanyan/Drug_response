@@ -807,13 +807,13 @@ class drug_transformer_():
 	"""
 	def __init__(self, gene_expression_vocab):
 
-		self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
-		self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
+		#self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
+		#self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
 
-		self.input_gene_expression_names = tf.constant(gene_expression_vocab)
-		self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
+		#self.input_gene_expression_names = tf.constant(gene_expression_vocab)
+		#self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
 
-		self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
+		#self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
 
 		self.masked_softmax_ = masked_softmax()
 		self.masked_softmax_2 = masked_softmax()
@@ -917,12 +917,12 @@ class drug_transformer_():
 
 		shape_input = tf.shape(X_input)
 
-		gene_expression_input = tf.broadcast_to(tf.expand_dims(self.input_gene_expression_one_hot, axis=0),shape=(shape_input[0],5843,5843))
+		#gene_expression_input = tf.broadcast_to(tf.expand_dims(self.input_gene_expression_one_hot, axis=0),shape=(shape_input[0],5843,5843))
 
 		"""
 		Degine the one-hot gene expression input
 		"""
-		#gene_expression_input = Input((5843,5843))
+		gene_expression_input = Input((5843,5843))
 
 		gene_expression_ = self.dense_8(gene_expression_input)
 
@@ -1038,7 +1038,7 @@ class drug_transformer_():
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 
-		Y = tf.concat([Y, gene_expression_], axis=-1)
+		Y = tf.math.l2_normalize(tf.concat([Y, gene_expression_], axis=-1))
 
 		self.check_Y = Y
 		self.check_X_global = X_global
@@ -1060,7 +1060,7 @@ class drug_transformer_():
 		Y = self.dense_5(Y)
 		#Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
+		self.model = Model(inputs=(X_input, Y_input, gene_expression_input, enc_valid_lens), outputs=Y)
 
 		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
