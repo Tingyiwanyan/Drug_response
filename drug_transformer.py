@@ -827,7 +827,7 @@ class drug_transformer_():
 		"""
 		global decoder
 		"""
-		self.decoder_global = decoder_cross_block(60)
+		self.decoder_global = decoder_cross_block(30)
 
 		"""
 		1st head attention
@@ -892,7 +892,7 @@ class drug_transformer_():
 
 		self.dense_7 = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_9 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_9 = tf.keras.layers.Dense(60, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.kernel_key = tf.keras.layers.Dense(50, activation='sigmoid', 
 			kernel_regularizer=regularizers.L2(1e-4))
@@ -945,10 +945,10 @@ class drug_transformer_():
 		X_global = tf.expand_dims(X_global, axis=1)
 		print(X_global)
 
-		#X_global = self.dense_9(X_global)
+		X_global = self.dense_9(X_global)
 
-		X_global = self.feature_selection(X_global)
-		print(X_global)
+		#X_global = self.feature_selection(X_global)
+		#print(X_global)
 
 		"""
 		self attention for the encoder
@@ -1043,11 +1043,11 @@ class drug_transformer_():
 		self.check_Y = Y
 		self.check_X_global = X_global
 
-		#XX, att_score_global = self.decoder_global(X_global, Y)
-		#self.check_att_score = att_score_global
+		XX, att_score_global = self.decoder_global(X_global, Y)
+		self.check_att_score = att_score_global
 
-		#att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
-		att_score_global = tf.transpose(X_global, perm=[0,2,1])
+		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
+		#att_score_global = tf.transpose(X_global, perm=[0,2,1])
 
 		#print(att_score_global)
 
