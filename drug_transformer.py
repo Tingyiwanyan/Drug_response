@@ -827,7 +827,7 @@ class drug_transformer_():
 		"""
 		global decoder
 		"""
-		self.decoder_global = decoder_cross_block(30)
+		self.decoder_global = decoder_cross_block(60)
 
 		"""
 		1st head attention
@@ -947,8 +947,8 @@ class drug_transformer_():
 
 		X_global = self.dense_9(X_global)
 
-		X_global = self.feature_selection(X_global)
-		print(X_global)
+		#X_global = self.feature_selection(X_global)
+		#print(X_global)
 
 		"""
 		self attention for the encoder
@@ -1043,11 +1043,11 @@ class drug_transformer_():
 		self.check_Y = Y
 		self.check_X_global = X_global
 
-		#XX, att_score_global = self.decoder_global(X_global, Y)
-		#self.check_att_score = att_score_global
+		XX, att_score_global = self.decoder_global(X_global, Y)
+		self.check_att_score = att_score_global
 
-		#att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
-		att_score_global = tf.transpose(X_global, perm=[0,2,1])
+		att_score_global = tf.transpose(att_score_global, perm=[0,2,1])
+		#att_score_global = tf.transpose(X_global, perm=[0,2,1])
 
 		#print(att_score_global)
 
