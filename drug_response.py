@@ -47,6 +47,7 @@ drug_one_hot_encoding_test = tf.reshape(drug_one_hot_encoding_test,[drug_one_hot
 #testing_ic50 = np.ones((2000))
 #inital_model = tf.keras.saving.load_model('single_head.tf')
 
+"""
 gene_expression_vocab = list(gene_expression_filtered.columns)
 
 string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
@@ -58,7 +59,7 @@ input_gene_expression_one_hot = layer_one_hot(input_gene_expression_index)
 
 gene_expression_input = tf.broadcast_to(tf.expand_dims(input_gene_expression_one_hot, axis=0),shape=(gene_expression.shape[0],5843,5843))
 gene_expression_input_test = tf.broadcast_to(tf.expand_dims(input_gene_expression_one_hot, axis=0),shape=(gene_expression_test.shape[0],5843,5843))
-
+"""
 k = drug_transformer_(list(gene_expression_filtered.columns))
 model = k.model_construction()
 model.summary()
@@ -69,8 +70,8 @@ model.summary()
 #att_output_model = att_score_output(model)
 #att_output_ = att_output_model.predict((drug_one_hot_encoding_test[0:10], gene_expression_test[0:10], np.array(drug_smile_length_test)[0:10]))
 for i in range(20):
-	history = model.fit((drug_one_hot_encoding, gene_expression, gene_expression_input, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=5)
-	ic50_predict = model.predict((drug_one_hot_encoding_test, gene_expression_test, gene_expression_input_test, np.array(drug_smile_length_test)))
+	history = model.fit((drug_one_hot_encoding, gene_expression, np.array(drug_smile_length)),np.array(ic50_list),batch_size=32, validation_split=0.2, epochs=5)
+	ic50_predict = model.predict((drug_one_hot_encoding_test, gene_expression_test, np.array(drug_smile_length_test)))
 	print("%i th correlation is: %f" %((i+1)*5, scipy.stats.pearsonr(np.array(ic50_list_test),ic50_predict[:,0])[0]))
 
 
