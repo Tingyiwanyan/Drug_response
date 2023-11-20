@@ -1038,7 +1038,7 @@ class drug_transformer_():
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 
-		Y = tf.math.l2_normalize(tf.concat([Y, gene_expression_], axis=-1))
+		Y = tf.concat([Y, gene_expression_], axis=-1)
 
 		self.check_Y = Y
 		self.check_X_global = X_global
