@@ -906,6 +906,7 @@ class drug_transformer_():
 		self.flattern_deco = tf.keras.layers.Flatten()
 		self.flattern_score = tf.keras.layers.Flatten()
 		self.flattern_global = tf.keras.layers.Flatten()
+		self.flattern_global_ = tf.keras.layers.Flatten()
 
 	def model_construction(self):
 		"""
@@ -1056,7 +1057,10 @@ class drug_transformer_():
 		#Y = tf.math.multiply(score, Y)
 		Y = tf.math.multiply(att_score_global, Y)
 
+		X_global = self.flattern_global_(X_global)
+
 		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
+		Y = tf.concat([Y, X_global], axis=-1)
 		Y = self.dense_5(Y)
 		#Y = tf.expand_dims(tf.reduce_sum(tf.math.multiply(score, Y)),axis=0)
 
