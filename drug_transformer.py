@@ -727,9 +727,17 @@ class drug_transformer():
 	"""
 	def __init__(self):
 
-		self.dense_1 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
+		self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
 
-		self.dense_2 = tf.keras.layers.Dense(10, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.input_gene_expression_names = tf.constant(gene_expression_vocab)
+		self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
+
+		self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index) 
+
+		self.dense_1 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_2 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(500, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -737,13 +745,17 @@ class drug_transformer():
 
 		self.dense_5 = tf.keras.layers.Dense(1)
 
+		self.dense_8 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
+		self.dense_9 = tf.keras.layers.Dense(60, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
 
 		"""
 		1st head attention
 		"""
-		self.encoder_1 = encoder_block(10,130)
+		self.encoder_1 = encoder_block(5,130)
 		#self.decoder_self_1 = encoder_block(20,130)
 		self.decoder_self_1 = decoder_self_block(10)
 		self.decoder_cross_1 = decoder_cross_block(10)
@@ -763,24 +775,45 @@ class drug_transformer():
 		Y_input = Input((5843, 1))
 		enc_valid_lens = Input(())
 
+		shape_input = tf.shape(X_input)
+
+		gene_expression_input = tf.broadcast_to(tf.expand_dims(self.input_gene_expression_one_hot, axis=0),shape=(shape_input[0],5843,5843))
+
+		"""
+		Degine the one-hot gene expression input
+		"""
+		#gene_expression_input = Input((5843,5843))
+
+		gene_expression_ = self.dense_8(gene_expression_input)
+
 		X = self.dense_1(X_input)
 		Y = self.dense_2(Y_input)
+
+		Y = tf.concat([Y, gene_expression_], axis=-1)
 
 		"""
 		multi head transformer
 		"""
 		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
+
+		X_global = self.flattern_enco(X)
+		print(X_global)
+
+		X_global = tf.expand_dims(X_global, axis=1)
+		print(X_global)
+
+		X_global = self.dense_9(X_global)
 		#X, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
 
 		#X = tf.concat([X_,X_2],axis=-1)
 
 		#Y, att_score_deco, kernel_projection_f = self.decoder_self_1(Y)
-		Y, att_score_deco = self.decoder_self_1(Y, enc_valid_lens)
+		#Y, att_score_deco = self.decoder_self_1(Y, enc_valid_lens)
 		#Y, att_score_deco_2, kernel_projection_f_2 = self.decoder_self_2(Y)
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
 
-		Y, att_score_deco_cross = self.decoder_cross_1(Y, X, enc_valid_lens)
+		Y, att_score_deco_cross = self.decoder_cross_1(X, Y, enc_valid_lens)
 
 		Y = self.flattern_deco(Y)
 

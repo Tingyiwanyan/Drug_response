@@ -293,6 +293,65 @@ def z_normalization(drug_ic50_df: pd.DataFrame, drug_name: str, ic50_value: floa
 
 	return (ic50_value-mean)/std
 
+def generate_df_origin_ic50(drug_cellline_features_clean_df: pd.DataFrame):
+	"""
+	generate filtered clean dataframe with drug specific z-normalized values
+
+	Parameters:
+	-----------
+	drug_cellline_features_clean_df: the pre-filtered clean drug cellline dataframe
+	drug_ic50_df: the calculated drug ic50 mean and std dataframe
+
+	Returns:
+	-------
+	dataframe with filtered data and z-normalized ic50 values
+	"""
+	cell_line_name_list = []
+	drug_name_list = []
+	gene_expression_data_list = []
+	drug_compound_smile_list = []
+	drug_one_hot_encoding_list = []
+	IC50_list = []
+	
+	#drug_ic50_df.set_index("drug_name", inplace =True)
+	#drug_cellline_features_clean_df.set_index()
+	#for row in drug_cellline_features_df['drug_name']:
+	for i in range(len(drug_cellline_features_clean_df)):
+		gene_expression = drug_cellline_features_clean_df['gene_expression_data'][i]
+		drug_compound = drug_cellline_features_clean_df['drug_compound_smile'][i]
+		ic50_value = drug_cellline_features_clean_df['IC50_value'][i]
+		ic50_value = process_ic50(ic50_value)
+		drug_name = drug_cellline_features_clean_df['drug_name'][i]
+		#try: 
+		if np.isnan(ic50_value) == True:
+			print("im here in is nan")
+			print(ic50_value)
+			continue
+		#else:
+		#	ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
+		#except:
+			#ic50_value = z_normalization(drug_ic50_df, drug_name, ic50_value)
+		#try:
+		#print(i)
+		drug_compound = smiles_encoder(drug_compound)
+		cell_line_name_list.append(drug_cellline_features_clean_df['cell_line_name'][i])
+		drug_name_list.append(drug_name)
+		gene_expression_data_list.append(gene_expression)
+		drug_compound_smile_list.append(drug_cellline_features_clean_df['drug_compound_smile'][i])
+		drug_one_hot_encoding_list.append(drug_compound)
+		IC50_list.append(ic50_value)
+			#drug_cellline_features_df['gene_expression_data'][i] = gene_expression
+		#except:
+			#continue
+
+
+	#drug_cellline_features_df.loc[:,"drug_one_hot_encoding"] = drug_one_hot_encoding
+
+	df_cell_line_drug_feature_ic50_normalied = pd.DataFrame(list(zip(cell_line_name_list, drug_name_list, gene_expression_data_list,\
+		drug_compound_smile_list, drug_one_hot_encoding_list, IC50_list)),columns=['cell_line_name','drug_name','gene_expression_data',\
+		'drug_compound_smile','drug_one_hot_encoding','IC50_value'])
+
+	return df_cell_line_drug_feature_ic50_normalied
 
 def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, drug_ic50_df: pd.DataFrame):
 	"""
