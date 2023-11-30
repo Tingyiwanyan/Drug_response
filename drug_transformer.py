@@ -757,13 +757,13 @@ class drug_transformer():
 		"""
 		self.encoder_1 = encoder_block(30,130)
 		#self.decoder_self_1 = encoder_block(20,130)
-		self.decoder_self_1 = decoder_self_block(10)
+		self.decoder_self_1 = decoder_self_block(30)
 		self.decoder_cross_1 = decoder_cross_block(10)
 
 		"""
 		2nd head attention
 		"""
-		self.encoder_2 = encoder_block(10,130)
+		self.encoder_2 = encoder_block(30,130)
 		self.decoder_self_2 = decoder_self_block(10)
 		self.decoder_cross_2 = decoder_cross_block(10)
 
@@ -813,7 +813,7 @@ class drug_transformer():
 
 		#Y = tf.concat([Y_,Y_2],axis=-1)
 
-		Y, att_score_deco_cross = self.decoder_cross_1(X, Y, enc_valid_lens)
+		Y, att_score_deco_cross = self.decoder_cross_1(X, Y)
 
 		Y = self.flattern_deco(Y)
 
@@ -822,7 +822,7 @@ class drug_transformer():
 		#Y = tf.concat([X,Y],axis=1)
 
 		#Y = self.dense_3(Y)
-		Y = self.dense_4(Y)
+		#Y = self.dense_4(Y)
 		Y = self.dense_5(Y)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens), outputs=Y)
