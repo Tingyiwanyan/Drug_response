@@ -862,6 +862,8 @@ class drug_transformer_():
 		"""
 		self.decoder_global = decoder_cross_block(30)
 
+		self.encoder_1 = encoder_block(30,130)
+
 		"""
 		1st head attention
 		"""
@@ -963,7 +965,8 @@ class drug_transformer_():
 		X = self.dense_0(X_input)
 		#X_ = self.dense_1(X_input)
 
-		X = self.pos_encoding(X)
+		X = self.encoder_1(X)
+		#X = self.pos_encoding(X)
 		#X_ = self.pos_encoding(X_)
 		#X = tf.concat([X,X_],axis=-1)
 
