@@ -725,7 +725,7 @@ class drug_transformer():
 	"""
 	Implimentation of drug transformer
 	"""
-	def __init__(self):
+	def __init__(self, gene_expression_vocab):
 
 		self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
 		self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
@@ -755,7 +755,7 @@ class drug_transformer():
 		"""
 		1st head attention
 		"""
-		self.encoder_1 = encoder_block(5,130)
+		self.encoder_1 = encoder_block(30,130)
 		#self.decoder_self_1 = encoder_block(20,130)
 		self.decoder_self_1 = decoder_self_block(10)
 		self.decoder_cross_1 = decoder_cross_block(10)
@@ -796,13 +796,13 @@ class drug_transformer():
 		"""
 		X, encoder_att_score = self.encoder_1(X, enc_valid_lens)
 
-		X_global = self.flattern_enco(X)
-		print(X_global)
+		X = self.flattern_enco(X)
+		print(X)
 
-		X_global = tf.expand_dims(X_global, axis=1)
-		print(X_global)
+		X = tf.expand_dims(X, axis=1)
+		print(X)
 
-		X_global = self.dense_9(X_global)
+		X = self.dense_9(X)
 		#X, encoder_att_score_2 = self.encoder_2(X, enc_valid_lens)
 
 		#X = tf.concat([X_,X_2],axis=-1)
@@ -821,7 +821,7 @@ class drug_transformer():
 
 		#Y = tf.concat([X,Y],axis=1)
 
-		Y = self.dense_3(Y)
+		#Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
 		Y = self.dense_5(Y)
 
