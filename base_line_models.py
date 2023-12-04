@@ -41,7 +41,7 @@ def shallow_position_wise_nn():
 	Abalation study on testing baseline for single position-wise feed forward nn
 	"""
 	X_input = Input((130, 56))
-	Y_input = Input((5842, 1))
+	Y_input = Input((5843, 1))
 
 	dense_1 = tf.keras.layers.Dense(50, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 

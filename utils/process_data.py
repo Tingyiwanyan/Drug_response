@@ -603,6 +603,38 @@ def train_test_split(drug_cellline_features_clean_df: pd.DataFrame, train_percen
 
 	return train_sample_num, num_list
 
+def train_test_split_cell_line(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):
+	"""
+	perform training and testing dataset split
+	"""
+	train_list = []
+	distinct_list = []
+	for i in drug_cellline_features_clean_df['cell_line_name']:
+	    if not i in distinct_list:
+	        distinct_list.append(i)
+	total_num_cell_line = len(distinct_list)
+	num_list = list(np.array(range(total_num_cell_line)))
+	train_num = int(np.floor(total_num_cell_line*train_percent))
+	random.seed(50)
+	train_sample_num = random.sample(num_list,train_num)
+
+	[num_list.remove(i) for i in train_sample_num]
+	train_sample_num.sort()
+	train_cell_line = [distinct_list[i] for i in train_sample_num]
+
+	total_num = len(drug_cellline_features_clean_df)
+	num_list_whole = list(np.array(range(total_num)))
+
+	k = list(drug_cellline_features_clean_df['cell_line_name'])
+	for i in train_cell_line:
+		single_train_num = list(np.where(np.array(k)==i)[0])
+		train_list += single_train_num
+
+	[num_list.remove(i) for i in train_list]
+	train_list.sort()
+
+	return train_list, num_list
+
 
 def process_gene_expression(gene_expression: str)-> list:
 	"""
