@@ -908,7 +908,7 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_0 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_0 = tf.keras.layers.Dense(60, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_1 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
@@ -965,7 +965,7 @@ class drug_transformer_():
 		X = self.dense_0(X_input)
 		#X_ = self.dense_1(X_input)
 
-		X, self_drug_att_score= self.encoder_1(X)
+		#X, self_drug_att_score= self.encoder_1(X)
 		#X = self.pos_encoding(X)
 		#X_ = self.pos_encoding(X_)
 		#X = tf.concat([X,X_],axis=-1)
@@ -1010,6 +1010,8 @@ class drug_transformer_():
 		self attention for the deocoder
 		"""
 		Y = self.dense_2(Y_input)
+
+		Y = tf.concat([Y, gene_expression_], axis=-1)
 		#Y_ = self.dense_22(Y_input)
 		#Y = tf.concat([Y,Y_],axis=-1)
 		#top_indices, output_score, Y = self.feature_selction(Y)
@@ -1074,8 +1076,6 @@ class drug_transformer_():
 		#Y = tf.gather(Y, indices=top_indices, batch_dims=1)
 		Y = self.dense_3(Y)
 		Y = self.dense_4(Y)
-
-		Y = tf.concat([Y, gene_expression_], axis=-1)
 
 		self.check_Y = Y
 		self.check_X_global = X_global
