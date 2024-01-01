@@ -573,8 +573,8 @@ class residual_connection(tf.keras.layers.Layer):
 	def call(self, X, Y, **kwargs):
 		#X = tf.math.l2_normalize(X, axis=-1)
 		#Y = tf.math.l2_normalize(Y, axis=-1)
-		#return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
-		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -936,6 +936,8 @@ class drug_transformer_():
 			kernel_regularizer=regularizers.L2(1e-4))
 
 		self.pos_encoding = positionalencoding(30,130)
+
+		self.pos_encoding_gene = positionalencoding(30, 5843)
 
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()

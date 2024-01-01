@@ -529,7 +529,7 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expr
 	"""
 	CCLE_names = [drug_cellline_features_clean_df['cell_line_name'][i] for i in index_array]
 	#gene_expression_list = [list(drug_cellline_features_clean_df['gene_expression_data'])[i] for i in index_array]
-	gene_expression_list = [list(gene_expression_filtered.loc[i][1:]) for i in CCLE_names]
+	gene_expression_list = [gene_expression_filtered.loc[i].values for i in CCLE_names]
 	drug_one_hot_encoding_list = [list(drug_cellline_features_clean_df['drug_one_hot_encoding'])[i] for i in index_array]
 	ic50_list = [list(drug_cellline_features_clean_df['IC50_value'])[i] for i in index_array]
 	drug_name_list = [list(drug_cellline_features_clean_df['drug_name'])[i] for i in index_array]
