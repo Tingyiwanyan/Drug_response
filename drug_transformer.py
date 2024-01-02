@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras import regularizers
+import tensorflow_addons as tfa
 import keras.backend as K
 
 
@@ -11,14 +12,17 @@ class masked_softmax(tf.keras.layers.Layer):
 		super().__init__()
 		self.value = value
 
-	def call(self, X, valid_lens=None, **kwargs):
+	def call(self, X, if_sparse_max=None, valid_lens=None, **kwargs):
 		"""
 		Parameters:
 		-----------
 		X: 2D tensor specifying the attention matrix [query_seq_length, key_seq_length]
 		"""
 		if valid_lens == None:
-			return tf.nn.softmax(X, axis=-1)
+			if if_sparse_max == None:
+				return tf.nn.softmax(X, axis=-1)
+			else
+				return tfa.activations.sparsemax(X)
 			#print("Im here")
 		else:
 			shape_X = tf.shape(X)
@@ -359,7 +363,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
 		#	kernel_regularizer=regularizers.L2(1e-4))
  
-		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
+		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', kernel_initializer=initializers.RandomNormal(stddev=0.01), 
 			kernel_regularizer=regularizers.L2(1e-4))
 
 	
@@ -908,11 +912,14 @@ class drug_transformer_():
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-		self.dense_0 = tf.keras.layers.Dense(60, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_0 = tf.keras.layers.Dense(60, activation='relu', kernel_initializer=initializers.RandomNormal(stddev=0.01), 
+			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_1 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_1 = tf.keras.layers.Dense(30, activation='relu', kernel_initializer=initializers.RandomNormal(stddev=0.01), 
+			kernel_regularizer=regularizers.L2(1e-4))
 
-		self.dense_2 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
+		self.dense_2 = tf.keras.layers.Dense(30, activation='relu', kernel_initializer=initializers.RandomNormal(stddev=0.01), 
+			kernel_regularizer=regularizers.L2(1e-4))
 		self.dense_22 = tf.keras.layers.Dense(30, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
 
 		self.dense_3 = tf.keras.layers.Dense(100, activation='relu', kernel_regularizer=regularizers.L2(1e-4))
