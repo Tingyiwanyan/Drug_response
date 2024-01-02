@@ -5,6 +5,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras import regularizers
 import tensorflow_addons as tfa
 import keras.backend as K
+from tensorflow.keras import initializers
 
 
 class masked_softmax(tf.keras.layers.Layer):
@@ -339,69 +340,70 @@ class feature_selection_layer_global_drug(tf.keras.layers.Layer):
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
-	"""
-	Define scaled dot product layer
+    """
+    Define scaled dot product layer
 
-	Parameters:
-	-----------
-	kernel_key: embedding matrix for key
-	kernel_value: embedding matrix for value
-	kernel_query: embedding matrix for query
+    Parameters:
+    -----------
+    kernel_key: embedding matrix for key
+    kernel_value: embedding matrix for value
+    kernel_query: embedding matrix for query
 
-	Returns:
-	--------
-	attention_score: the scale dot product score
-	"""
-	def __init__(self, output_dim):
-		super().__init__()
-		self.output_dim = output_dim
-		#self.masked_softmax = masked_softmax()
+    Returns:
+    --------
+    attention_score: the scale dot product score
+    """
+    def __init__(self, output_dim):
+        super().__init__()
+        self.output_dim = output_dim
+        #self.masked_softmax = masked_softmax()
 
-		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
+        #self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+        #	kernel_regularizer=regularizers.L2(1e-4))
 
-		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
- 
-		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', kernel_initializer=initializers.RandomNormal(stddev=0.01), 
-			kernel_regularizer=regularizers.L2(1e-4))
+        #self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+        #	kernel_regularizer=regularizers.L2(1e-4))
 
-	
-	def build(self, input_shape):
-		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		b_init = tf.zeros_initializer()
-		self.b_key = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		self.b_query = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+        self.kernel_value = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
+                                             kernel_regularizer=regularizers.L2(1e-4),
+                                             bias_initializer=initializers.Zeros())
 
 
-		#self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-		#	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
+    def build(self, input_shape):
+        self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+            initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
-		#self.b_value = tf.Variable(
-		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-	
+        b_init = tf.zeros_initializer()
+        self.b_key = tf.Variable(
+            initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	def call(self, queries, keys, values, valid_lens=None, **kwargs):
-		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
-		#queries = self.kernel_query(queries)
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
-		#keys = self.kernel_key(keys)
-		#values = tf.matmul(values, self.kernel_value) + self.b_value
-		values = self.kernel_value(values)
-		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-			tf.cast(d, dtype=tf.float32))
+        self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+            initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
-		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries
+        self.b_query = tf.Variable(
+            initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+
+        #self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+        #	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
+
+        #self.b_value = tf.Variable(
+        #	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+
+    def call(self, queries, keys, values, valid_lens=None, **kwargs):
+        d = queries.shape[-1]
+        queries = tf.matmul(queries, self.kernel_query) + self.b_query
+        #queries = self.kernel_query(queries)
+        keys = tf.matmul(keys, self.kernel_key) + self.b_key
+        #keys = self.kernel_key(keys)
+        #values = tf.matmul(values, self.kernel_value) + self.b_value
+        values = self.kernel_value(values)
+        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+            tf.cast(d, dtype=tf.float32))
+
+        #self.attention_weights = self.masked_softmax(scores, valid_lens)
+        return scores, values, queries
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
@@ -701,28 +703,28 @@ class decoder_self_block(tf.keras.layers.Layer):
 		return self_deco_embedding, att_score_deco
 
 class decoder_cross_block(tf.keras.layers.Layer):
-	"""
-	Define decoder cross attention 
-	"""
-	def __init__(self, num_hiddens):
-		super().__init__()
-		self.masked_softmax_deco_cross = masked_softmax()
-		self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
-		self.att_embedding = attention_embedding()
-		self.r_connection = residual_connection()
+    """
+    Define decoder cross attention 
+    """
+    def __init__(self, num_hiddens):
+        super().__init__()
+        self.masked_softmax_deco_cross = masked_softmax()
+        self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
+        self.att_embedding = attention_embedding()
+        self.r_connection = residual_connection()
 
-	def call(self, Y, X, enc_valid_lens=None, **kwargs):
-		score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
-		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, enc_valid_lens)
-		att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+    def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, **kwargs):
+        score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
+        att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)
+        att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
 
-		#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
-		#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
+        #att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
+        #query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
-		cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
+        cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
-		return cross_embedding, att_score_deco_cross
+        return cross_embedding, att_score_deco_cross
 
 
 class drug_transformer():
