@@ -12,17 +12,17 @@ class masked_softmax(tf.keras.layers.Layer):
 		super().__init__()
 		self.value = value
 
-	def call(self, X, if_sparse_max=None, valid_lens=None, **kwargs):
+	def call(self, X, if_sparse_max=False, valid_lens=None, **kwargs):
 		"""
 		Parameters:
 		-----------
 		X: 2D tensor specifying the attention matrix [query_seq_length, key_seq_length]
 		"""
 		if valid_lens == None:
-			if if_sparse_max == None:
-				return tf.nn.softmax(X, axis=-1)
-			else
+			if if_sparse_max == True:
 				return tfa.activations.sparsemax(X)
+			else
+				return tf.nn.softmax(X, axis=-1)
 			#print("Im here")
 		else:
 			shape_X = tf.shape(X)
