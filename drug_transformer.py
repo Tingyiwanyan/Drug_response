@@ -21,7 +21,7 @@ class masked_softmax(tf.keras.layers.Layer):
 		if valid_lens == None:
 			if if_sparse_max == True:
 				return tfa.activations.sparsemax(X)
-			else
+			else:
 				return tf.nn.softmax(X, axis=-1)
 			#print("Im here")
 		else:
