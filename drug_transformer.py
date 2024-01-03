@@ -204,29 +204,29 @@ class masked_softmax_selected(tf.keras.layers.Layer):
 
 
 class positionalencoding(tf.keras.layers.Layer):  
-	"""Positional encoding."""
-	def __init__(self, num_hiddens, num_length, max_len=6000):
-		super().__init__()
-		#self.dropout = tf.keras.layers.Dropout(dropout)
-		# Create a long enough P
-		self.num_length = num_length
-		self.max_len = max_len
-		self.num_hiddens = num_hiddens
-	def call(self, X, **kwargs):
-		#X = X + self.P[:, :X.shape[1], :]
-		#return self.dropout(X, **kwargs)
-		self.P = np.zeros((1, self.max_len, self.num_hiddens))
-		XX = np.arange(self.max_len, dtype=np.float32).reshape(
-			-1,1)/np.power(10000, np.arange(
-				0, self.num_hiddens, 2, dtype=np.float32) / self.num_hiddens)
-		self.P[:, :, 0::2] = np.sin(XX)
-		self.P[:, :, 1::2] = np.cos(XX)
-		shape_X = tf.shape(X)
-		X = tf.math.l2_normalize(X, axis=-1)
-		self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
-			dtype=tf.float32)
+    """Positional encoding."""
+    def __init__(self, num_hiddens, num_length, max_len=6000):
+        super().__init__()
+        #self.dropout = tf.keras.layers.Dropout(dropout)
+        # Create a long enough P
+        self.num_length = num_length
+        self.max_len = max_len
+        self.num_hiddens = num_hiddens
+    def call(self, X, **kwargs):
+        #X = X + self.P[:, :X.shape[1], :]
+        #return self.dropout(X, **kwargs)
+        self.P = np.zeros((1, self.max_len, self.num_hiddens))
+        XX = np.arange(self.max_len, dtype=np.float32).reshape(
+            -1,1)/np.power(10000, np.arange(
+                0, self.num_hiddens, 2, dtype=np.float32) / self.num_hiddens)
+        self.P[:, :, 0::2] = np.sin(XX)
+        self.P[:, :, 1::2] = np.cos(XX)
+        shape_X = tf.shape(X)
+        X = tf.math.l2_normalize(X, axis=-1)
+        self.P = tf.cast(tf.math.l2_normalize(self.P[:, :self.num_length,:], axis=-1), 
+            dtype=tf.float32)
 
-		return tf.cast(tf.math.l2_normalize(tf.math.add(X, self.P), axis=-1), dtype=tf.float32)
+        return tf.cast(tf.math.l2_normalize(tf.math.add(X, self.P), axis=-1), dtype=tf.float32)
 
 
 class position_wise_embedding(tf.keras.layers.Layer):
@@ -652,10 +652,10 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-	def call(self, X, enc_valid_lens=None, **kwargs):
+	def call(self, X, if_sparse_max=False, enc_valid_lens=None, **kwargs):
 		X = self.pos_encoding(X)
 		score, value, query = self.dotproductattention(X,X,X)
-		att_score = self.masked_softmax(score, enc_valid_lens)
+		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
