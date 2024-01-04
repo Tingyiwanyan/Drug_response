@@ -285,8 +285,9 @@ def att_score_self_enco(input_model, name):
 
 	return att_output
 
-def att_score_self_doce(input_model, name):
-	att_layer = input_model.get_layer(name)
+def att_score_self_doce(input_model, index):
+	#att_layer = input_model.get_layer(name)
+	att_layer = input_model.layers[index]
 	att_output = Model(inputs=input_model.input, outputs = att_layer.output)
 
 	return att_output
