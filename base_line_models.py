@@ -276,11 +276,12 @@ def model_load(name):
 	"""
 	return tf.keras.saving.load_model(name)
 
-def att_score_self_enco(input_model, name):
+def att_score_self_enco(input_model, index):
 	"""
 	Generate intermediate attention score for examination
 	"""
-	att_layer = input_model.get_layer(name)
+	#att_layer = input_model.get_layer(name)
+	att_layer = input_model.layers[index]
 	att_output = Model(inputs=input_model.input, outputs = att_layer.output)
 
 	return att_output
