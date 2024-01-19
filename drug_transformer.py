@@ -409,8 +409,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			print("scores_ shape")
 			print(scores_.shape)
 			queries_ = tf.expand_dims(queries, axis=1)
-
-			queries_ = tf.broadcast_to(queries, [shape[0],shape[1],shape[1],shape[-1]])
+ß
+			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			print(queries_.shape)
 			relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
