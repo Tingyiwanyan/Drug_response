@@ -7,6 +7,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+from keras.layers import Conv2D, MaxPooling2D,Conv1D,MaxPooling1D
 from drug_transformer import *
 
 epochs = 30
