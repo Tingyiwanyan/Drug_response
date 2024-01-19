@@ -356,6 +356,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
     def __init__(self, output_dim):
         super().__init__()
         self.output_dim = output_dim
+        self.relative_encoding_lookup = relative_encoding_lookup
         #self.masked_softmax = masked_softmax()
 
         #self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
@@ -384,23 +385,38 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 
-        #self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-        #	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
+        self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+        	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
 
-        #self.b_value = tf.Variable(
-        #	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+        self.b_value = tf.Variable(
+        	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 
-    def call(self, queries, keys, values, valid_lens=None, **kwargs):
+    def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
         d = queries.shape[-1]
         queries = tf.matmul(queries, self.kernel_query) + self.b_query
+        shape = tf.shape(queries)
         #queries = self.kernel_query(queries)
         keys = tf.matmul(keys, self.kernel_key) + self.b_key
         #keys = self.kernel_key(keys)
-        #values = tf.matmul(values, self.kernel_value) + self.b_value
-        values = self.kernel_value(values)
-        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-            tf.cast(d, dtype=tf.float32))
+        values = tf.matmul(values, self.kernel_value) + self.b_value
+        #values = self.kernel_value(values)
+
+        if relative_encoding_lookup == None:
+			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+			    tf.cast(d, dtype=tf.float32))
+		else:
+			scores_ = tf.matmul(queries, keys, transpose_b=True)
+
+			queries_ = tf.expand_dims(queries, axis=1)
+			queries_ = tf.broadcast_to(queries, [shape[0],shape[1],shape[1],shape[-1]])
+			relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
+			relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
+			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)
+
+			scores = tf.add(scores_, score_position)
+			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
+
 
         #self.attention_weights = self.masked_softmax(scores, valid_lens)
         return scores, values, queries
@@ -653,8 +669,8 @@ class encoder_block(tf.keras.layers.Layer):
 		self.r_connection = residual_connection()
 
 	def call(self, X, if_sparse_max=False, enc_valid_lens=None, **kwargs):
-		X = self.pos_encoding(X)
-		score, value, query = self.dotproductattention(X,X,X)
+		#X = self.pos_encoding(X)
+		score, value, query = self.dotproductattention(X,X,X,enc_valid_lens)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		att_embedding_ = self.att_embedding(att_score, value)
 
