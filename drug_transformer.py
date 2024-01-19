@@ -356,7 +356,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	def __init__(self, output_dim):
 	    super().__init__()
 	    self.output_dim = output_dim
-	    self.relative_encoding_lookup = relative_encoding_lookup
+	    #self.relative_encoding_lookup = relative_encoding_lookup
 	    #self.masked_softmax = masked_softmax()
 
 	    #self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
