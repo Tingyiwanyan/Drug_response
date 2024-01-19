@@ -393,16 +393,16 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
     def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
-        d = queries.shape[-1]
-        queries = tf.matmul(queries, self.kernel_query) + self.b_query
-        shape = tf.shape(queries)
-        #queries = self.kernel_query(queries)
-        keys = tf.matmul(keys, self.kernel_key) + self.b_key
-        #keys = self.kernel_key(keys)
-        values = tf.matmul(values, self.kernel_value) + self.b_value
-        #values = self.kernel_value(values)
+		d = queries.shape[-1]
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		shape = tf.shape(queries)
+		#queries = self.kernel_query(queries)
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		#keys = self.kernel_key(keys)
+		values = tf.matmul(values, self.kernel_value) + self.b_value
+		#values = self.kernel_value(values)
 
-        if relative_encoding_lookup == None:
+		if relative_encoding_lookup == None:
 			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 		else:
 			scores_ = tf.matmul(queries, keys, transpose_b=True)
@@ -417,8 +417,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 
-        #self.attention_weights = self.masked_softmax(scores, valid_lens)
-        return scores, values, queries
+		#self.attention_weights = self.masked_softmax(scores, valid_lens)
+		return scores, values, queries
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
