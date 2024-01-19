@@ -403,8 +403,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
         #values = self.kernel_value(values)
 
         if relative_encoding_lookup == None:
-			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-			    tf.cast(d, dtype=tf.float32))
+			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 		else:
 			scores_ = tf.matmul(queries, keys, transpose_b=True)
 
