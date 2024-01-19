@@ -413,7 +413,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
 			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)
 
-			scores = tf.add(scores_, score_position)
+			scores = tf.add(scores_, scores_position)
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 
