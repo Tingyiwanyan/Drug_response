@@ -677,7 +677,8 @@ class encoder_block(tf.keras.layers.Layer):
 	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, **kwargs):
 		#X = self.pos_encoding(X)
 		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc)
-		att_score = self.masked_softmax(score, if_sparse_max, relative_pos_enc)
+		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
+		print(att_score.shape)
 		att_embedding_ = self.att_embedding(att_score, value)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
