@@ -340,59 +340,59 @@ class feature_selection_layer_global_drug(tf.keras.layers.Layer):
 
 
 class dotproductattention(tf.keras.layers.Layer):  #@save
-    """
-    Define scaled dot product layer
+	"""
+	Define scaled dot product layer
 
-    Parameters:
-    -----------
-    kernel_key: embedding matrix for key
-    kernel_value: embedding matrix for value
-    kernel_query: embedding matrix for query
+	Parameters:
+	-----------
+	kernel_key: embedding matrix for key
+	kernel_value: embedding matrix for value
+	kernel_query: embedding matrix for query
 
-    Returns:
-    --------
-    attention_score: the scale dot product score
-    """
-    def __init__(self, output_dim):
-        super().__init__()
-        self.output_dim = output_dim
-        self.relative_encoding_lookup = relative_encoding_lookup
-        #self.masked_softmax = masked_softmax()
+	Returns:
+	--------
+	attention_score: the scale dot product score
+	"""
+	def __init__(self, output_dim):
+	    super().__init__()
+	    self.output_dim = output_dim
+	    self.relative_encoding_lookup = relative_encoding_lookup
+	    #self.masked_softmax = masked_softmax()
 
-        #self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-        #	kernel_regularizer=regularizers.L2(1e-4))
+	    #self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+	    #	kernel_regularizer=regularizers.L2(1e-4))
 
-        #self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-        #	kernel_regularizer=regularizers.L2(1e-4))
+	    #self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
+	    #	kernel_regularizer=regularizers.L2(1e-4))
 
-        self.kernel_value = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros())
-
-
-    def build(self, input_shape):
-        self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
-            initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
-
-        b_init = tf.zeros_initializer()
-        self.b_key = tf.Variable(
-            initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-        self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
-            initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
-
-        self.b_query = tf.Variable(
-            initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+	    self.kernel_value = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
+	                                         kernel_regularizer=regularizers.L2(1e-4),
+	                                         bias_initializer=initializers.Zeros())
 
 
-        self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-        	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
+	def build(self, input_shape):
+	    self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+	        initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
-        self.b_value = tf.Variable(
-        	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+	    b_init = tf.zeros_initializer()
+	    self.b_key = tf.Variable(
+	        initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+	    self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+	        initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
+
+	    self.b_query = tf.Variable(
+	        initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 
-    def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
+	    self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+	    	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
+
+	    self.b_value = tf.Variable(
+	    	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+
+	def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
 		d = queries.shape[-1]
 		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
