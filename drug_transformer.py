@@ -38,7 +38,7 @@ class masked_softmax(tf.keras.layers.Layer):
 
 			X = tf.where(mask, X, self.value)
 
-			if_sparse_max == True:
+			if if_sparse_max == True:
 				return tfa.activations.sparsemax(tf.reshape(X, shape=shape_X))
 			else:
 				return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
