@@ -38,7 +38,10 @@ class masked_softmax(tf.keras.layers.Layer):
 
 			X = tf.where(mask, X, self.value)
 
-			return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
+			if_sparse_max == True:
+				return tfa.activations.sparsemax(tf.reshape(X, shape=shape_X))
+			else:
+				return tf.nn.softmax(tf.reshape(X, shape=shape_X), axis=-1)
 
 
 class masked_softmax_sliding_window(tf.keras.layers.Layer):
@@ -416,7 +419,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			print(relative_encoding_lookup.shape)
 			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)
 			print(scores_position.shape)
-
+ 
 			scores = tf.add(scores_, scores_position)
 			print(scores.shape)
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
