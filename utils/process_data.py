@@ -581,7 +581,7 @@ def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFram
 	#ic50_list = normalize_ic50(ic50_list)
 	gene_expression_array = np.array(gene_expression_list)
 	drug_one_hot_encoding_array = np.array(drug_one_hot_encoding_list)
-	#gene_expression_array = normalize_min_max_array(gene_expression_array)
+	gene_expression_array = normalize_min_max_array(gene_expression_array)
 	cell_line_drug_feature = np.concatenate((gene_expression_array,drug_one_hot_encoding_array),1)
 	#cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
 
