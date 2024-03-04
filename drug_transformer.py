@@ -374,21 +374,21 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 	def build(self, input_shape):
-	    self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
+	    self.kernel_key = self.add_weight(shape = (input_shape[-1], self.output_dim),
 	        initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 	    b_init = tf.zeros_initializer()
 	    self.b_key = tf.Variable(
 	        initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
-	    self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
+	    self.kernel_query  = self.add_weight(shape = (input_shape[-1], self.output_dim),
 	        initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 	    self.b_query = tf.Variable(
 	        initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 
-	    self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+	    self.kernel_value = self.add_weight(shape=(input_shape[-1], self.output_dim),
 	    	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
 
 	    self.b_value = tf.Variable(
