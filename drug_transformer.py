@@ -406,15 +406,15 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
 		d = queries.shape[-1]
-		#queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
+		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
-		#keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		#values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
-		values = tf.matmul(values, self.kernel_value) + self.b_value
+		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
 		if relative_encoding_lookup == None:
@@ -429,7 +429,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
 			print(relative_encoding_lookup.shape)
-			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)
+			scores_position = tf.reduce_sum(tf.multiply(queries_, tf.math.l2_normalize(relative_encoding_lookup, axis=-1)), axis=-1)
 			print(scores_position.shape)
  
 			scores = tf.add(scores_, scores_position)
