@@ -406,12 +406,15 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
 		d = queries.shape[-1]
-		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
+		#queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
+		queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
-		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+		#keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+		keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+		#values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+		values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
 		if relative_encoding_lookup == None:
@@ -599,7 +602,8 @@ class attention_embedding(tf.keras.layers.Layer):
 
 	def call(self, att_weights, input_value, **kwargs):
 
-		return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
+		#return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
+		return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 
 
 class residual_connection(tf.keras.layers.Layer):
@@ -612,8 +616,8 @@ class residual_connection(tf.keras.layers.Layer):
 	def call(self, X, Y, **kwargs):
 		#X = tf.math.l2_normalize(X, axis=-1)
 		#Y = tf.math.l2_normalize(Y, axis=-1)
-		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
-		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+		#return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
