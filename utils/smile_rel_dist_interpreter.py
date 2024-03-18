@@ -3,8 +3,10 @@ import numpy as np
 def smile_cl_converter(smile):
     new_smile = ''
     for i in range(len(smile)):
-        if smile[i] == 'C' and smile[i+1] == 'l':
-            new_smile += 'L'
+        if smile[i] == 'C':
+            if not i == len(smile) - 1:
+                if smile[i+1] == 'l':
+                    new_smile += 'L'
         elif smile[i] == 'l' and smile[i-1] == 'C':
             continue
         else:
