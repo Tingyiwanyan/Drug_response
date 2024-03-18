@@ -11,6 +11,16 @@ def smile_cl_converter(smile):
                     new_smile += smile[i]
         elif smile[i] == 'l' and smile[i-1] == 'C':
             continue
+
+        elif smile[i] == 'B':
+            if not i == len(smile) - 1:
+                if smile[i+1] == 'r':
+                    new_smile += 'B'
+                else:
+                    new_smile += smile[i]
+        elif smile[i] == 'r' and smile[i-1] == 'B':
+            continue
+            
         else:
             #new_smile.append(smile[i])
             new_smile+=smile[i]
@@ -22,6 +32,8 @@ def symbol_converter(symbol):
     elif symbol == ')':
         return (None, 2)
     elif symbol == '=':
+        return (None, 1)
+    elif symbol == '#':
         return (None, 1)
     elif symbol == '1':
         return (None, 2)
