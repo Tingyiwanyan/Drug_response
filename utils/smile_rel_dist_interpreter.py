@@ -94,7 +94,7 @@ def prop_dist(smile, pos, direction):
                 
     if direction == "right":
         flag = 0
-        for i in range(length-pos-1):
+        for i in range(length-pos):
             #print(i)
             rel_pos = int(pos+i+1)
             symbol, dist = symbol_converter(smile[rel_pos])
@@ -130,7 +130,7 @@ def smile_rel_dis_interpreter(smile, pos):
     rel_distance[pos] = -1 #make specific mark for current position
     symbol, dist = symbol_converter(smile[pos])
     interpret_smile = pos_left[1] + list(symbol) + pos_right[1]
-    projection = pos_left[2] + pos_right[2]
+    projection = pos_left[2] + pos_right[2] 
     projection[pos] = pos
     if pos == 0:
         projection[pos] = -2 #mark the initial pos position
