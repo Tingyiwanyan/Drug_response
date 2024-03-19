@@ -68,7 +68,7 @@ def prop_dist(smile, pos, direction):
             rel_pos = int(pos-i-1)
             symbol, dist = symbol_converter(smile[rel_pos])
             if symbol == None:
-                if dist == 2:
+                if dist == 2 and flag == 0:
                     #rel_distance[pos - i - 2] = 2 + accumulate_left
                     #accumulate_left += 2
                     flag = 0
@@ -94,14 +94,14 @@ def prop_dist(smile, pos, direction):
                 
     if direction == "right":
         flag = 0
-        for i in range(length-pos):
+        for i in range(length-pos-1):
             #print(i)
             rel_pos = int(pos+i+1)
             symbol, dist = symbol_converter(smile[rel_pos])
             if symbol == None:
-                if rel_pos == length-1:
+                if rel_pos == length:
                     continue
-                if dist == 2:
+                if dist == 2 and flag == 0:
                     #rel_distance[pos + i + 2] = 2 + accumulate_right
                     #accumulate_right += 2
                     flag = 0
