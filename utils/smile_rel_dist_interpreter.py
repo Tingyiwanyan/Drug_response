@@ -84,10 +84,10 @@ def prop_dist(smile, pos, direction):
                     projection[pos - i - 1] = -2 
                 interpret_smile.append(symbol)
                 if flag == 1:
-                    rel_distance[pos - i - 1] = 1 + accumulate_left
+                    rel_distance[pos - i - 1] = -(1 + accumulate_left)
                     accumulate_left += 1
                 else:
-                    rel_distance[pos - i - 1] = 2 + accumulate_left
+                    rel_distance[pos - i - 1] = -(2 + accumulate_left)
                     accumulate_left += 2
                 flag = 0
 
