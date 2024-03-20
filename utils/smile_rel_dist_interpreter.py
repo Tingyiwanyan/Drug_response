@@ -9,6 +9,8 @@ def smile_cl_converter(smile):
                     new_smile += 'L'
                 else:
                     new_smile += smile[i]
+            else:
+                new_smile += smile[i]
         elif smile[i] == 'l' and smile[i-1] == 'C':
             continue
 
