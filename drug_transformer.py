@@ -425,7 +425,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#scores_ = tf.matmul(queries, keys, transpose_b=True)
 			#print("scores_ shape")
 			#print(scores_.shape)
-			queries_origin = tt.expand_dims(queries, axis=1)
+			queries_origin = tf.expand_dims(queries, axis=1)
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
 			queries_ = tf.expand_dims(queries, axis=1)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
