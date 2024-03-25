@@ -423,8 +423,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			return scores, values, queries
 		else:
 			#scores_ = tf.matmul(queries, keys, transpose_b=True)
-			print("scores_ shape")
-			print(scores_.shape)
+			#print("scores_ shape")
+			#print(scores_.shape)
 			queries_ = tf.expand_dims(queries, axis=1)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			queries_ = tf.math.add(queries_, tf.math.l2_normalize(relative_encoding_lookup))
