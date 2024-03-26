@@ -712,7 +712,7 @@ class encoder_block(tf.keras.layers.Layer):
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, query, relative_encoding_lookup=relative_pos_enc)
+		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
