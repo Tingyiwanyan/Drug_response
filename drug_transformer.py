@@ -427,7 +427,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#print(scores_.shape)
 			queries_origin = tf.expand_dims(queries, axis=1)
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
-			queries_ = tf.expand_dims(queries, axis=1)
+			queries_ = tf.expand_dims(queries, axis=2)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			queries_ = tf.math.add(queries_, tf.math.l2_normalize(relative_encoding_lookup))
 			print(queries_.shape)
@@ -612,7 +612,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
 		else:
 			shape = tf.shape(input_value)
-			value_ = tf.expand_dims(input_value, axis=1)
+			value_ = tf.expand_dims(input_value, axis=2)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			value_ = tf.math.add(value_, tf.math.l2_normalize(relative_encoding_lookup))
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
@@ -717,7 +717,7 @@ class encoder_block(tf.keras.layers.Layer):
 		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
 
-		return encoder_embedding, att_score
+		return encoder_embedding, att_score, score
 
 
 class decoder_self_block(tf.keras.layers.Layer):
