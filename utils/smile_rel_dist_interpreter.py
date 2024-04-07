@@ -1,4 +1,8 @@
 import numpy as np
+from rdkit import Chem
+from rdkit.Chem import MolFromSmiles, rdmolops
+from rdkit.Chem import AllChem, AddHs
+import networkx as nx
 
 def smile_cl_converter(smile):
     new_smile = ''
@@ -151,7 +155,8 @@ def smile_rel_dis_interpreter(smile, pos):
 
     return rel_distance_, interpret_smile_, projection_
 
-def generate_rel_dist_matrix(smile):
+
+def generate_interpret_smile(smile):
     new_smile = smile_cl_converter(smile)
     length = len(new_smile)
     rel_distance_whole = []
@@ -172,4 +177,35 @@ def generate_rel_dist_matrix(smile):
     projection_whole = np.stack(projection_whole)
     interpret_smile_whole = np.stack(interpret_smile_whole)
 
-    return rel_distance_whole, interpret_smile_whole, projection_whole
+    return interpret_smile_whole
+
+def generate_rel_dist_matrix(smile):
+    """
+    generate relative distance matrix for position encoding 
+    from the shortest path.
+    """
+    mol = Chem.MolFromSmiles(smile)
+    A = np.array(rdmolops.GetAdjacencyMatrix(mol))
+    G = nx.DiGraph(A)
+    rel_dist_matrix = np.zeros((A.shape[0],A.shape[1]))
+    for i in range(A.shape[0]):
+        for j in range(A.shape[1]):
+            rel_dist_matrix[i,j] = len(nx.shortest_path(G,source=i,target=j)) - 1
+
+    return rel_dist_matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
