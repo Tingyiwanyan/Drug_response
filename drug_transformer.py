@@ -720,7 +720,7 @@ class encoder_block(tf.keras.layers.Layer):
 		print(att_score.shape)
 		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 
-		encoder_embedding = self.r_connection(value, att_embedding_)
+		encoder_embedding = self.r_connection(query, att_embedding_)
 		#encoder_embedding = value
 
 		return encoder_embedding, att_score, score
