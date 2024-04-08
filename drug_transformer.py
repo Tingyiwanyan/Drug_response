@@ -430,7 +430,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
 			#queries_origin = tf.math.add(queries_origin, relative_encoding_origin)
 			#queries_origin = tf.concat((queries_origin, relative_encoding_origin),axis=-1)
-			queries_ = tf.expand_dims(queries, axis=2)
+			queries_ = tf.expand_dims(keys, axis=2)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			#queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
 			queries_ = tf.math.add(queries_, relative_encoding_lookup)
@@ -618,7 +618,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			shape = tf.shape(input_value)
 			value_ = tf.expand_dims(input_value, axis=2)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
-			value_ = tf.math.l2_normalize(tf.math.add(value_, relative_encoding_lookup))
+			#value_ = tf.math.l2_normalize(tf.math.add(value_, relative_encoding_lookup))
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
 			att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
 
@@ -720,9 +720,9 @@ class encoder_block(tf.keras.layers.Layer):
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, query, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
+		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 
-		encoder_embedding = self.r_connection(query, att_embedding_)
+		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
 
 		return encoder_embedding, att_score, score
