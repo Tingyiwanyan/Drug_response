@@ -404,7 +404,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, **kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 		d = queries.shape[-1]
 		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
@@ -425,10 +425,14 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#scores_ = tf.matmul(queries, keys, transpose_b=True)
 			#print("scores_ shape")
 			#print(scores_.shape)
-			queries_origin = tf.expand_dims(queries, axis=1)
+			#queries_origin_ = tf.concat(queries_origin_, relative_encoding_origin)
+			queries_origin = tf.expand_dims(queries, axis=2)
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
-			queries_ = tf.expand_dims(queries, axis=2)
+			#queries_origin = tf.math.add(queries_origin, relative_encoding_origin)
+			#queries_origin = tf.concat((queries_origin, relative_encoding_origin),axis=-1)
+			queries_ = tf.expand_dims(queries, axis=1)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
+			#queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
 			queries_ = tf.math.add(queries_, relative_encoding_lookup)
 			print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
@@ -436,7 +440,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			print(relative_encoding_lookup.shape)
 			#scores_position = tf.reduce_sum(tf.multiply(queries_, tf.math.l2_normalize(relative_encoding_lookup, axis=-1)), axis=-1)
 			#print(scores_position.shape)
-			scores = tf.reduce_sum(tf.multiply(queries_origin, tf.math.l2_normalize(queries_, axis=-1)), axis=-1)
+			scores = tf.reduce_sum(tf.multiply(queries_origin, tf.math.l2_normalize(queries_)), axis=-1)
 			#scores = tf.add(scores_, scores_position)
 			print(scores.shape)
 			#scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
@@ -606,13 +610,13 @@ class attention_embedding(tf.keras.layers.Layer):
 	def __init__(self):
 		super().__init__()
 
-	def call(self, att_weights, input_value,relative_encoding_lookup=None, **kwargs):
+	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 
 		if relative_encoding_lookup == None:
 			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
 		else:
 			shape = tf.shape(input_value)
-			value_ = tf.expand_dims(input_value, axis=2)
+			value_ = tf.expand_dims(input_value, axis=1)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			value_ = tf.math.l2_normalize(tf.math.add(value_, relative_encoding_lookup))
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
@@ -633,6 +637,10 @@ class residual_connection(tf.keras.layers.Layer):
 	def call(self, X, Y, **kwargs):
 		#X = tf.math.l2_normalize(X, axis=-1)
 		#Y = tf.math.l2_normalize(Y, axis=-1)
+		print("X shape")
+		print(X.shape)
+		print("Y shape")
+		print(Y.shape)
 		return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
 		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
@@ -706,15 +714,15 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding()
 		self.r_connection = residual_connection()
 
-	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, **kwargs):
+	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, relative_pos_origin_=None, **kwargs):
 		#X = self.pos_encoding(X)
-		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc)
+		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, query, relative_encoding_lookup=relative_pos_enc)
+		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 
-		encoder_embedding = self.r_connection(value, att_embedding_)
+		encoder_embedding = self.r_connection(query, att_embedding_)
 		#encoder_embedding = value
 
 		return encoder_embedding, att_score, score
@@ -1172,6 +1180,7 @@ class drug_transformer_():
 		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
+
 
 
 
