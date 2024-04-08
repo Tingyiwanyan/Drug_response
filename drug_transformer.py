@@ -446,7 +446,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
-			return scores, queries_, queries
+			return scores, queries_, queries_origin
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
@@ -608,7 +608,7 @@ class attention_embedding(tf.keras.layers.Layer):
 	def __init__(self):
 		super().__init__()
 
-	def call(self, att_weights, input_value,relative_encoding_lookup=None, **kwargs):
+	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 
 		if relative_encoding_lookup == None:
 			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
@@ -714,7 +714,7 @@ class encoder_block(tf.keras.layers.Layer):
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, query, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
+		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
