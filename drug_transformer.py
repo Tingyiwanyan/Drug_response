@@ -425,13 +425,15 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#scores_ = tf.matmul(queries, keys, transpose_b=True)
 			#print("scores_ shape")
 			#print(scores_.shape)
-			queries_origin = tf.expand_dims(queries, axis=1)
+			#queries_origin_ = tf.concat(queries_origin_, relative_encoding_origin)
+			queries_origin = tf.expand_dims(queries, axis=2)
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
-			queries_origin = tf.concat((queries_origin, relative_encoding_origin),axis=-1)
-			queries_ = tf.expand_dims(queries, axis=2)
+			#queries_origin = tf.math.add(queries_origin, relative_encoding_origin)
+			#queries_origin = tf.concat((queries_origin, relative_encoding_origin),axis=-1)
+			queries_ = tf.expand_dims(queries, axis=1)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
-			queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
-			#queries_ = tf.math.add(queries_, relative_encoding_lookup)
+			#queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
+			queries_ = tf.math.add(queries_, relative_encoding_lookup)
 			print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			#relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
@@ -446,7 +448,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
-			return scores, queries_, tf.reduce_mean(queries_origin, axis=2)
+			return scores, queries, queries
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
@@ -614,13 +616,13 @@ class attention_embedding(tf.keras.layers.Layer):
 			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
 		else:
 			shape = tf.shape(input_value)
-			#value_ = tf.expand_dims(input_value, axis=1)
-			#value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
-			#value_ = tf.math.l2_normalize(tf.math.add(value_, relative_encoding_lookup))
+			value_ = tf.expand_dims(input_value, axis=1)
+			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
+			value_ = tf.math.l2_normalize(tf.math.add(value_, relative_encoding_lookup))
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
 			att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
 
-			return tf.cast(tf.math.l2_normalize(tf.reduce_sum(tf.multiply(att_weights_, input_value), 
+			return tf.cast(tf.math.l2_normalize(tf.reduce_sum(tf.multiply(att_weights_, value_), 
 				axis=-2), axis=-1), dtype=tf.float32)
 		#return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 
