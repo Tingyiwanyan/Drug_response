@@ -425,10 +425,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#scores_ = tf.matmul(queries, keys, transpose_b=True)
 			#print("scores_ shape")
 			#print(scores_.shape)
-			queries_origin = tf.expand_dims(queries, axis=1)
+			queries_origin = tf.expand_dims(queries, axis=2)
 			queries_origin = tf.broadcast_to(queries_origin, [shape[0],shape[1],shape[1],shape[-1]])
 			queries_origin = tf.concat((queries_origin, relative_encoding_origin),axis=-1)
-			queries_ = tf.expand_dims(queries, axis=2)
+			queries_ = tf.expand_dims(queries, axis=1)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
 			#queries_ = tf.math.add(queries_, relative_encoding_lookup)
@@ -446,7 +446,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
-			return scores, queries_, queries_origin
+			return scores, queries_, tf.reduce_mean(queries_origin, axis=2)
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
