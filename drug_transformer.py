@@ -607,8 +607,17 @@ class attention_embedding(tf.keras.layers.Layer):
 
 	the attention embedding matrix
 	"""
-	def __init__(self):
+	def __init__(self, output_dim):
 		super().__init__()
+		self.output_dim = output_dim
+
+	def build(self, input_shape):
+		self.kernel_position = self.add_weight(name = 'kernel_position', shape = (input_shape[-1], self.output_dim),
+			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
+
+		b_init = tf.zeros_initializer()
+		self.b_position = tf.Variable(
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 
@@ -618,7 +627,8 @@ class attention_embedding(tf.keras.layers.Layer):
 			shape = tf.shape(input_value)
 			value_ = tf.expand_dims(input_value, axis=2)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
-			value_ = tf.math.add(value_, relative_encoding_lookup)
+			relative_encoding_lookup_ = tf.matmul(relative_encoding_lookup, self.kernel_position) + self.b_position
+			value_ = tf.math.add(value_, relative_encoding_lookup_)
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
 			#att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
 
@@ -711,7 +721,7 @@ class encoder_block(tf.keras.layers.Layer):
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
 		self.dotproductattention = dotproductattention(num_hiddens)
-		self.att_embedding = attention_embedding()
+		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
 	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, relative_pos_origin_=None, **kwargs):
@@ -774,7 +784,7 @@ class decoder_cross_block(tf.keras.layers.Layer):
         super().__init__()
         self.masked_softmax_deco_cross = masked_softmax()
         self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
-        self.att_embedding = attention_embedding()
+        self.att_embedding = attention_embedding(num_hiddens)
         self.r_connection = residual_connection()
 
     def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, **kwargs):
