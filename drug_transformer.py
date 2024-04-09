@@ -630,7 +630,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			#att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
 
 			return tf.cast(tf.math.l2_normalize(tf.reduce_sum(tf.multiply(att_weights_, value_), 
-				axis=-2), axis=-1), dtype=tf.float32)
+				axis=-3), axis=-1), dtype=tf.float32)
 		#return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 
 
