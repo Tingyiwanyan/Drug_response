@@ -613,7 +613,7 @@ class attention_embedding(tf.keras.layers.Layer):
 	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 
 		if relative_encoding_lookup == None:
-			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value), axis=-1), dtype=tf.float32)
+			return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 		else:
 			shape = tf.shape(input_value)
 			value_ = tf.expand_dims(input_value, axis=2)
@@ -720,7 +720,7 @@ class encoder_block(tf.keras.layers.Layer):
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
+		att_embedding_ = self.att_embedding(att_score, value)#, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
