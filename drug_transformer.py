@@ -625,7 +625,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			value_ = tf.expand_dims(input_value, axis=1)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			#relative_encoding_lookup_ = self.kernel_position(relative_encoding_lookup)
-			#value_ = tf.math.add(value_, 0.000000000001*relative_encoding_lookup)
+			value_ = tf.math.add(value_, 0.00001*relative_encoding_lookup)
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
 			att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
 
