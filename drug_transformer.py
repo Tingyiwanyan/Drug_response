@@ -611,6 +611,10 @@ class attention_embedding(tf.keras.layers.Layer):
 		super().__init__()
 		self.output_dim = output_dim
 
+		self.kernel_position = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
+			activation='relu', 
+			kernel_regularizer=regularizers.L2(1e-4))
+
 	def build(self, input_shape):
 		self.kernel_position = self.add_weight(name = 'kernel_position', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
@@ -627,7 +631,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			shape = tf.shape(input_value)
 			value_ = tf.expand_dims(input_value, axis=2)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
-			relative_encoding_lookup_ = tf.matmul(relative_encoding_lookup, self.kernel_position) + self.b_position
+			relative_encoding_lookup_ = self.kernel_position(relative_encoding_lookup)
 			value_ = tf.math.add(value_, relative_encoding_lookup_)
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
 			#att_weights_ = tf.broadcast_to(att_weights_, [shape[0],shape[1],shape[1],shape[-1]])
