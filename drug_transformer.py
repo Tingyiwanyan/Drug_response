@@ -615,14 +615,6 @@ class attention_embedding(tf.keras.layers.Layer):
 			activation='relu', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-	def build(self, input_shape):
-		self.kernel_position = self.add_weight(name = 'kernel_position', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		b_init = tf.zeros_initializer()
-		self.b_position = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
 	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
 
 		if relative_encoding_lookup == None:
