@@ -622,7 +622,7 @@ class attention_embedding(tf.keras.layers.Layer):
 		else:
 			print("Im here")
 			shape = tf.shape(input_value)
-			value_ = tf.expand_dims(input_value, axis=2)
+			value_ = tf.expand_dims(input_value, axis=1)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			#relative_encoding_lookup_ = self.kernel_position(relative_encoding_lookup)
 			#value_ = tf.math.add(value_, 0.000000000001*relative_encoding_lookup)
