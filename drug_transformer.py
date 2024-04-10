@@ -406,14 +406,14 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None,**kwargs):
 		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
+		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
+		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key,axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.matmul(values, self.kernel_value) + self.b_value
+		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value,axis=-1)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
@@ -620,7 +620,7 @@ class attention_embedding(tf.keras.layers.Layer):
 	def call(self, att_weights, input_value,relative_encoding_lookup=None, edge_type_embedding=None,**kwargs):
 
 		if relative_encoding_lookup == None:
-			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value),axis=-1), dtype=tf.float32)
+			return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 		else:
 			print("Im here")
 			shape = tf.shape(input_value)
@@ -653,7 +653,7 @@ class residual_connection(tf.keras.layers.Layer):
 		print(X.shape)
 		print("Y shape")
 		print(Y.shape)
-		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+		return tf.math.l2_normalize(tf.cast(tf.math.add(X,Y), dtype=tf.float32),axis=-1)
 		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
