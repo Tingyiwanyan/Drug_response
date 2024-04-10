@@ -194,6 +194,28 @@ def generate_rel_dist_matrix(smile):
 
     return rel_dist_matrix
 
+def get_drug_edge_type(smile):
+    mol = Chem.MolFromSmiles(smile)
+    interpretsmile = generate_interpret_smile(smile)
+    edge_type_matrix = np.zeros((len(interpretsmile[0]),len(interpretsmile[0])))
+    for bond in mol.GetBonds():
+        atom1 = bond.GetBeginAtomIdx()
+        atom2 = bond.GetEndAtomIdx()
+        bond_type = bond.GetBondType()
+        if bond_type.name == "SINGLE":
+            edge_type_matrix[atom1,atom2] = 1
+            edge_type_matrix[atom2,atom1] = 1
+        elif bond_type.name == "DOUBLE":
+            edge_type_matrix[atom1,atom2] = 2
+            edge_type_matrix[atom2,atom1] = 2
+        elif bond_type.name == "TRIPLE":
+            edge_type_matrix[atom1,atom2] = 3
+            edge_type_matrix[atom2,atom1] = 3
+        elif bond_type.name == "AROMATIC":
+            edge_type_matrix[atom1,atom2] = 4
+            edge_type_matrix[atom2,atom1] = 4
+
+    return edge_type_matrix
 
 
 
