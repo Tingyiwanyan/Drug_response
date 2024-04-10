@@ -410,10 +410,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
-		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key,axis=-1)
+		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value,axis=-1)
+		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
@@ -653,7 +653,7 @@ class residual_connection(tf.keras.layers.Layer):
 		print(X.shape)
 		print("Y shape")
 		print(Y.shape)
-		return tf.math.l2_normalize(tf.cast(tf.math.add(X,Y), dtype=tf.float32),axis=-1)
+		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
