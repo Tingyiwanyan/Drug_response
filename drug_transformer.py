@@ -404,7 +404,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None,**kwargs):
 		d = queries.shape[-1]
 		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
@@ -433,15 +433,17 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			queries_ = tf.expand_dims(queries, axis=2)
 			queries_ = tf.broadcast_to(queries_, [shape[0],shape[1],shape[1],shape[-1]])
 			#queries_ = tf.concat((queries_, relative_encoding_lookup),axis=-1)
-			queries_ = tf.math.add(queries_, relative_encoding_lookup)
+			#queries_ = tf.math.add(queries_, relative_encoding_lookup)
 			#print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			#relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
 			print(relative_encoding_lookup.shape)
 			scores_position = tf.reduce_sum(tf.multiply(queries_, tf.math.l2_normalize(relative_encoding_lookup, axis=-1)), axis=-1)
+			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, tf.math.l2_normalize(edge_type_embedding, axis=-1)), axis=-1)
 			#print(scores_position.shape)
 			#scores = tf.reduce_sum(tf.multiply(queries_origin, queries_), axis=-1)
 			scores = tf.add(scores_, scores_position)
+			scores = tf.add(scores_, scores_edge_embedding)
 			print(scores.shape)
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 			#print(scores.shape)
@@ -615,7 +617,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			activation='relu', 
 			kernel_regularizer=regularizers.L2(1e-4))
 
-	def call(self, att_weights, input_value,relative_encoding_lookup=None, relative_encoding_origin=None,**kwargs):
+	def call(self, att_weights, input_value,relative_encoding_lookup=None, edge_type_embedding=None,**kwargs):
 
 		if relative_encoding_lookup == None:
 			return tf.cast(tf.math.l2_normalize(tf.matmul(att_weights, input_value),axis=-1), dtype=tf.float32)
@@ -626,6 +628,7 @@ class attention_embedding(tf.keras.layers.Layer):
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			relative_encoding_lookup_ = self.kernel_position(relative_encoding_lookup)
 			value_ = tf.math.add(value_, relative_encoding_lookup_)
+			value_ = tf.math.add(value_, edge_type_embedding)
 			#value_ = tf.concat((value_, relative_encoding_lookup),axis=-1)
 			#value_ = self.kernel_position(value_)
 			att_weights_ = tf.expand_dims(att_weights, axis=-1)
@@ -723,13 +726,13 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
-	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, relative_pos_origin_=None, **kwargs):
+	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, **kwargs):
 		#X = self.pos_encoding(X)
-		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
+		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		print(att_score.shape)
-		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, relative_encoding_origin=relative_pos_origin_)
+		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
 		#encoder_embedding = value
