@@ -563,7 +563,7 @@ def get_gene_mutation_input(gene_name_update, mutation, CCLE_name):
             mutation_gene_index = []
             mutation_gene_list_data = []
             mutation_vector = np.zeros(len(gene_name_update))
-            mutation_vector_ = np.zeros(len(gene_name_update))
+            mutation_vector_ = np.ones(len(gene_name_update))
             mutation_vector = np.stack([mutation_vector, mutation_vector_],axis=1)
             for i in mutation.loc[drug_name].keys():
                 if not mutation.loc[drug_name][i] == '':
