@@ -25,6 +25,38 @@ gene_expression_filtered_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/
 gene_expression_selected_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/gene_expression_selected.csv"
 
 
+CCLE_drug_smiles = ['CC1CC(C(C(C=C(C(C(C=CC=C(C(=O)NC2=CC(=O)C(=C(C1)C2=O)NCC=C)C)OC)OC(=O)N)C)C)O)OC',
+ 'C1CN(C1)CC2CC(C2)N3C=C(C4=C(N=CN=C43)N)C5=CC(=CC=C5)OCC6=CC=CC=C6',
+ 'CN1CCN(CC1)CCOC2=CC3=C(C(=C2)OC4CCOCC4)C(=NC=N3)NC5=C(C=CC6=C5OCO6)Cl',
+ 'CN1C=NC2=C1C=C(C(=C2F)NC3=C(C=C(C=C3)Br)Cl)C(=O)NOCCO',
+ 'COCCOC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC=CC(=C3)C#C)OCCOC',
+ 'CCC1=C2CN3C(=CC4=C(C3=O)COC(=O)C4(CC)O)C2=NC5=C1C=C(C=C5)OC(=O)N6CCC(CC6)N7CCCCC7',
+ 'CC(C)CC(C(=O)NC(CC1=CC=CC=C1)C(=O)N)NC(=O)C(CC2=CC=CC=C2)CC(C(CC3=CC=CC=C3)NC(=O)OC(C)(C)C)O',
+ 'CS(=O)(=O)CCNCC1=CC=C(O1)C2=CC3=C(C=C2)N=CN=C3NC4=CC(=C(C=C4)OCC5=CC(=CC=C5)F)Cl',
+ 'CC(C(=O)NC(C1CCCCC1)C(=O)N2CCC3C2CN(CC3)CCC4=CC=CC=C4)NC',
+ 'CC1=C(C=C(C=C1)C(=O)NC2=CC(=CC(=C2)C(F)(F)F)N3C=C(N=C3)C)NC4=NC=CC(=N4)C5=CN=CC=C5',
+ 'CC(C)OC1=C(C=CC(=C1)OC)C2=NC(C(N2C(=O)N3CCNC(=O)C3)C4=CC=C(C=C4)Cl)C5=CC=C(C=C5)Cl',
+ 'CC1=C2C(C(=O)C3(C(CC4C(C3C(C(C2(C)C)(CC1OC(=O)C(C(C5=CC=CC=C5)NC(=O)C6=CC=CC=C6)O)O)OC(=O)C7=CC=CC=C7)(CO4)OC(=O)C)O)C)OC(=O)C',
+ 'CC1=C(C2=CC=CC=C2N1)CCNCC3=CC=C(C=C3)C=CC(=O)NO',
+ 'C1=CC(=C(C=C1I)F)NC2=C(C=CC(=C2F)F)C(=O)NOCC(CO)O',
+ 'CC1=C(C(=O)N(C2=NC(=NC=C12)NC3=NC=C(C=C3)N4CCNCC4)C5CCCC5)C(=O)C',
+ 'CC(C1=C(C=CC(=C1Cl)F)Cl)OC2=C(N=CC(=C2)C3=CN(N=C3)C4CCNCC4)N',
+ 'CC1=C(NC(=C1C(=O)N2CCCC2CN3CCCC3)C)C=C4C5=C(C=CC(=C5)S(=O)(=O)CC6=C(C=CC=C6Cl)Cl)NC4=O',
+ 'CCCS(=O)(=O)NC1=C(C(=C(C=C1)F)C(=O)C2=CNC3=C2C=C(C=N3)Cl)F',
+ 'CN1C2=C(C=C(C=C2)OC3=CC(=NC=C3)C4=NC=C(N4)C(F)(F)F)N=C1NC5=CC=C(C=C5)C(F)(F)F',
+ 'CNC(=O)C1=NC=CC(=C1)OC2=CC=C(C=C2)NC(=O)NC3=CC(=C(C=C3)Cl)C(F)(F)F',
+ 'CC(C)S(=O)(=O)C1=CC=CC=C1NC2=NC(=NC=C2Cl)NC3=C(C=C(C=C3)N4CCC(CC4)N5CCN(CC5)C)OC',
+ 'CN1CCN(CC1)C2=CC3=C(C=C2)N=C(N3)C4=C(C5=C(C=CC=C5F)NC4=O)N',
+ 'CCC1(C2=C(COC1=O)C(=O)N3CC4=CC5=C(C=CC(=C5CN(C)C)O)N=C4C3=C2)O',
+ 'CN1CCC(CC1)COC2=C(C=C3C(=C2)N=CN=C3NC4=C(C=C(C=C4)Br)F)OC']
+
+vocabulary_drug = ['F', 'S', 'N', 'O', 'I', 'L', 'B', 'C']
+vocabulary_gene_mutation = [0, 1]
+
+drug_names = ['17-AAG','NVP-AEW541','AZD0530','AZD6244','Erlotinib','Irinotecan',
+ 'L-685458','lapatinib','LBW242','nilotinib','nutlin-3','Paclitaxel','Panobinostat',
+ 'PD-0325901','PD-0332991','Crizotinib','PHA-665752','PLX-4720','RAF265','sorafenib',
+ 'NVP-TAE684','dovitinib','topotecan','vandetanib']
 
 gene_expression = pyreadr.read_r(gene_expression_path)[None]
 cell_line_drug = pyreadr.read_r(cell_line_drug_path)[None]
@@ -789,7 +821,47 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	return df_cell_line_drug
 
 
+def cross_validate_10(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):
+    """
+    perform training and testing dataset split
+    """
+    distinct_list = []
+    for i in drug_cellline_features_clean_df['cell_line_name']:
+        if not i in distinct_list:
+            distinct_list.append(i)
+    total_num_cell_line = len(distinct_list)
+    train_num = int(np.floor(total_num_cell_line*train_percent))
+    total_num = len(drug_cellline_features_clean_df)
+    #if cross_val == True:
+    random.seed(50)
+    train_pair = []
+    test_pair = []
+    for kk in range(10):
+        train_list = []
+        num_list = list(np.array(range(total_num_cell_line)))
+        train_sample_num = random.sample(num_list,train_num)
 
+        [num_list.remove(i) for i in train_sample_num]
+        train_sample_num.sort()
+        train_cell_line = [distinct_list[i] for i in train_sample_num]
+
+        num_list_whole = list(np.array(range(total_num)))
+
+        k = list(drug_cellline_features_clean_df['cell_line_name'])
+        #print(train_cell_line)
+        for i in train_cell_line:
+            single_train_num = list(np.where(np.array(k)==i)[0])
+            #print(single_train_num)
+            train_list += single_train_num
+
+
+        [num_list_whole.remove(i) for i in train_list]
+        train_list.sort()
+        
+        train_pair.append(train_list)
+        test_pair.append(num_list_whole)
+
+    return train_pair, test_pair
 
 
 	
