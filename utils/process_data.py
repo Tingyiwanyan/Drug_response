@@ -563,6 +563,8 @@ def get_gene_mutation_input(gene_name_update, mutation, CCLE_name):
             mutation_gene_index = []
             mutation_gene_list_data = []
             mutation_vector = np.zeros(len(gene_name_update))
+            mutation_vector_ = np.zeros(len(gene_name_update))
+            mutation_vector = np.stack([mutation_vector, mutation_vector_],axis=1)
             for i in mutation.loc[drug_name].keys():
                 if not mutation.loc[drug_name][i] == '':
                     mutation_gene_list.append(i)
@@ -574,11 +576,13 @@ def get_gene_mutation_input(gene_name_update, mutation, CCLE_name):
                 except:
                     continue
             for i in mutation_gene_index:
-                mutation_vector[int(i)] = 1
+                mutation_vector[int(i),0] = 1
+                mutation_vector[int(i),1] = 0
             mutation_dict[drug_name] = {}
             mutation_dict[drug_name]['mutation_vector'] = mutation_vector
             mutation_dict[drug_name]['mutation_gene_list'] = mutation_gene_list_data
             mutation_dict[drug_name]['mutation_index'] = mutation_gene_index
+            gene_mutation_input.append(mutation_vector)
         #index_ += 1
     #gene_mutation_input = tf.stack(gene_mutation_input)
     return mutation_dict, gene_mutation_input
