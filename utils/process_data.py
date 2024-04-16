@@ -580,7 +580,7 @@ def get_gene_mutation_input(gene_name_update, mutation, CCLE_name):
             mutation_dict[drug_name]['mutation_gene_list'] = mutation_gene_list_data
             mutation_dict[drug_name]['mutation_index'] = mutation_gene_index
         #index_ += 1
-    gene_mutation_input = tf.stack(gene_mutation_input)
+    #gene_mutation_input = tf.stack(gene_mutation_input)
     return mutation_dict, gene_mutation_input
 
 
