@@ -821,7 +821,7 @@ def generate_feature_frame(cell_line_drug: pd.DataFrame):
 	return df_cell_line_drug
 
 
-def cross_validate_10(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.8):
+def cross_validate_10(drug_cellline_features_clean_df: pd.DataFrame, train_percent:float=0.9):
     """
     perform training and testing dataset split
     """
