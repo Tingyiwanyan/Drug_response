@@ -373,7 +373,7 @@ def generate_df_normalized_ic50(drug_cellline_features_clean_df: pd.DataFrame, d
 	drug_one_hot_encoding_list = []
 	IC50_list = []
 	
-	drug_ic50_df.set_index("drug_name", inplace =True)
+	drug_ic50_df.set_index("drug_name", inplace =True) 
 	#drug_cellline_features_clean_df.set_index()
 	#for row in drug_cellline_features_df['drug_name']:
 	for i in range(len(drug_cellline_features_clean_df)):
@@ -545,6 +545,44 @@ def process_chunck_data(drug_cellline_features_clean_df: pd.DataFrame, gene_expr
 	#cell_line_drug_feature = normalize_min_max_array(cell_line_drug_feature)
 
 	return cell_line_drug_feature, ic50_list, drug_name_list
+
+
+def get_gene_mutation_input(gene_name_update, mutation, CCLE_name):
+    gene_name_decode = np.array([i.decode() for i in gene_name_update])
+    mutation_dict = {}
+    gene_mutation_input = []
+    #index_ = 0
+    for drug_name in CCLE_name:
+        #print(index_)
+        #print(drug_name)
+        if drug_name in mutation_dict.keys():
+            #print("im here")
+            gene_mutation_input.append(mutation_dict[drug_name]['mutation_vector'])
+        else:
+            mutation_gene_list = []
+            mutation_gene_index = []
+            mutation_gene_list_data = []
+            mutation_vector = np.zeros(len(gene_name_update))
+            for i in mutation.loc[drug_name].keys():
+                if not mutation.loc[drug_name][i] == '':
+                    mutation_gene_list.append(i)
+            for j in mutation_gene_list:
+                try:
+                    index = np.where(gene_name_decode == j)[0][0]
+                    mutation_gene_index.append(index)
+                    mutation_gene_list_data.append(j)
+                except:
+                    continue
+            for i in mutation_gene_index:
+                mutation_vector[int(i)] = 1
+            mutation_dict[drug_name] = {}
+            mutation_dict[drug_name]['mutation_vector'] = mutation_vector
+            mutation_dict[drug_name]['mutation_gene_list'] = mutation_gene_list_data
+            mutation_dict[drug_name]['mutation_index'] = mutation_gene_index
+        #index_ += 1
+    gene_mutation_input = tf.stack(gene_mutation_input)
+    return mutation_dict, gene_mutation_input
+
 
 def process_chunck_data_transformer(drug_cellline_features_clean_df: pd.DataFrame, gene_expression_filtered: pd.DataFrame, index_array:list =None):
 	"""
