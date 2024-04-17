@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pyreadr
 import random
+import tensorflow as tf
 
 from pubchempy import get_compounds, Compound
 
