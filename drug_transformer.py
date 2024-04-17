@@ -1246,7 +1246,7 @@ def generate_chunk_data(model_midi, gene_expression_update, drug_smile_list_upda
         interpret_smile_ = generate_interpret_smile(drug_smile_list_update[j])
         ic50_list_update_chunk.append(ic50_list_update[j])
         #rel_distance_train.append(rel_distance_)
-        interpret_smile_train.append(interpret_smile_[0])
+        #interpret_smile_train.append(interpret_smile_[0])
         gene_mutation_update_chunk.append(mutation_gene_update[j])
         #projection_train.append(projection_)
     
