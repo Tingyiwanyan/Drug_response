@@ -643,17 +643,16 @@ class attention_embedding(tf.keras.layers.Layer):
 
 
 class residual_connection(tf.keras.layers.Layer):
-	"""
-	Define reidual connection layer
-	"""
-	def __init__(self):  
-		super().__init__()
+    """
+    Define residual connection layer
+    """
+    def __init__(self):  
+        super().__init__()
 
-	def call(self, X, Y, **kwargs):
-		#X = tf.math.l2_normalize(X, axis=-1)
-		#Y = tf.math.l2_normalize(Y, axis=-1)
-		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
-		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+    def call(self, X, Y, **kwargs):
+        #X = tf.math.l2_normalize(X, axis=-1)
+        #Y = tf.math.l2_normalize(Y, axis=-1)
+        return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -730,7 +729,7 @@ class encoder_block(tf.keras.layers.Layer):
 		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
-		print(att_score.shape)
+		#print(att_score.shape)
 		att_embedding_ = self.att_embedding(att_score, value, relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 
 		encoder_embedding = self.r_connection(value, att_embedding_)
@@ -850,7 +849,6 @@ class drug_transformer_():
     
         self.dotproductattention_deco_cross = dotproductattention(30)
     
-    
         self.decoder_cross_1 = decoder_cross_block(15)
     
         """
@@ -884,6 +882,8 @@ class drug_transformer_():
     
         #self.att_embedding = attention_embedding()
         self.r_connection = residual_connection()
+        self.r_connection_gene_emb = residual_connection()
+        self.r_connection_gene_mutate = residual_connection()
     
         self.dense_0 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
@@ -895,12 +895,12 @@ class drug_transformer_():
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_1")
     
-        self.dense_2 = tf.keras.layers.Dense(15, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_2 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_2")
         
-        self.dense_3 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_3 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_3")
@@ -939,7 +939,7 @@ class drug_transformer_():
                                               kernel_regularizer=regularizers.L2(1e-4),
                                               bias_initializer=initializers.Zeros(), name="dense_13")
 
-        self.dense_14 = tf.keras.layers.Dense(15, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_14 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                               activation='relu',
                                               kernel_regularizer=regularizers.L2(1e-4),
                                               bias_initializer=initializers.Zeros(), name="dense_14")
@@ -1001,7 +1001,7 @@ class drug_transformer_():
     
         return self.model
     
-    def model_construction_midi(self):
+    def model_construction_midi(self, if_mutation=None):
         """
         construct the transformer model
         """
@@ -1018,7 +1018,7 @@ class drug_transformer_():
         gene_embedding = tf.expand_dims(gene_embedding, axis=0)
         gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
     
-        gene_embedding = self.dense_3(gene_embedding)
+        gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
 
         #rel_position_embedding_ = tf.math.l2_normalize(self.dense_13(rel_position_embedding), axis = -1)
         edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
@@ -1037,7 +1037,6 @@ class drug_transformer_():
         #X = tf.concat([X_enc_1, X_enc_2],axis=-1)
     
         X = self.dense_1(X)
-        print(X.shape)
         
         X_global = self.flattern_global(X)
         X_global = tf.expand_dims(X_global, axis=1)
@@ -1046,11 +1045,13 @@ class drug_transformer_():
         """
         self-attention for the decoder
         """
-        Y = self.dense_2(Y_input)
-        Y = tf.concat([gene_embedding, Y],axis=-1)
+        Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
+        #Y = tf.concat([gene_embedding, Y],axis=-1)
+        Y = self.r_connection_gene_emb(Y, gene_embedding)
 
-        Y_gene_mutate = self.dense_14(gene_mutation_input)
-        Y = tf.concat([Y, Y_gene_mutate],axis=-1)
+        if not if_mutation == None:
+	        Y_gene_mutate = self.dense_14(gene_mutation_input)
+	        Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
         #Y = self.pos_encoding_gene(Y)
     
         """
@@ -1078,10 +1079,8 @@ class drug_transformer_():
         Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
         Y = tf.concat([X_global, Y], axis=-1)   
         Y = self.dense_5(Y)
-       
-    
+    	
         self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=Y)
-    
         self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
     
         return self.model
