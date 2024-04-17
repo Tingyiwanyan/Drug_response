@@ -6,6 +6,21 @@ import random
 from pubchempy import get_compounds, Compound
 
 
+P = np.zeros((1, 100, 60))
+XX = np.arange(100, dtype=np.float32).reshape(
+    -1,1)/np.power(1000, np.arange(
+        0, 60, 2, dtype=np.float32) / 60)
+P[:, :, 0::2] = np.sin(XX)
+P[:, :, 1::2] = np.cos(XX)
+#P[0][0] = np.zeros((60))
+#shape_X = tf.shape(X)
+#X = tf.math.l2_normalize(X, axis=-1)
+P = tf.cast(tf.math.l2_normalize(P[:, :100,:], axis=-1), 
+    dtype=tf.float32)
+edge_type_dict = np.zeros((5,5))
+for i in range(5):
+    edge_type_dict[i,i] = 1
+edge_type_dict = tf.cast(edge_type_dict,dtype=tf.float32)
 
 std_threshold = 0.6
 zero_threshold = 250
