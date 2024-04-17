@@ -1005,11 +1005,11 @@ class drug_transformer_():
         """
         construct the transformer model
         """
-        X_input = Input((60, 8))
+        X_input = Input((70, 8))
         Y_input = Input((5370, 1))
         gene_mutation_input = Input((5370, 2))
-        rel_position_embedding = Input((60,60,60))
-        edge_type_embedding = Input((60,60,5))
+        rel_position_embedding = Input((70,70,60))
+        edge_type_embedding = Input((70,70,5))
         #rel_position_embedding_origin = Input((80,80,60))
         enc_valid_lens_ = Input(())
         
@@ -1222,7 +1222,7 @@ def return_gene_drug_target_train(model, gene_names, drug_lung, gene_lung, drug_
 
 def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_update,ic50_list_update, 
                         mutation_gene_update,string_lookup, layer_one_hot,
-                        training_chunk_size,smile_length=60):
+                        training_chunk_size,smile_length=70):
     
     drug_rel_position_chunk = []
     drug_smile_length_update = []
