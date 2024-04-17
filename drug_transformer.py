@@ -1262,7 +1262,7 @@ def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_u
         drug_rel_position = tf.concat((drug_rel_position,concat_right),axis=1)
         drug_rel_position_chunk.append(drug_rel_position)
     
-        edge_type_matrix = get_drug_edge_type(drug_smile_list_update[kk*training_chunk_size+j])
+        edge_type_matrix = get_drug_edge_type(drug_smile_list_update[j])
         shape = edge_type_matrix.shape[0]
         edge_type_matrix = tf.gather(edge_type_dict,tf.cast(edge_type_matrix,tf.int16),axis=0)
         #drug_rel_position = tf.cast(tf.gather(P[0], tf.cast(rel_distance_,tf.int32), axis=0), tf.float32)
