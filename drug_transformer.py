@@ -440,14 +440,12 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			#relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
-			print(relative_encoding_lookup.shape)
 			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)*0.4
 			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, edge_type_embedding), axis=-1)*0.4
 			#print(scores_position.shape)
 			#scores = tf.reduce_sum(tf.multiply(queries_origin, queries_), axis=-1)
 			scores = tf.add(scores_, scores_position)
 			scores = tf.add(scores_, scores_edge_embedding)
-			print(scores.shape)
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 			#print(scores.shape)
 
@@ -625,7 +623,6 @@ class attention_embedding(tf.keras.layers.Layer):
 		if relative_encoding_lookup == None:
 			return tf.cast(tf.matmul(att_weights, input_value), dtype=tf.float32)
 		else:
-			print("Im here")
 			shape = tf.shape(input_value)
 			value_ = tf.expand_dims(input_value, axis=1)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
@@ -655,10 +652,6 @@ class residual_connection(tf.keras.layers.Layer):
 	def call(self, X, Y, **kwargs):
 		#X = tf.math.l2_normalize(X, axis=-1)
 		#Y = tf.math.l2_normalize(Y, axis=-1)
-		print("X shape")
-		print(X.shape)
-		print("Y shape")
-		print(Y.shape)
 		return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 		#return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
