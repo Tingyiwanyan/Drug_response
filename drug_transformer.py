@@ -1005,11 +1005,11 @@ class drug_transformer_():
         """
         construct the transformer model
         """
-        X_input = Input((80, 8))
+        X_input = Input((60, 8))
         Y_input = Input((5370, 1))
         gene_mutation_input = Input((5370, 2))
-        rel_position_embedding = Input((80,80,60))
-        edge_type_embedding = Input((80,80,5))
+        rel_position_embedding = Input((60,60,60))
+        edge_type_embedding = Input((60,60,5))
         #rel_position_embedding_origin = Input((80,80,60))
         enc_valid_lens_ = Input(())
         
@@ -1222,7 +1222,7 @@ def return_gene_drug_target_train(model, gene_names, drug_lung, gene_lung, drug_
 
 def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_update,ic50_list_update, 
                         mutation_gene_update,string_lookup, layer_one_hot,
-                        training_chunk_size):
+                        training_chunk_size,smile_length=60):
     
     drug_rel_position_chunk = []
     drug_smile_length_update = []
@@ -1249,8 +1249,8 @@ def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_u
         #rel_distance_origin = np.zeros(shape=shape_)
         #drug_rel_position_origin = tf.cast(tf.gather(P[0], tf.cast(rel_distance_origin,tf.int32), axis=0), tf.float32)
         drug_rel_position = tf.cast(tf.gather(P[0], tf.cast(rel_distance_,tf.int32), axis=0), tf.float32)
-        concat_left = tf.cast(tf.zeros((80-shape,shape,60)), tf.float32)
-        concat_right = tf.cast(tf.zeros((80,80-shape,60)), tf.float32)
+        concat_left = tf.cast(tf.zeros((smile_length-shape,shape,60)), tf.float32)
+        concat_right = tf.cast(tf.zeros((smile_length,smile_length-shape,60)), tf.float32)
         drug_rel_position = tf.concat((drug_rel_position,concat_left),axis=0)
         drug_rel_position = tf.concat((drug_rel_position,concat_right),axis=1)
         drug_rel_position_chunk.append(drug_rel_position)
@@ -1259,8 +1259,8 @@ def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_u
         shape = edge_type_matrix.shape[0]
         edge_type_matrix = tf.gather(edge_type_dict,tf.cast(edge_type_matrix,tf.int16),axis=0)
         #drug_rel_position = tf.cast(tf.gather(P[0], tf.cast(rel_distance_,tf.int32), axis=0), tf.float32)
-        concat_left = tf.zeros((80-shape,shape,5))
-        concat_right = tf.zeros((80,80-shape,5))
+        concat_left = tf.zeros((smile_length-shape,shape,5))
+        concat_right = tf.zeros((smile_length,smile_length-shape,5))
         edge_type_matrix = tf.concat((edge_type_matrix,concat_left),axis=0)
         edge_type_matrix = tf.concat((edge_type_matrix,concat_right),axis=1)
         edge_type_matrix_chunk.append(edge_type_matrix)
@@ -1276,7 +1276,7 @@ def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_u
         input_drug_atom_index = string_lookup(input_drug_atom_names)-1
         input_drug_atom_one_hot = layer_one_hot(input_drug_atom_index)
         shape_drug_miss = input_drug_atom_one_hot.shape[0]
-        concat_right = tf.zeros((80-shape_drug_miss,8))
+        concat_right = tf.zeros((smile_length-shape_drug_miss,8))
         input_drug_atom_one_hot = tf.concat((input_drug_atom_one_hot,concat_right),axis=0)
         drug_smile_length_update.append(shape_drug_miss)
         input_drug_atom_one_hot_chunk.append(input_drug_atom_one_hot)
