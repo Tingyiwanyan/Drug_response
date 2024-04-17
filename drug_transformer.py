@@ -1297,7 +1297,7 @@ def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_u
     gene_expression_update_chunk = tf.stack(gene_expression_update_chunk)
     gene_mutation_update_chunk = tf.stack(gene_mutation_update_chunk)
     
-    return input_drug_atom_one_hot_chunk, gene_expression_update_chunk, drug_smile_length_update,drug_rel_position_chunk,
+    return input_drug_atom_one_hot_chunk, gene_expression_update_chunk, drug_smile_length_update,drug_rel_position_chunk,\
     edge_type_matrix_chunk,gene_mutation_update_chunk,np.array(ic50_list_update_chunk)
 
 
