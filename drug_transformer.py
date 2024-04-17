@@ -1227,7 +1227,7 @@ def return_gene_drug_target_train(model, gene_names, drug_lung, gene_lung, drug_
 
     return top_gene_names, top_genes_score, top_genes_index
 
-def generate_chunk_data(model_midi, gene_expression_update, drug_smile_list_update,ic50_list_update, 
+def generate_chunk_data(model_midi, P, gene_expression_update, drug_smile_list_update,ic50_list_update, 
                         mutation_gene_update,string_lookup, layer_one_hot,
                         training_chunk_size):
     
