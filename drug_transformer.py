@@ -627,9 +627,9 @@ class attention_embedding(tf.keras.layers.Layer):
 			value_ = tf.expand_dims(input_value, axis=1)
 			value_ = tf.broadcast_to(value_, [shape[0],shape[1],shape[1],shape[-1]])
 			#relative_encoding_lookup_ = self.kernel_position(relative_encoding_lookup)
-			value_ = value_
-			relative_encoding_lookup = relative_encoding_lookup
-			edge_type_embedding = edge_type_embedding
+			value_ = value_ * 0.2
+			relative_encoding_lookup = relative_encoding_lookup * 0.4
+			edge_type_embedding = edge_type_embedding * 0.4
 			value_ = tf.math.add(value_, relative_encoding_lookup)
 			value_ = tf.math.add(value_, edge_type_embedding)
 			#value_ = tf.concat((value_, relative_encoding_lookup),axis=-1)
@@ -916,7 +916,7 @@ class drug_transformer_():
                                              bias_initializer=initializers.Zeros(), name="dense_8")
     
         self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             bias_initializer=initializers.Zeros())
+                                             bias_initializer=initializers.Zeros(), name="dense_5")
     
         self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', 
                                              kernel_initializer=initializers.RandomNormal(seed=42),
