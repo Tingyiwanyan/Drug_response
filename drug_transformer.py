@@ -425,7 +425,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 			return scores, values, queries
 		else:
-			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.4
+			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.2
 			#print("scores_ shape")
 			#print(scores_.shape)
 			#queries_origin_ = tf.concat(queries_origin_, relative_encoding_origin)
