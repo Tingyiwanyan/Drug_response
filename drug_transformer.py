@@ -1179,9 +1179,9 @@ def return_gene_drug_target_train(model, gene_names, drug_lung, gene_lung, drug_
     """
     return the gene-drug targeting cross-attention matrix
     """
-    feature_select_score_model1 = att_score_self_enco(model,18)
-    feature_select_score_model2 = att_score_self_enco(model,19)
-    feature_select_score_model3 = att_score_self_enco(model,20)
+    feature_select_score_model1 = att_score_self_enco(model,27)
+    feature_select_score_model2 = att_score_self_enco(model,28)
+    feature_select_score_model3 = att_score_self_enco(model,29)
     feature_select_score_whole = []
     len_train = len(drug_lung)
     #print(len_train)
