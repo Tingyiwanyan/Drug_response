@@ -425,7 +425,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 			return scores, values, queries
 		else:
-			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.2
+			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.3
 			#print("scores_ shape")
 			#print(scores_.shape)
 			#queries_origin_ = tf.concat(queries_origin_, relative_encoding_origin)
@@ -440,7 +440,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			#relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
-			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)*0.4
+			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)*0.3
 			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, edge_type_embedding), axis=-1)*0.4
 			#print(scores_position.shape)
 			#scores = tf.reduce_sum(tf.multiply(queries_origin, queries_), axis=-1)
