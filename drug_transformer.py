@@ -444,7 +444,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, edge_type_embedding), axis=-1)*0.6
 			#print(scores_position.shape)
 			#scores = tf.reduce_sum(tf.multiply(queries_origin, queries_), axis=-1)
-			scores = tf.add(scores_, scores_position)
+			scores_ = tf.add(scores_, scores_position)
 			scores = tf.add(scores_, scores_edge_embedding)
 			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 			#print(scores.shape)
@@ -1006,7 +1006,7 @@ class drug_transformer_():
         construct the transformer model
         """
         X_input = Input((70, 8))
-        Y_input = Input((5370, 1))
+        Y_input = Input((5370, 60))
         gene_mutation_input = Input((5370, 2))
         rel_position_embedding = Input((70,70,60))
         edge_type_embedding = Input((70,70,5))

@@ -39,8 +39,8 @@ for i in range(5):
     edge_type_dict[i,i] = 1
 edge_type_dict = tf.cast(edge_type_dict,dtype=tf.float32)
 
-std_threshold = 0.6
-zero_threshold = 250
+std_threshold = 0.8
+zero_threshold = 300
 
 gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
 cell_line_drug_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.rds"
@@ -178,7 +178,7 @@ def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
 	std_list = []
 	zeros_list = []
 	filtered_list = []
-	gene_names = gene_expression.columns[2:]
+	gene_names = gene_expression.columns[1:]
 	index = 0
 	for i in gene_names:
 		#print(index)
