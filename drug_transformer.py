@@ -805,17 +805,17 @@ class drug_transformer_():
     """
     Implement the drug transformer model architecture
     """
-    def __init__(self, gene_expression_vocab, gene_embeddings):#, relative_pos_enc_lookup=None):
+    def __init__(self, gene_embeddings):#, relative_pos_enc_lookup=None):
 
-        self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
-        self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
+        #self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
+        #self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
     
-        self.input_gene_expression_names = tf.constant(gene_expression_vocab)
-        self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
+        #self.input_gene_expression_names = tf.constant(gene_expression_vocab)
+        #self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
     
         #self.relative_pos_enc_lookup = relative_pos_enc_lookup
     
-        self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
+        #self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
     
         self.input_gene_embeddings = gene_embeddings
     
