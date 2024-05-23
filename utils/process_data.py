@@ -35,9 +35,13 @@ P[:, :, 1::2] = np.cos(XX)
 P = tf.cast(tf.math.l2_normalize(P[:, :100,:], axis=-1), 
     dtype=tf.float32)
 edge_type_dict = np.zeros((5,5))
+gene_expression_bin_dict = np.zeros((4,4))
 for i in range(5):
     edge_type_dict[i,i] = 1
 edge_type_dict = tf.cast(edge_type_dict,dtype=tf.float32)
+for i in range(4):
+    gene_expression_bin_dict[i,i] = 1
+gene_expression_bin_dict = tf.cast(gene_expression_bin_dict,dtype=tf.float32)
 
 std_threshold = 0.8
 zero_threshold = 300
@@ -84,6 +88,7 @@ CCLE_drug_smiles = ['CC1CC(C(C(C=C(C(C(C=CC=C(C(=O)NC2=CC(=O)C(=C(C1)C2=O)NCC=C)
 
 vocabulary_drug = ['F', 'S', 'N', 'O', 'I', 'L', 'B', 'C']
 vocabulary_gene_mutation = [0, 1]
+vocabulary_gene_expression = [1, 2, 3, 4]
 
 drug_names = ['17-AAG','NVP-AEW541','AZD0530','AZD6244','Erlotinib','Irinotecan',
  'L-685458','lapatinib','LBW242','nilotinib','nutlin-3','Paclitaxel','Panobinostat',
@@ -94,15 +99,15 @@ gene_expression = pyreadr.read_r(gene_expression_path)[None]
 cell_line_drug = pyreadr.read_r(cell_line_drug_path)[None]
 drug_index_match = pd.read_csv(drug_index_match_path, encoding='windows-1254')
 
-drug_cellline_features_df = pd.read_csv(feature_frame_path)
+#drug_cellline_features_df = pd.read_csv(feature_frame_path)
 
-drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
+#drug_cellline_features_clean_df = pd.read_csv(feature_clean_frame_path)
 
-drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_path)
+#drug_cellline_features_ic50_normalized_df = pd.read_csv(feature_ic50_normalized_path)
 
-gene_expression_selected = pd.read_csv(gene_expression_selected_path)
+#gene_expression_selected = pd.read_csv(gene_expression_selected_path)
 
-gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
+#gene_expression_filtered = pd.read_csv(gene_expression_filtered_path)
 
 """
 One hot encoding smile drug molecule sequence, reference:

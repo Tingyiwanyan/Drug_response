@@ -23,7 +23,7 @@ drug_names = ['17-AAG','NVP-AEW541','AZD0530','AZD6244','Erlotinib','Irinotecan'
  'PD-0325901','PD-0332991','Crizotinib','PHA-665752','PLX-4720','RAF265','sorafenib',
  'NVP-TAE684','dovitinib','topotecan','vandetanib']
 
- train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50_normalized_df)
+train_sample_num, test_sample_num = train_test_split(drug_cellline_features_ic50_normalized_df)
 
 gene_expression_filtered.set_index('CCLE_ID',inplace=True)
 
