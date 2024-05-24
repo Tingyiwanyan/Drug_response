@@ -359,9 +359,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim):
+	def __init__(self, output_dim, if_select_feature=None):
 	    super().__init__()
 	    self.output_dim = output_dim
+	    self.if_select_feature = if_select_feature
 	    #self.relative_encoding_lookup = relative_encoding_lookup
 	    #self.masked_softmax = masked_softmax()
 
@@ -371,9 +372,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	    #self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
 	    #	kernel_regularizer=regularizers.L2(1e-4))
 
-	    self.kernel_value = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
-	                                         kernel_regularizer=regularizers.L2(1e-4),
-	                                         bias_initializer=initializers.Zeros())
+	    #self.kernel_value = tf.keras.layers.Dense(output_dim, kernel_initializer=initializers.RandomNormal(seed=42),
+	                                         #kernel_regularizer=regularizers.L2(1e-4),
+	                                         #bias_initializer=initializers.Zeros())
+
 
 
 	def build(self, input_shape):
@@ -396,12 +398,12 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	    #self.b_query = self.add_weight(name='bias_query',shape = (self.output_dim,),
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
+        if self.if_select_feature == None:
+		    self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
+		    	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
 
-	    self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-	    	initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
-
-	    self.b_value = tf.Variable(name='bias_value',
-	    	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+		    self.b_value = tf.Variable(name='bias_value',
+		    	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	    #self.b_value = self.add_weight(name='bias_value',shape = (self.output_dim,),
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
