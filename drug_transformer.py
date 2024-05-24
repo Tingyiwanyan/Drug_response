@@ -770,7 +770,7 @@ class decoder_cross_block(tf.keras.layers.Layer):
 	#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
 	#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
-		cross_embedding = self.r_connection(value_deco_cross, att_embedding_deco_cross)
+		cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		if if_select_feature_ == None:
 			return cross_embedding, att_score_deco_cross
