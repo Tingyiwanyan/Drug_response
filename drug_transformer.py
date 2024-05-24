@@ -456,7 +456,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
-			if not if_select_feature == None:	
+			if if_select_feature == None:	
 				return scores, values, queries
 			else:
 				return scores, queries
