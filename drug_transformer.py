@@ -407,7 +407,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None,**kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_select_feature=None,**kwargs):
 		d = queries.shape[-1]
 		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
@@ -416,14 +416,19 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
-		values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+		if if_select_feature == None:
+			values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
+
 
 		if relative_encoding_lookup == None:
 			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
-			return scores, values, queries
+			if if_select_feature == None:
+				return scores, values, queries
+			else:
+				return scores, queries
 		else:
 			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.2
 			#print("scores_ shape")
@@ -451,7 +456,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
-			return scores, values, queries
+			if not if_select_feature == None:	
+				return scores, values, queries
+			else:
+				return scores, queries
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
@@ -737,45 +745,6 @@ class encoder_block(tf.keras.layers.Layer):
 
 		return encoder_embedding, att_score, score
 
-
-class decoder_self_block(tf.keras.layers.Layer):
-	"""
-	Define self-attention decoder block, since 
-	gene expression doesn't contain sequencing information, so 
-	we don't add position encoding in the embedding layer. 
-	Use Linformer for the attention operation
-
-	Parameters:
-	-----------
-	num_hiddens_self: hidden embedding dimension for the self att block
-
-	Returns:
-	--------
-	cross_decoder_embedding: the decoder embedding output
-	self_att_score: the self att score in decoder self att block
-	cross_att_score: the cross att score in the decoder cross att block
-	"""
-	def __init__(self, num_hiddens):
-		super().__init__()
-		self.masked_softmax_deco_self = masked_softmax()
-		self.dotproductattention_deco = dotproductattention_column(num_hiddens)
-		#self.dotproductattention_deco = dotproductattention(num_hiddens)
-		self.att_embedding = attention_embedding()
-		self.r_connection = residual_connection()
-
-	def call(self, Y, enc_valid_lens=None, **kwargs):
-		#score_deco, value_deco, query_deco, value_linformer_deco, kernel_projection_f = self.dotproductattention_deco(Y,Y,Y)
-		score_deco, value_deco, query_deco,value_deco_ = self.dotproductattention_deco(Y,Y,Y)
-		att_score_deco = self.masked_softmax_deco_self(score_deco, enc_valid_lens)
-		#att_embedding_deco = self.att_embedding(att_score_deco, value_linformer_deco)
-		att_embedding_deco = self.att_embedding(att_score_deco, value_deco_)
-
-		self_deco_embedding = self.r_connection(value_deco, att_embedding_deco)
-		#self_deco_embedding = value_deco
-
-		#return self_deco_embedding, att_score_deco, kernel_projection_f
-		return self_deco_embedding, att_score_deco
-
 class decoder_cross_block(tf.keras.layers.Layer):
     """
     Define decoder cross attention 
@@ -787,18 +756,27 @@ class decoder_cross_block(tf.keras.layers.Layer):
         self.att_embedding = attention_embedding(num_hiddens)
         self.r_connection = residual_connection()
 
-    def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, **kwargs):
-        score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X)
+    def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, if_select_feature_=None, **kwargs):
+    	if if_select_feature_ == None:
+        	score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
+        else:
+        	score_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
         att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)
-        att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+
+        if if_select_feature_ == None:
+	        att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
 
-        #att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
-        #query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
+	        #att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
+	        #query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
-        cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
+	        cross_embedding = self.r_connection(value_deco_cross, att_embedding_deco_cross)
 
-        return cross_embedding, att_score_deco_cross
+	    if if_select_feature_ == None:
+        	return cross_embedding, att_score_deco_cross
+        else:
+        	return att_score_deco_cross
+
 
 
 class drug_transformer_():
@@ -1063,9 +1041,9 @@ class drug_transformer_():
     
         Y = tf.concat([Y1,Y2],axis=-1)
     
-        XX1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
-        XX2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
-        XX3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
+        att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
     
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
