@@ -746,36 +746,36 @@ class encoder_block(tf.keras.layers.Layer):
 		return encoder_embedding, att_score, score
 
 class decoder_cross_block(tf.keras.layers.Layer):
-    """
-    Define decoder cross attention 
-    """
-    def __init__(self, num_hiddens):
-        super().__init__()
-        self.masked_softmax_deco_cross = masked_softmax()
-        self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
-        self.att_embedding = attention_embedding(num_hiddens)
-        self.r_connection = residual_connection()
+	"""
+	Define decoder cross attention 
+	"""
+	def __init__(self, num_hiddens):
+		super().__init__()
+		self.masked_softmax_deco_cross = masked_softmax()
+		self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
+		self.att_embedding = attention_embedding(num_hiddens)
+		self.r_connection = residual_connection()
 
-    def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, if_select_feature_=None, **kwargs):
-    	if if_select_feature_ == None:
-        	score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
-        else:
-        	score_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
-        att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)
+	def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, if_select_feature_=None, **kwargs):
+		if if_select_feature_ == None:
+			score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
+		else:
+			score_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
+			att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)	
 
-        if if_select_feature_ == None:
-	        att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
+		if if_select_feature_ == None:
+			att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
 
 
-	        #att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
-	        #query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
+	#att_embedding_deco_cross = tf.concat([att_embedding_deco_cross, att_embedding_deco_cross2],axis=-1)
+	#query_deco_cross = tf.concat([query_deco_cross, query_deco_cross2],axis=-1)
 
-	        cross_embedding = self.r_connection(value_deco_cross, att_embedding_deco_cross)
+		cross_embedding = self.r_connection(value_deco_cross, att_embedding_deco_cross)
 
-	    if if_select_feature_ == None:
-        	return cross_embedding, att_score_deco_cross
-        else:
-        	return att_score_deco_cross
+		if if_select_feature_ == None:
+			return cross_embedding, att_score_deco_cross
+		else:
+			return att_score_deco_cross
 
 
 
