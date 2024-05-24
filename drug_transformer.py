@@ -761,7 +761,7 @@ class decoder_cross_block(tf.keras.layers.Layer):
 			score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
 		else:
 			score_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
-			att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)	
+		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)	
 
 		if if_select_feature_ == None:
 			att_embedding_deco_cross = self.att_embedding(att_score_deco_cross, value_deco_cross)
