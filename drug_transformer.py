@@ -811,7 +811,7 @@ class drug_transformer_():
         """
         global decoder
         """
-        self.decoder_global_1 = decoder_cross_block(30，if_select_feature_=True)
+        self.decoder_global_1 = decoder_cross_block(30, if_select_feature_=True)
         self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
         self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
     
