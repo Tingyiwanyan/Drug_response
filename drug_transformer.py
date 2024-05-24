@@ -751,10 +751,10 @@ class decoder_cross_block(tf.keras.layers.Layer):
 	"""
 	Define decoder cross attention 
 	"""
-	def __init__(self, num_hiddens):
+	def __init__(self, num_hiddens, if_select_feature_=None):
 		super().__init__()
 		self.masked_softmax_deco_cross = masked_softmax()
-		self.dotproductattention_deco_cross = dotproductattention(num_hiddens)
+		self.dotproductattention_deco_cross = dotproductattention(num_hiddens, if_select_feature=if_select_feature_)
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
@@ -811,9 +811,9 @@ class drug_transformer_():
         """
         global decoder
         """
-        self.decoder_global_1 = decoder_cross_block(30)
-        self.decoder_global_2 = decoder_cross_block(30)
-        self.decoder_global_3 = decoder_cross_block(30)
+        self.decoder_global_1 = decoder_cross_block(30，if_select_feature_=True)
+        self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
+        self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
     
         self.encoder_1 = encoder_block(60,130)
     
