@@ -359,10 +359,11 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, if_select_feature=None):
+	def __init__(self, output_dim, if_select_feature=None, if_self_att=False):
 	    super().__init__()
 	    self.output_dim = output_dim
 	    self.if_select_feature = if_select_feature
+	    self.if_self_att = if_self_att
 	    #self.relative_encoding_lookup = relative_encoding_lookup
 	    #self.masked_softmax = masked_softmax()
 
@@ -379,12 +380,14 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 	def build(self, input_shape):
-		#self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
-			#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
-
 		b_init = tf.zeros_initializer()
-		#self.b_key = tf.Variable(name='bias_key', 
-			#initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+		if self.if_self_att == False:
+			self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
+				initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
+
+			self.b_key = tf.Variable(name='bias_key', 
+				initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		#self.b_key = self.add_weight(name='bias_key',shape = (self.output_dim,),
 		#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
@@ -418,7 +421,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		"""
 		change the kernel_key to kernel_query in order for self-att matrix to be consistent
 		"""
-		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
+		if self.if_self_att == False:
+			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+		else:
+			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
@@ -729,11 +735,11 @@ class encoder_block(tf.keras.layers.Layer):
 	encoder_embedding: the encoder embedding output
 	att_score: the self attention score
 	"""
-	def __init__(self, num_hiddens, seq_length):
+	def __init__(self, num_hiddens, seq_length, if_self_att_=True):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
-		self.dotproductattention = dotproductattention(num_hiddens)
+		self.dotproductattention = dotproductattention(num_hiddens, if_self_att=if_self_att_)
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
@@ -754,10 +760,10 @@ class decoder_cross_block(tf.keras.layers.Layer):
 	"""
 	Define decoder cross attention 
 	"""
-	def __init__(self, num_hiddens, if_select_feature_=None):
+	def __init__(self, num_hiddens, if_select_feature_=None, if_self_att_=False):
 		super().__init__()
 		self.masked_softmax_deco_cross = masked_softmax()
-		self.dotproductattention_deco_cross = dotproductattention(num_hiddens, if_select_feature=if_select_feature_)
+		self.dotproductattention_deco_cross = dotproductattention(num_hiddens, if_select_feature=if_select_feature_, if_self_att=if_self_att_)
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
