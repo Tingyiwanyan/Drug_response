@@ -379,12 +379,12 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 	def build(self, input_shape):
-		self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
+		#self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
+			#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 		b_init = tf.zeros_initializer()
-		self.b_key = tf.Variable(name='bias_key', 
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+		#self.b_key = tf.Variable(name='bias_key', 
+			#initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		#self.b_key = self.add_weight(name='bias_key',shape = (self.output_dim,),
 		#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
@@ -415,7 +415,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
-		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+		"""
+		change the kernel_key to kernel_query in order for self-att matrix to be consistent
+		"""
+		keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
