@@ -1050,7 +1050,7 @@ class drug_transformer_():
         Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
         Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
-        Y = tf.concat([Y1,Y2],axis=-1)
+        Y_ = tf.concat([Y1,Y2],axis=-1)
     
         #att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
         #att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
@@ -1065,7 +1065,7 @@ class drug_transformer_():
         #att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
-        Y = self.dense_6(Y)
+        Y = self.dense_6(Y_)
         #Y_global1 = tf.math.multiply(att_score_global1, Y)
         #Y_global2 = tf.math.multiply(att_score_global2, Y)
         #Y_global3 = tf.math.multiply(att_score_global3, Y)
