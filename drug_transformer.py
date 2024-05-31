@@ -913,7 +913,7 @@ class drug_transformer_():
                                              bias_initializer=initializers.Zeros(), name="dense_6")
     
     
-        self.dense_9 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_9 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_9")
