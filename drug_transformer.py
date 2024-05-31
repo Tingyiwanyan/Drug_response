@@ -1051,9 +1051,9 @@ class drug_transformer_():
         Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
         Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
-        #Y_ = tf.concat([Y1,Y2],axis=-1)
+        Y = tf.concat([Y1,Y2],axis=-1)
 
-        Y = self.r_connection_multi_deco_gene(Y1,Y2)
+        #Y = self.r_connection_multi_deco_gene(Y1,Y2)
     
         att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
         att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
