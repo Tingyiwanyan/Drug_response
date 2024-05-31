@@ -838,7 +838,7 @@ class drug_transformer_():
     
         self.dotproductattention_deco_cross = dotproductattention(30)
     
-        self.decoder_cross_1 = decoder_cross_block(15)
+        self.decoder_cross_1 = decoder_cross_block(30)
     
         """
         2nd head attention
@@ -849,7 +849,7 @@ class drug_transformer_():
     
         self.dotproductattention_deco_cross2 = dotproductattention(10)
     
-        self.decoder_cross_2 = decoder_cross_block(15)
+        self.decoder_cross_2 = decoder_cross_block(30)
     
     
         """
