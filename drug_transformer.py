@@ -1060,7 +1060,7 @@ class drug_transformer_():
         X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
         X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
 
-        X_global = tf.concat([X_global1, X_global2, X_global3])
+        X_global = tf.concat([X_global1, X_global2, X_global3],axis=-1)
     
         #att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
