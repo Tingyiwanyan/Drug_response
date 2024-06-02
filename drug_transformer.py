@@ -906,7 +906,7 @@ class drug_transformer_():
                                              bias_initializer=initializers.Zeros(), name="dense_8")
     
         self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
-								        	 kernel_regularizer=regularizers.L2(1e-4),
+								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_5")
     
         self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', 
