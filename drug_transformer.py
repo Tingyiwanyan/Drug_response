@@ -437,9 +437,9 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 			if if_select_feature == None:
-				return scores, values, queries
+				return scores, values, queries, keys
 			else:
-				return scores, queries
+				return scores, queries, keys
 		else:
 			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.2
 			#print("scores_ shape")
@@ -468,9 +468,9 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 			#self.attention_weights = self.masked_softmax(scores, valid_lens)
 			if if_select_feature == None:	
-				return scores, values, queries
+				return scores, values, queries, keys
 			else:
-				return scores, queries
+				return scores, queries, keys
 
 class dotproductattention_column(tf.keras.layers.Layer):  #@save
 	"""
@@ -745,7 +745,7 @@ class encoder_block(tf.keras.layers.Layer):
 
 	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, **kwargs):
 		#X = self.pos_encoding(X)
-		score, value, query = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
+		score, value, query, keys = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		#print(att_score.shape)
@@ -769,9 +769,9 @@ class decoder_cross_block(tf.keras.layers.Layer):
 
 	def call(self, Y, X, if_sparse_max=False, enc_valid_lens=None, if_select_feature_=None, **kwargs):
 		if if_select_feature_ == None:
-			score_deco_cross, value_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
+			score_deco_cross, value_deco_cross, query_deco_cross,key_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
 		else:
-			score_deco_cross, query_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
+			score_deco_cross, query_deco_cross, key_deco_cross = self.dotproductattention_deco_cross(Y,X,X,if_select_feature=if_select_feature_)
 		att_score_deco_cross = self.masked_softmax_deco_cross(score_deco_cross, if_sparse_max, enc_valid_lens)	
 
 		if if_select_feature_ == None:
@@ -784,9 +784,9 @@ class decoder_cross_block(tf.keras.layers.Layer):
 			cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		if if_select_feature_ == None:
-			return cross_embedding, att_score_deco_cross
+			return cross_embedding, att_score_deco_cross, key_deco_cross
 		else:
-			return att_score_deco_cross
+			return query_deco_cross, att_score_deco_cross, key_deco_cross
 
 
 
@@ -906,7 +906,8 @@ class drug_transformer_():
                                              bias_initializer=initializers.Zeros(), name="dense_8")
     
         self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             bias_initializer=initializers.Zeros(), name="dense_5")
+								        	 kernel_regularizer=regularizers.L2(1e-4),
+								        	 bias_initializer=initializers.Zeros(), name="dense_5")
     
         self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', 
                                              kernel_initializer=initializers.RandomNormal(seed=42),
@@ -1048,16 +1049,16 @@ class drug_transformer_():
         cross attention for the decoder
         """
     
-        Y1, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-        Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
         Y = tf.concat([Y1,Y2],axis=-1)
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
     
-        att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
-        att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
-        att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        X_global, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        #att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        #att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
         #X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
@@ -1066,16 +1067,17 @@ class drug_transformer_():
         #X_global = tf.concat([X_global1, X_global2, X_global3],axis=-1)
     
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
-        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
-        att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
+        #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+        #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
         Y = self.dense_6(Y)
-        Y_global1 = tf.math.multiply(att_score_global1, Y)
-        Y_global2 = tf.math.multiply(att_score_global2, Y)
-        Y_global3 = tf.math.multiply(att_score_global3, Y)
-        Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
+        Y_global1 = tf.math.multiply(att_score_global1, Y_key)
+        #Y_global2 = tf.math.multiply(att_score_global2, Y)
+        #Y_global3 = tf.math.multiply(att_score_global3, Y)
+        #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
+        Y = Y_global1
         X_global = self.flattern_global_(X_global)
-        #Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-        Y = self.flattern_deco(Y)
+        Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
+        #Y = self.flattern_deco(Y)
         Y = tf.concat([X_global, Y], axis=-1)   
         Y = self.dense_5(Y)
     	
