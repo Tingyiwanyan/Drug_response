@@ -906,7 +906,7 @@ class drug_transformer_():
                                              bias_initializer=initializers.Zeros(), name="dense_8")
     
         self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
-								        	 #kernel_regularizer=regularizers.L2(1e-4),
+								        	 kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_5")
     
         self.dense_6 = tf.keras.layers.Dense(1, activation='sigmoid', 
@@ -1069,8 +1069,8 @@ class drug_transformer_():
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
-        Y = self.dense_6(Y)
-        Y_global1 = tf.math.multiply(att_score_global1, Y_key)
+        Y = self.dense_6(Y_key)
+        Y_global1 = tf.math.multiply(att_score_global1, Y)
         #Y_global2 = tf.math.multiply(att_score_global2, Y)
         #Y_global3 = tf.math.multiply(att_score_global3, Y)
         #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
