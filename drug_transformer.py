@@ -671,7 +671,8 @@ class residual_connection(tf.keras.layers.Layer):
     def call(self, X, Y, **kwargs):
         #X = tf.math.l2_normalize(X, axis=-1)
         #Y = tf.math.l2_normalize(Y, axis=-1)
-        return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+        #return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+        return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -820,7 +821,7 @@ class drug_transformer_():
         """
         global decoder
         """
-        self.decoder_global_1 = decoder_cross_block(30, if_select_feature_=True)
+        self.decoder_global_1 = decoder_cross_block(60, if_select_feature_=True)
         self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
         self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
     
@@ -1009,10 +1010,10 @@ class drug_transformer_():
         gene_embedding = tf.expand_dims(gene_embedding, axis=0)
         gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
     
-        gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
+        gene_embedding = self.dense_3(gene_embedding)
 
         #rel_position_embedding_ = tf.math.l2_normalize(self.dense_13(rel_position_embedding), axis = -1)
-        edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
+        edge_type_embedding_ = self.dense_8(edge_type_embedding)
         
         X = self.dense_0(X_input)
         #X = self.pos_encoding(X)
@@ -1032,13 +1033,15 @@ class drug_transformer_():
         X_global = self.flattern_global(X)
         X_global = tf.expand_dims(X_global, axis=1)
         X_global = self.dense_9(X_global)
+
+        X_global1, att_score_global1, gene_key = self.decoder_global_1(X_global, gene_embedding, if_sparse_max=True, if_select_feature_=True)
         
         """
         self-attention for the decoder
         """
-        Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
+        Y = self.dense_2(Y_input)
         #Y = tf.concat([gene_embedding, Y],axis=-1)
-        Y = self.r_connection_gene_emb(Y, gene_embedding)
+        Y = self.r_connection_gene_emb(Y, gene_key)
 
         if not if_mutation == None:
 	        Y_gene_mutate = self.dense_14(gene_mutation_input)
@@ -1056,19 +1059,19 @@ class drug_transformer_():
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
     
-        X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        #X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, gene_embedding, if_sparse_max=True, if_select_feature_=True)
         #X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
         #X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
-        
+
         X_global = X_global1
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
-        Y_key = self.dense_6(Y_key)
+        Y_key = self.dense_6(Y)
         #Y_key2 = self.dense_6(Y_key2)
         #Y_key3 = self.dense_6(Y_key3)
         Y_global = tf.math.multiply(att_score_global1, Y_key)
