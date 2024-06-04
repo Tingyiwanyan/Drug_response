@@ -1089,7 +1089,7 @@ class drug_transformer_():
         #Y = self.r_connection_gene_emb(Y, gene_embedding)
 
         #if not if_mutation == None:
-	    Y_gene_mutate = self.dense_14(gene_mutation_input)
+        Y_gene_mutate = self.dense_14(gene_mutation_input)
 	    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
         #Y = self.pos_encoding_gene(Y)
     
