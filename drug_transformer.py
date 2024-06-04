@@ -866,11 +866,7 @@ class drug_transformer_():
     
         self.encoder_2 = encoder_block(768,130)
         self.encoder_3 = encoder_block(30,130)
-
-        """
-        global cross attention sequence feature selection
-        """
-		self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
+        self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
 
         """
         1st head attention
