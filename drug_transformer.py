@@ -870,7 +870,7 @@ class drug_transformer_():
         """
         global cross attention sequence feature selection
         """
-    	self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
+		self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
 
         """
         1st head attention
