@@ -412,8 +412,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, gene_embedding=None, 
-		mutation_embedding=None, if_select_feature=None, **kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_select_feature=None,**kwargs):
 		d = queries.shape[-1]
 		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
@@ -435,16 +434,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 
 		if relative_encoding_lookup == None:
-			scores_expression = tf.matmul(queries, keys, transpose_b=True)*0.5
-
-			scores_gene_embedding = tf.matmul(queries, gene_embedding, transpose_b=True)*0.3
-
-			scores_gene_mutation = tf.matmul(queries, mutation_embedding, transpose_b=True)*0.2
-
-			scores = tf.add(scores_expression, scores_gene_embedding)
-			scores = tf.add(scores, scores_gene_mutation)
-
-			scores = scores/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
+			scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
 
 			if if_select_feature == None:
 				return scores, values, queries, keys
