@@ -1086,25 +1086,25 @@ class drug_transformer_():
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
     
         X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
-        #X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
-        #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
         #X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
         
-        X_global = X_global1
+        X_global = tf.concat([X_global1, X_global2, X_global3],axis=-1)
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
-        #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
-        #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
+        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+        att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
         Y_key = self.dense_6(Y_key)
         #Y_key2 = self.dense_6(Y_key2)
         #Y_key3 = self.dense_6(Y_key3)
-        Y_global = tf.math.multiply(att_score_global1, Y_key)
-        #Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
-        #Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
-        #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
-        Y = Y_global
+        Y_global1 = tf.math.multiply(att_score_global1, Y_key)
+        Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
+        Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
+        Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
+        #Y = Y_global
         X_global = self.flattern_global_(X_global)
         #Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
         Y = self.flattern_deco(Y)
