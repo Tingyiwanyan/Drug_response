@@ -1056,12 +1056,13 @@ class drug_transformer_():
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
         #X = tf.concat([X_enc_1, X_enc_2],axis=-1)
     
-        X = self.dense_1(X)
+        #X = self.dense_1(X)
         
-        X_global = self.flattern_global(X)
-        X_global = tf.expand_dims(X_global, axis=1)
-        X_global = self.dense_9(X_global)
+        #X_global = self.flattern_global(X)
+        #X_global = tf.expand_dims(X_global, axis=1)
+        #X_global = self.dense_9(X_global)
         
+        X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=-2), axis=-1)
         """
         self-attention for the decoder
         """
@@ -1094,12 +1095,13 @@ class drug_transformer_():
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
         
         X_global = tf.concat([X_global1, X_global2, X_global3],axis=-1)
+        #X_global=X_global1
         att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
         Y_key = self.dense_6(Y_key)
-        #Y_key2 = self.dense_6(Y_key2)
-        #Y_key3 = self.dense_6(Y_key3)
+        Y_key2 = self.dense_6(Y_key2)
+        Y_key3 = self.dense_6(Y_key3)
         Y_global1 = tf.math.multiply(att_score_global1, Y_key)
         Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
         Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
