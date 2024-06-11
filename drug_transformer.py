@@ -1063,6 +1063,7 @@ class drug_transformer_():
         #X_global = self.dense_9(X_global)
         
         X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=-2), axis=-1)
+        print(X_global.shape)
         """
         self-attention for the decoder
         """
@@ -1108,6 +1109,7 @@ class drug_transformer_():
         Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
         #Y = Y_global
         X_global = self.flattern_global_(X_global)
+        print(X_global.shape)
         #Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
         Y = self.flattern_deco(Y)
         Y = tf.concat([X_global, Y], axis=-1)   
