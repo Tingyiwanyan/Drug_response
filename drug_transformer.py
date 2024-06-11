@@ -1062,7 +1062,8 @@ class drug_transformer_():
         #X_global = tf.expand_dims(X_global, axis=1)
         #X_global = self.dense_9(X_global)
         
-        X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=-2), axis=-1)
+        X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=1), axis=-1)
+        X_global = tf.expand_dims(X_global, axis=1)
         print(X_global.shape)
         """
         self-attention for the decoder
