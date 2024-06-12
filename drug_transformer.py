@@ -967,7 +967,7 @@ class drug_transformer_():
         self.dense_15 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                               activation='relu',
                                               kernel_regularizer=regularizers.L2(1e-4),
-                                              bias_initializer=initializers.Zeros(), name="dense_14")
+                                              bias_initializer=initializers.Zeros(), name="dense_15")
     
         
         self.pos_encoding = positionalencoding(30,130)
