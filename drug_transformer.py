@@ -909,7 +909,7 @@ class drug_transformer_():
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_0")
     
-        self.dense_1 = tf.keras.layers.Dense(5, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_1 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_1")
@@ -1071,13 +1071,15 @@ class drug_transformer_():
         self-attention for the decoder
         """
         Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
-        Y = tf.concat([gene_embedding, Y],axis=-1)
+        #Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
         #Y = self.r_connection_gene_emb(Y, gene_embedding)
+        Y = tf.math.add(Y, gene_embedding)
 
         if not if_mutation == None:
 	        Y_gene_mutate = self.dense_14(gene_mutation_input)
-	        Y = tf.concat([Y, Y_gene_mutate],axis=-1)
+	        #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
 	        #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
+	        Y = tf.math.add(Y, Y_gene_mutate)
         #Y = self.pos_encoding_gene(Y)
     
         """
@@ -1091,7 +1093,7 @@ class drug_transformer_():
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
 
-        Y = self.dense_15(Y)
+        #Y = self.dense_15(Y)
     
         X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
         #X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
