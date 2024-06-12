@@ -785,7 +785,7 @@ class decoder_cross_block(tf.keras.layers.Layer):
 			cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		if if_select_feature_ == None:
-			return cross_embedding, att_score_deco_cross, key_deco_cross
+			return cross_embedding, att_score_deco_cross, value_deco_cross
 		else:
 			return query_deco_cross, att_score_deco_cross, key_deco_cross
 
@@ -848,13 +848,13 @@ class drug_transformer_():
         """
         global decoder
         """
-        self.decoder_global_1 = decoder_cross_block(30, if_select_feature_=True)
+        self.decoder_global_1 = decoder_cross_block(30)
         self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
         self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
     
         self.encoder_1 = encoder_block(60,130)
     
-        self.encoder_2 = encoder_block(768,130)
+        self.encoder_2 = encoder_block(60,130)
         self.encoder_3 = encoder_block(30,130)
         self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
 
@@ -904,7 +904,7 @@ class drug_transformer_():
         self.r_connection_gene_mutate = residual_connection()
         self.r_connection_multi_deco_gene = residual_connection()
     
-        self.dense_0 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_0 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_0")
@@ -1056,6 +1056,13 @@ class drug_transformer_():
                                 edge_type_enc = edge_type_embedding_,
                                 #relative_pos_origin_ = rel_position_embedding_origin,
                                 if_sparse_max=False)
+
+        X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
+                                #relative_pos_enc=self.relative_pos_enc_lookup,
+                                relative_pos_enc=rel_position_embedding,
+                                edge_type_enc = edge_type_embedding_,
+                                #relative_pos_origin_ = rel_position_embedding_origin,
+                                if_sparse_max=False)
         #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
                                      #relative_pos_enc=self.relative_pos_enc_lookup)
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
@@ -1095,22 +1102,22 @@ class drug_transformer_():
 
         #Y = self.dense_15(Y)
     
-        X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-        #X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        X_global, att_score_global1, Y_value = self.decoder_global_1(X_global, Y, if_sparse_max=False)
+        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=True, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
         #X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
         
-        X_global = X_global1
-        att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
+        #X_global = X_global1
+        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
         Y_key = self.dense_6(Y_key)
         #Y_key2 = self.dense_6(Y_key2)
         #Y_key3 = self.dense_6(Y_key3)
-        Y_global = tf.math.multiply(att_score_global1, Y_key)
+        Y_global = tf.math.multiply(att_score_global2, Y_key)
         #Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
         #Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
         #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
