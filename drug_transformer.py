@@ -1103,7 +1103,7 @@ class drug_transformer_():
         #Y = self.dense_15(Y)
     
         X_global, att_score_global1, Y_value = self.decoder_global_1(X_global, Y, if_sparse_max=False)
-        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=True, if_select_feature_=True)
+        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
@@ -1129,7 +1129,7 @@ class drug_transformer_():
         Y = self.dense_5(Y)
     	
         self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=Y)
-        self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+        #self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
     
         return self.model
     
