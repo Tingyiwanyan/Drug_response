@@ -1055,7 +1055,6 @@ class drug_transformer_():
         edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
         
         X = self.dense_0(X_input)
-        X_prior = self.dense_0(X_input_prior)
         #X = self.pos_encoding(X)
         X, att, score = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
                                 #relative_pos_enc=self.relative_pos_enc_lookup,
@@ -1064,12 +1063,6 @@ class drug_transformer_():
                                 #relative_pos_origin_ = rel_position_embedding_origin,
                                 if_sparse_max=False)
 
-        X_prior, att_prior, score_prior = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
-                                #relative_pos_enc=self.relative_pos_enc_lookup,
-                                relative_pos_enc=rel_position_embedding,
-                                edge_type_enc = edge_type_embedding_,
-                                #relative_pos_origin_ = rel_position_embedding_origin,
-                                if_sparse_max=False)
         #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
                                      #relative_pos_enc=self.relative_pos_enc_lookup)
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
