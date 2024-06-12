@@ -1095,7 +1095,7 @@ class drug_transformer_():
 
         #Y = self.dense_15(Y)
     
-        X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+        X_global1, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=False, if_select_feature_=True)
         #X_global2, att_score_global2, Y_key2 = self.decoder_global_2(X_global, Y, if_sparse_max=True, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
