@@ -671,8 +671,8 @@ class residual_connection(tf.keras.layers.Layer):
     def call(self, X, Y, **kwargs):
         #X = tf.math.l2_normalize(X, axis=-1)
         #Y = tf.math.l2_normalize(Y, axis=-1)
-        #return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
-        return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+        return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+        #return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
@@ -867,7 +867,7 @@ class drug_transformer_():
     
         self.dotproductattention_deco_cross = dotproductattention(30)
     
-        self.decoder_cross_1 = decoder_cross_block(30)
+        self.decoder_cross_1 = decoder_cross_block(60)
     
         """
         2nd head attention
@@ -878,7 +878,7 @@ class drug_transformer_():
     
         self.dotproductattention_deco_cross2 = dotproductattention(10)
     
-        self.decoder_cross_2 = decoder_cross_block(30)
+        self.decoder_cross_2 = decoder_cross_block(60)
     
     
         """
@@ -1096,7 +1096,9 @@ class drug_transformer_():
         Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
         Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
-        Y = tf.concat([Y1,Y2],axis=-1)
+        #Y = tf.concat([Y1,Y2],axis=-1)
+
+        Y = tf.math.add(Y1,Y2)
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
 
