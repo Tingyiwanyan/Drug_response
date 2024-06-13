@@ -1093,12 +1093,12 @@ class drug_transformer_():
         cross attention for the decoder
         """
     
-        Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-        Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        #Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        #Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
         #Y = tf.concat([Y1,Y2],axis=-1)
 
-        Y = tf.math.add(Y1,Y2)
+        #Y = tf.math.add(Y1,Y2)
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
 
