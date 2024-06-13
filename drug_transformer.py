@@ -909,7 +909,7 @@ class drug_transformer_():
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_0")
     
-        self.dense_1 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+        self.dense_1 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
                                              kernel_regularizer=regularizers.L2(1e-4),
                                              bias_initializer=initializers.Zeros(), name="dense_1")
@@ -1093,17 +1093,17 @@ class drug_transformer_():
         cross attention for the decoder
         """
     
-        #Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-        #Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+        Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
     
-        #Y = tf.concat([Y1,Y2],axis=-1)
+        Y = tf.concat([Y1,Y2],axis=-1)
 
         #Y = self.r_connection_multi_deco_gene(Y1,Y2)
 
         #Y = self.dense_15(Y)
     
-        X_global, att_score_global1, Y_value = self.decoder_global_1(X_global, Y, if_sparse_max=False)
-        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
+        X_global, att_score_global1, Y_key = self.decoder_global_1(X_global, Y, if_sparse_max=False, if_select_feature_=True)
+        #X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
@@ -1111,13 +1111,13 @@ class drug_transformer_():
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
         
         #X_global = X_global1
-        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+        att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
         Y_key = self.dense_6(Y_key)
         #Y_key2 = self.dense_6(Y_key2)
         #Y_key3 = self.dense_6(Y_key3)
-        Y_global = tf.math.multiply(att_score_global2, Y_key)
+        Y_global = tf.math.multiply(att_score_global1, Y_key)
         #Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
         #Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
         #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
