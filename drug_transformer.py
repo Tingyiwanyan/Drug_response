@@ -1118,10 +1118,10 @@ class drug_transformer_():
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
 
         X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
-        X_global_att = tf.math.multiply(att_score_global1, X_global_att)
-        Y_key = tf.math.add(X_global_att, Y_key)
+        Y = tf.math.multiply(att_score_global1, Y)
+        #Y_key = tf.math.add(X_global_att, Y_key)
 
-        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_key, if_sparse_max=False, if_select_feature_=True)
+        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
 
         Y_key = self.dense_6(Y_key)
         #Y_key2 = self.dense_6(Y_key2)
