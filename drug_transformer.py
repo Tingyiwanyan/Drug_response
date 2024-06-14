@@ -1117,7 +1117,7 @@ class drug_transformer_():
         #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
 
-        X_global_att = tf.broadcast_to(X_global, shape=Y_key.shape)
+        X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
         X_global_att = tf.math.multiply(att_score_global1, X_global_att)
         Y_key = tf.math.add(X_global_att, Y_key)
 
