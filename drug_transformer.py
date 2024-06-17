@@ -848,7 +848,7 @@ class drug_transformer_():
         """
         global decoder
         """
-        self.decoder_global_1 = decoder_cross_block(30, if_select_feature_=True)
+        self.decoder_global_1 = decoder_cross_block(30)#, if_select_feature_=True)
         self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
         self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
     
@@ -1104,8 +1104,8 @@ class drug_transformer_():
 
         #Y = self.dense_15(Y)
     
-        X_global, att_score_global1, Y = self.decoder_global_1(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-        #X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
+        X_global, att_score_global1, Y_value = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
+        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
@@ -1113,20 +1113,20 @@ class drug_transformer_():
         #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
         
         #X_global = X_global1
-        att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
-        #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+        #att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
+        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
 
         #X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
-        Y = tf.math.multiply(att_score_global1, Y)
+        Y_key = tf.math.multiply(att_score_global2, Y_key)
         #Y_key = tf.math.add(X_global_att, Y_key)
 
-        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
+        #X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
 
         Y_key = self.dense_6(Y_key)
         #Y_key2 = self.dense_6(Y_key2)
         #Y_key3 = self.dense_6(Y_key3)
-        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+        #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
         Y_global = tf.math.multiply(att_score_global2, Y_key)
         #Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
         #Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
