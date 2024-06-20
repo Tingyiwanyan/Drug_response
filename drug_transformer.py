@@ -671,8 +671,8 @@ class residual_connection(tf.keras.layers.Layer):
     def call(self, X, Y, **kwargs):
         #X = tf.math.l2_normalize(X, axis=-1)
         #Y = tf.math.l2_normalize(Y, axis=-1)
-        return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
-        #return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
+        #return tf.cast(tf.math.l2_normalize(tf.math.add(X,Y), axis=-1), dtype=tf.float32)
+        return tf.cast(tf.math.add(X,Y), dtype=tf.float32)
 
 
 class feed_forward_layer(tf.keras.layers.Layer):
