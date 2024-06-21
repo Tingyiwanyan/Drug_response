@@ -1032,7 +1032,7 @@ class drug_transformer_():
         construct the transformer model
         """
         X_input = Input((70, 8))
-        Y_input = Input((6144, 3))
+        Y_input = Input((6144, 4))
         gene_mutation_input = Input((6144, 2))
         rel_position_embedding = Input((70,70,60))
         edge_type_embedding = Input((70,70,5))
