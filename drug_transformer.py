@@ -785,9 +785,9 @@ class decoder_cross_block(tf.keras.layers.Layer):
 			cross_embedding = self.r_connection(query_deco_cross, att_embedding_deco_cross)
 
 		if if_select_feature_ == None:
-			return cross_embedding, att_score_deco_cross, value_deco_cross
+			return cross_embedding, att_score_deco_cross, value_deco_cross, score_deco_cross
 		else:
-			return query_deco_cross, att_score_deco_cross, key_deco_cross
+			return query_deco_cross, att_score_deco_cross, key_deco_cross, score_deco_cross
 
 
 class feature_selection_cross_block(tf.keras.layers.Layer):
@@ -1105,8 +1105,8 @@ class drug_transformer_():
 
         #Y = self.dense_15(Y)
     
-        X_global, att_score_global1, Y_value = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
-        X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
+        X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
+        X_global, att_score_global2, Y_key, score_cross_global = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
         #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
         #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
@@ -1140,7 +1140,7 @@ class drug_transformer_():
         Y = tf.concat([X_global, Y], axis=-1)   
         Y = self.dense_5(Y)
     	
-        self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=Y)
+        self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=[Y,score_cross_global])
         #self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
     
         return self.model
