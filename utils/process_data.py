@@ -251,7 +251,7 @@ def quantile_normalization(input_array, quantile_num=4):
         
     return output_array#, avarage_values, index_quantile_groups, quantile_values
 
-def normalize_min_max(inputs: list)->list:
+def normalize_min_max(inputs: list, max=None, min=None)->list:
 	"""
 	normalize ic50 values through the list
 
@@ -270,8 +270,10 @@ def normalize_min_max(inputs: list)->list:
 	#q_output = quantile_normalization(np.array(inputs), 20)
 
 	q_output = inputs
-	max = np.max(q_output)
-	min = np.min(q_output)
+	if max == None:
+		max = np.max(q_output)
+	if min == None:
+		min = np.min(q_output)
 
 	#normalized_ic50 = [(x-min)/(max-min) for x in inputs]
 	normalized_ic50 = [(x-min)/(max-min) for x in q_output]
