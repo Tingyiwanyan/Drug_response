@@ -938,6 +938,10 @@ class drug_transformer_():
         self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
 								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_5")
+
+        self.dense_bias = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
+								        	 #kernel_regularizer=regularizers.L2(1e-4),
+								        	 bias_initializer=initializers.Zeros(), name="drug_bias_layer")
     
         self.dense_6 = tf.keras.layers.Dense(1, activation='relu', 
                                              kernel_initializer=initializers.RandomNormal(seed=42),
@@ -1139,6 +1143,8 @@ class drug_transformer_():
         Y = self.flattern_deco(Y)
         Y = tf.concat([X_global, Y], axis=-1)   
         Y = self.dense_5(Y)
+        Y_bias = self.dense_bias(X_global)
+        Y = tf.math.add(Y,Y_bias)
     	
         self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=[Y,score_cross_global])
         #self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
