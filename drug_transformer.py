@@ -430,7 +430,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			if if_bias == True:
 				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
 			else:
-				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key), axis=-1)
+				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query), axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
