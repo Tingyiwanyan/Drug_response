@@ -364,6 +364,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	    self.output_dim = output_dim
 	    self.if_select_feature = if_select_feature
 	    self.if_self_att = if_self_att
+	    self.if_bias = if_bias
 	    #self.relative_encoding_lookup = relative_encoding_lookup
 	    #self.masked_softmax = masked_softmax()
 
@@ -385,7 +386,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		if self.if_self_att == False:
 			self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
 				initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
-			if if_bias == True:
+			if self.if_bias == True:
 				self.b_key = tf.Variable(name='bias_key', 
 					initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
@@ -395,7 +396,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.kernel_query  = self.add_weight(name='kernel_query', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
-		if if_bias == True:
+		if self.if_bias == True:
 			self.b_query = tf.Variable(name='bias_query', 
 				initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
@@ -406,7 +407,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 				initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
 
-			if if_bias == True:
+			if self.if_bias == True:
 				self.b_value = tf.Variable(name='bias_value',
 					initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
