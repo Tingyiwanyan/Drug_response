@@ -1072,7 +1072,7 @@ class drug_transformer_():
                                 edge_type_enc = edge_type_embedding_,
                                 #relative_pos_origin_ = rel_position_embedding_origin,
                                 if_sparse_max=False,
-                                if_bias=False)
+                                if_bias_=False)
 
         X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
                                 #relative_pos_enc=self.relative_pos_enc_lookup,
@@ -1080,7 +1080,7 @@ class drug_transformer_():
                                 edge_type_enc = edge_type_embedding_,
                                 #relative_pos_origin_ = rel_position_embedding_origin,
                                 if_sparse_max=False,
-                                if_bias=False)
+                                if_bias_=False)
         #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
                                      #relative_pos_enc=self.relative_pos_enc_lookup)
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
