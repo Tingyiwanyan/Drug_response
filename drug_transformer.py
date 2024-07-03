@@ -417,7 +417,10 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 
 	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_bias=True,if_select_feature=None,**kwargs):
 		d = queries.shape[-1]
-		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
+		if if_bias == True:
+			queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
+		else:
+			queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query), axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
