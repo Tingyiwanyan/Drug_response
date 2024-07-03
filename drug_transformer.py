@@ -434,7 +434,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
-			if if_bias == True
+			if if_bias == True:
 				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
 			else:
 				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value), axis=-1)
