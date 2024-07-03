@@ -753,9 +753,9 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
-	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, **kwargs):
+	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, if_bias_=True, **kwargs):
 		#X = self.pos_encoding(X)
-		score, value, query, keys = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
+		score, value, query, keys = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc, if_bias=if_bias_)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		#print(att_score.shape)
@@ -1071,14 +1071,16 @@ class drug_transformer_():
                                 relative_pos_enc=rel_position_embedding,
                                 edge_type_enc = edge_type_embedding_,
                                 #relative_pos_origin_ = rel_position_embedding_origin,
-                                if_sparse_max=False)
+                                if_sparse_max=False,
+                                if_bias=False)
 
         X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
                                 #relative_pos_enc=self.relative_pos_enc_lookup,
                                 relative_pos_enc=rel_position_embedding,
                                 edge_type_enc = edge_type_embedding_,
                                 #relative_pos_origin_ = rel_position_embedding_origin,
-                                if_sparse_max=False)
+                                if_sparse_max=False,
+                                if_bias=False)
         #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
                                      #relative_pos_enc=self.relative_pos_enc_lookup)
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
