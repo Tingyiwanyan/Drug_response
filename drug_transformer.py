@@ -747,7 +747,7 @@ class encoder_block(tf.keras.layers.Layer):
 	encoder_embedding: the encoder embedding output
 	att_score: the self attention score
 	"""
-	def __init__(self, num_hiddens, seq_length, if_self_att_=True, if_bais_=False):
+	def __init__(self, num_hiddens, seq_length, if_self_att_=True, if_bias_=False):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
