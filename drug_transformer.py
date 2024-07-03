@@ -412,7 +412,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_select_feature=None,**kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_bias=True,if_select_feature=None,**kwargs):
 		d = queries.shape[-1]
 		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
@@ -422,13 +422,22 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		change the kernel_key to kernel_query in order for self-att matrix to be consistent
 		"""
 		if self.if_self_att == False:
-			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+			if if_bias == True:
+				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
+			else:
+				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key), axis=-1)
 		else:
-			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
+			if if_bias == True:
+				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
+			else:
+				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key), axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
-			values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+			if if_bias == True
+				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
+			else:
+				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value), axis=-1)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
@@ -907,13 +916,15 @@ class drug_transformer_():
     
         self.dense_0 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_0")
+                                             use_bias=False,
+                                             kernel_regularizer=regularizers.L2(1e-4))
+                                             #bias_initializer=initializers.Zeros(), name="dense_0")
     
         self.dense_1 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_1")
+                                             use_bias=False,
+                                             kernel_regularizer=regularizers.L2(1e-4))
+                                             #bias_initializer=initializers.Zeros(), name="dense_1")
     
         self.dense_2 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
                                              activation='relu',
