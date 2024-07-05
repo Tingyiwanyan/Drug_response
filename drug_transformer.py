@@ -1105,7 +1105,7 @@ class drug_transformer_():
 
 		shape_x = tf.shape(X)
 		mask = tf.expand_dims(mask, axis=-1)
-		mask = tf.cast(tf.broadcast_to(mask, shape=shape_x),floa32)
+		mask = tf.cast(tf.broadcast_to(mask, shape=shape_x),tf.float32)
 
 		X = tf.multiply(X, mask)
 
