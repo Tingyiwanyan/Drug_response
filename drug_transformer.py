@@ -1081,52 +1081,52 @@ class drug_transformer_():
                                 if_sparse_max=False,
                                 if_bias_=False)
 
-        X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
-                                #relative_pos_enc=self.relative_pos_enc_lookup,
-                                relative_pos_enc=rel_position_embedding,
-                                edge_type_enc = edge_type_embedding_,
-                                #relative_pos_origin_ = rel_position_embedding_origin,
-                                if_sparse_max=False,
-                                if_bias_=False)
+		X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
+		                        #relative_pos_enc=self.relative_pos_enc_lookup,
+		                        relative_pos_enc=rel_position_embedding,
+		                        edge_type_enc = edge_type_embedding_,
+		                        #relative_pos_origin_ = rel_position_embedding_origin,
+		                        if_sparse_max=False,
+		                        if_bias_=False)
 
-        #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
-                                     #relative_pos_enc=self.relative_pos_enc_lookup)
-        #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
-        #X = tf.concat([X_enc_1, X_enc_2],axis=-1)
-    
-        X = self.dense_1(X)
+		#X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
+		                             #relative_pos_enc=self.relative_pos_enc_lookup)
+		#X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
+		#X = tf.concat([X_enc_1, X_enc_2],axis=-1)
 
-        mask = tf.range(start=0, limit=70, dtype=tf.float32)
-        mask = tf.broadcast_to(tf.expand_dims(mask,axis=0),shape=[shape_input[0],70])
-        mask = tf.reshape(mask, shape=(mask.shape[0]*mask.shape[1]))
-        mask = mask < tf.cast(tf.repeat(enc_valid_lens_,repeats=70),tf.float32)
-        mask = tf.where(mask,1,0)
-        mask = tf.reshape(mask, shape=(shape_input[0],70))
+		X = self.dense_1(X)
 
-        shape_x = tf.shape(X)
-        mask = tf.expand_dims(mask, axis=-1)
+		mask = tf.range(start=0, limit=70, dtype=tf.float32)
+		mask = tf.broadcast_to(tf.expand_dims(mask,axis=0),shape=[shape_input[0],70])
+		mask = tf.reshape(mask, shape=(mask.shape[0]*mask.shape[1]))
+		mask = mask < tf.cast(tf.repeat(enc_valid_lens_,repeats=70),tf.float32)
+		mask = tf.where(mask,1,0)
+		mask = tf.reshape(mask, shape=(shape_input[0],70))
+
+		shape_x = tf.shape(X)
+		mask = tf.expand_dims(mask, axis=-1)
 		mask = tf.broadcast_to(mask, shape=shape_x)
 
 		X = tf.multiply(X, mask)
-        
-        #X_global = self.flattern_global(X)
-        X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=1),axis=-1)
-        X_global = tf.expand_dims(X_global, axis=1)
-        X_global = self.dense_9(X_global)
-        
-        """
-        self-attention for the decoder
-        """
-        Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
-        #Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
-        #Y = self.r_connection_gene_emb(Y, gene_embedding)
-        Y = tf.math.add(Y, gene_embedding)
 
-        if not if_mutation == None:
-	        Y_gene_mutate = self.dense_14(gene_mutation_input)
-	        #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
-	        #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
-	        Y = tf.math.add(Y, Y_gene_mutate)
+		#X_global = self.flattern_global(X)
+		X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=1),axis=-1)
+		X_global = tf.expand_dims(X_global, axis=1)
+		X_global = self.dense_9(X_global)
+
+		"""
+		self-attention for the decoder
+		"""
+		Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
+		#Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
+		#Y = self.r_connection_gene_emb(Y, gene_embedding)
+		Y = tf.math.add(Y, gene_embedding)
+
+		if not if_mutation == None:
+		    Y_gene_mutate = self.dense_14(gene_mutation_input)
+		    #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
+		    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
+		    Y = tf.math.add(Y, Y_gene_mutate)
         #Y = self.pos_encoding_gene(Y)
     
         """
