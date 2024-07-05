@@ -359,12 +359,11 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 	--------
 	attention_score: the scale dot product score
 	"""
-	def __init__(self, output_dim, if_select_feature=None, if_self_att=False, if_bias=True):
+	def __init__(self, output_dim, if_select_feature=None, if_self_att=False):
 	    super().__init__()
 	    self.output_dim = output_dim
 	    self.if_select_feature = if_select_feature
 	    self.if_self_att = if_self_att
-	    self.if_bias = if_bias
 	    #self.relative_encoding_lookup = relative_encoding_lookup
 	    #self.masked_softmax = masked_softmax()
 
@@ -386,9 +385,9 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		if self.if_self_att == False:
 			self.kernel_key = self.add_weight(name='kernel_key', shape = (input_shape[-1], self.output_dim),
 				initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
-			if self.if_bias == True:
-				self.b_key = tf.Variable(name='bias_key', 
-					initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+
+			self.b_key = tf.Variable(name='bias_key', 
+				initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		#self.b_key = self.add_weight(name='bias_key',shape = (self.output_dim,),
 		#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
@@ -396,9 +395,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		self.kernel_query  = self.add_weight(name='kernel_query', shape = (input_shape[-1], self.output_dim),
 			initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
-		if self.if_bias == True:
-			self.b_query = tf.Variable(name='bias_query', 
-				initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+		self.b_query = tf.Variable(name='bias_query', 
+			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 		#self.b_query = self.add_weight(name='bias_query',shape = (self.output_dim,),
 		#initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
@@ -407,20 +405,16 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
 				initializer=tf.keras.initializers.he_normal(seed=42), trainable=True)
 
-			if self.if_bias == True:
-				self.b_value = tf.Variable(name='bias_value',
-					initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
+			self.b_value = tf.Variable(name='bias_value',
+				initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
 
 	    #self.b_value = self.add_weight(name='bias_value',shape = (self.output_dim,),
             #initializer = tf.keras.initializers.RandomNormal(seed=42), trainable = True)
 
 
-	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_bias=True,if_select_feature=None,**kwargs):
+	def call(self, queries, keys, values, relative_encoding_lookup=None, edge_type_embedding=None, if_select_feature=None,**kwargs):
 		d = queries.shape[-1]
-		if if_bias == True:
-			queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
-		else:
-			queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query), axis=-1)
+		queries = tf.math.l2_normalize(tf.matmul(queries, self.kernel_query) + self.b_query, axis=-1)
 		#queries = tf.matmul(queries, self.kernel_query) + self.b_query
 		shape = tf.shape(queries)
 		#queries = self.kernel_query(queries)
@@ -428,22 +422,13 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 		change the kernel_key to kernel_query in order for self-att matrix to be consistent
 		"""
 		if self.if_self_att == False:
-			if if_bias == True:
-				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
-			else:
-				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key), axis=-1)
+			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_key) + self.b_key, axis=-1)
 		else:
-			if if_bias == True:
-				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
-			else:
-				keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query), axis=-1)
+			keys = tf.math.l2_normalize(tf.matmul(keys, self.kernel_query) + self.b_query, axis=-1)
 		#keys = tf.matmul(keys, self.kernel_key) + self.b_key
 		#keys = self.kernel_key(keys)
 		if if_select_feature == None:
-			if if_bias == True:
-				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
-			else:
-				values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value), axis=-1)
+			values = tf.math.l2_normalize(tf.matmul(values, self.kernel_value) + self.b_value, axis=-1)
 		#values = tf.matmul(values, self.kernel_value) + self.b_value
 		#values = self.kernel_value(values)
 
@@ -751,7 +736,7 @@ class encoder_block(tf.keras.layers.Layer):
 	encoder_embedding: the encoder embedding output
 	att_score: the self attention score
 	"""
-	def __init__(self, num_hiddens, seq_length, if_self_att_=True, if_bias_=False):
+	def __init__(self, num_hiddens, seq_length, if_self_att_=True):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
@@ -759,9 +744,9 @@ class encoder_block(tf.keras.layers.Layer):
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
-	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, if_bias_=False, **kwargs):
+	def call(self, X, if_sparse_max=False, enc_valid_lens=None, relative_pos_enc=None, edge_type_enc=None, **kwargs):
 		#X = self.pos_encoding(X)
-		score, value, query, keys = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc, if_bias=if_bias_)
+		score, value, query, keys = self.dotproductattention(X,X,X,relative_encoding_lookup=relative_pos_enc, edge_type_embedding=edge_type_enc)
 		value = tf.math.l2_normalize(value, axis=-1)
 		att_score = self.masked_softmax(score, if_sparse_max, enc_valid_lens)
 		#print(att_score.shape)
@@ -1025,8 +1010,7 @@ class drug_transformer_():
 
 		X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
 		                        #relative_pos_enc=self.relative_pos_enc_lookup,
-		                        relative_pos_enc=rel_pos_dist,
-		                        
+		                        relative_pos_enc=rel_pos_dist,	       
 		                        if_sparse_max=False)
 		#X = self.kernel_value(X)
 
@@ -1079,16 +1063,14 @@ class drug_transformer_():
 		                        relative_pos_enc=rel_position_embedding,
 		                        edge_type_enc = edge_type_embedding_,
 		                        #relative_pos_origin_ = rel_position_embedding_origin,
-		                        if_sparse_max=False,
-		                        if_bias_=False)
+		                        if_sparse_max=False)
 
 		X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
 		                        #relative_pos_enc=self.relative_pos_enc_lookup,
 		                        relative_pos_enc=rel_position_embedding,
 		                        edge_type_enc = edge_type_embedding_,
 		                        #relative_pos_origin_ = rel_position_embedding_origin,
-		                        if_sparse_max=False,
-		                        if_bias_=False)
+		                        if_sparse_max=False)
 
 		#X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
 		                             #relative_pos_enc=self.relative_pos_enc_lookup)
@@ -1115,7 +1097,8 @@ class drug_transformer_():
 		X = tf.multiply(X, mask)
 		"""
 		#X_global = self.flattern_global(X)
-		X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=1),axis=-1)
+		X_global = tf.reduce_sum(X, axis=1)
+		X_global = tf.math.divide(X_global, enc_valid_lens_)
 		X_global = tf.expand_dims(X_global, axis=1)
 		X_global = self.dense_9(X_global)
 		
