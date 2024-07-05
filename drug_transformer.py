@@ -1059,6 +1059,7 @@ class drug_transformer_():
         edge_type_embedding = Input((70,70,5))
         #rel_position_embedding_origin = Input((80,80,60))
         enc_valid_lens_ = Input(())
+
         
         shape_input = tf.shape(X_input)
         gene_embedding = self.input_gene_embeddings
@@ -1087,14 +1088,29 @@ class drug_transformer_():
                                 #relative_pos_origin_ = rel_position_embedding_origin,
                                 if_sparse_max=False,
                                 if_bias_=False)
+
         #X_enc_2, att = self.encoder_2(X, enc_valid_lens=enc_valid_lens_,
                                      #relative_pos_enc=self.relative_pos_enc_lookup)
         #X_enc_3, att = self.encoder_3(X, enc_valid_lens=enc_valid_lens_)
         #X = tf.concat([X_enc_1, X_enc_2],axis=-1)
     
         X = self.dense_1(X)
+
+        mask = tf.range(start=0, limit=70, dtype=tf.float32)
+        mask = tf.broadcast_to(tf.expand_dims(mask,axis=0),shape=[shape_input[0],70])
+        mask = tf.reshape(mask, shape=(mask.shape[0]*mask.shape[1]))
+        mask = mask < tf.cast(tf.repeat(enc_valid_lens_,repeats=70),tf.float32)
+        mask = tf.where(mask,1,0)
+        mask = tf.reshape(mask, shape=(shape_input[0],70))
+
+        shape_x = tf.shape(X)
+        mask = tf.expand_dims(mask, axis=-1)
+		mask = tf.broadcast_to(mask, shape=shape_x)
+
+		X = tf.multiply(X, mask)
         
-        X_global = self.flattern_global(X)
+        #X_global = self.flattern_global(X)
+        X_global = tf.math.l2_normalize(tf.reduce_sum(X, axis=1),axis=-1)
         X_global = tf.expand_dims(X_global, axis=1)
         X_global = self.dense_9(X_global)
         
