@@ -1098,7 +1098,7 @@ class drug_transformer_():
 
 		mask = tf.range(start=0, limit=70, dtype=tf.float32)
 		mask = tf.broadcast_to(tf.expand_dims(mask,axis=0),shape=[shape_input[0],70])
-		mask = tf.reshape(mask, shape=(mask.shape[0]*mask.shape[1]))
+		mask = tf.reshape(mask, shape=(shape_input[0]*70))
 		mask = mask < tf.cast(tf.repeat(enc_valid_lens_,repeats=70),tf.float32)
 		mask = tf.where(mask,1,0)
 		mask = tf.reshape(mask, shape=(shape_input[0],70))
