@@ -1057,6 +1057,7 @@ class drug_transformer_():
 		gene_mutation_input = Input((6144, 2))
 		rel_position_embedding = Input((70,70,60))
 		edge_type_embedding = Input((70,70,5))
+		mask_input = Input((70,1))
 		#rel_position_embedding_origin = Input((80,80,60))
 		enc_valid_lens_ = Input(())
 
@@ -1095,6 +1096,10 @@ class drug_transformer_():
 		#X = tf.concat([X_enc_1, X_enc_2],axis=-1)
 
 		X = self.dense_1(X)
+		shape_x = tf.shape(X)
+
+		mask = tf.cast(tf.broadcast_to(mask, shape=shape_x),tf.float32)
+		X = tf.multiply(mask,X)
 		"""
 		mask = tf.range(start=0, limit=70, dtype=tf.float32)
 		mask = tf.broadcast_to(tf.expand_dims(mask,axis=0),shape=[shape_input[0],70])
