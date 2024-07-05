@@ -1105,7 +1105,7 @@ class drug_transformer_():
 
 		shape_x = tf.shape(X)
 		mask = tf.expand_dims(mask, axis=-1)
-		mask = tf.broadcast_to(mask, shape=shape_x)
+		mask = tf.cast(tf.broadcast_to(mask, shape=shape_x),floa32)
 
 		X = tf.multiply(X, mask)
 
@@ -1114,7 +1114,7 @@ class drug_transformer_():
 		X_global = tf.expand_dims(X_global, axis=1)
 		X_global = self.dense_9(X_global)
 
-		"""
+		"""s
 		self-attention for the decoder
 		"""
 		Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
