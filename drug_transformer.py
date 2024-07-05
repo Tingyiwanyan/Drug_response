@@ -740,7 +740,7 @@ class encoder_block(tf.keras.layers.Layer):
 		super().__init__()
 		self.masked_softmax = masked_softmax()
 		self.pos_encoding = positionalencoding(num_hiddens,seq_length)
-		self.dotproductattention = dotproductattention(num_hiddens, if_self_att=if_self_att_, if_bias=if_bias_)
+		self.dotproductattention = dotproductattention(num_hiddens, if_self_att=if_self_att_)
 		self.att_embedding = attention_embedding(num_hiddens)
 		self.r_connection = residual_connection()
 
