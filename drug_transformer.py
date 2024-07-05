@@ -834,9 +834,9 @@ class feature_selection_cross_block(tf.keras.layers.Layer):
 
 
 class drug_transformer_():
-		"""
-		Implement the drug transformer model architecture
-		"""
+	"""
+	Implement the drug transformer model architecture
+	"""
 	def __init__(self, gene_embeddings):#, relative_pos_enc_lookup=None):
 
 		#self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
@@ -1048,7 +1048,7 @@ class drug_transformer_():
 
 		return self.model
 
-		def model_construction_midi(self, if_mutation=None):
+	def model_construction_midi(self, if_mutation=None):
 		"""
 		construct the transformer model
 		"""
@@ -1186,7 +1186,7 @@ class drug_transformer_():
 
 		return self.model
 
-		def model_construction_deeptta(self):
+	def model_construction_deeptta(self):
 		"""
 		construct the transformer model
 		"""
