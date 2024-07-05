@@ -1089,9 +1089,9 @@ class drug_transformer_():
 
 		X = tf.multiply(X, mask)
 		"""
-		#X_global = self.flattern_global(X)
-		X_global = tf.reduce_sum(X, axis=1)
-		X_global = tf.math.divide(X_global, tf.expand_dims(enc_valid_lens_,axis=-1))
+		X_global = self.flattern_global(X)
+		#X_global = tf.reduce_sum(X, axis=1)
+		#X_global = tf.math.divide(X_global, tf.expand_dims(enc_valid_lens_,axis=-1))
 		X_global = tf.expand_dims(X_global, axis=1)
 		X_global = self.dense_9(X_global)
 
