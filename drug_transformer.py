@@ -1158,7 +1158,7 @@ class drug_transformer_():
 		Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input，mask_input), outputs=[Y, score_cross_global])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
