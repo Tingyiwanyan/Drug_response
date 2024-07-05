@@ -834,252 +834,252 @@ class feature_selection_cross_block(tf.keras.layers.Layer):
 
 
 class drug_transformer_():
-    """
-    Implement the drug transformer model architecture
-    """
-    def __init__(self, gene_embeddings):#, relative_pos_enc_lookup=None):
+		"""
+		Implement the drug transformer model architecture
+		"""
+	def __init__(self, gene_embeddings):#, relative_pos_enc_lookup=None):
 
-        #self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
-        #self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
-    
-        #self.input_gene_expression_names = tf.constant(gene_expression_vocab)
-        #self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
-    
-        #self.relative_pos_enc_lookup = relative_pos_enc_lookup
-    
-        #self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
-    
-        self.input_gene_embeddings = gene_embeddings
-    
-        self.masked_softmax_ = masked_softmax()
-        self.masked_softmax_2 = masked_softmax()
-        self.masked_softmax_deco_self = masked_softmax()
-        self.masked_softmax_deco_self2 = masked_softmax()
-        self.masked_softmax_deco_cross = masked_softmax()
-        self.masked_softmax_deco_cross2 = masked_softmax()
-    
-        self.feature_selection = feature_selection_layer_global_drug()
-    
-        """
-        global decoder
-        """
-        self.decoder_global_1 = decoder_cross_block(30)#, if_select_feature_=True)
-        self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
-        self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
-    
-        self.encoder_1 = encoder_block(60,130)
-    
-        self.encoder_2 = encoder_block(60,130)
-        self.encoder_3 = encoder_block(30,130)
-        self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
+		#self.string_lookup = tf.keras.layers.StringLookup(vocabulary=gene_expression_vocab)
+		#self.layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=5843, output_mode="one_hot")
 
-        """
-        1st head attention
-        """
-        self.dotproductattention1 = dotproductattention(30)
-    
-        self.dotproductattention_deco = dotproductattention_column(30)
-    
-        self.dotproductattention_deco_cross = dotproductattention(30)
-    
-        self.decoder_cross_1 = decoder_cross_block(60)
-    
-        """
-        2nd head attention
-        """
-        self.dotproductattention2 = dotproductattention(15)
-    
-        self.dotproductattention_deco2 = dotproductattention(10)
-    
-        self.dotproductattention_deco_cross2 = dotproductattention(10)
-    
-        self.decoder_cross_2 = decoder_cross_block(60)
-    
-    
-        """
-        3rd head attention
-        """
-        self.dotproductattention3 = dotproductattention(10)
-    
-        self.dotproductattention_deco3 = dotproductattention(10)
-    
-        self.dotproductattention_deco_cross3 = dotproductattention(10)
-    
-        self.decoder_cross_3 = decoder_cross_block(10)
-    
-        self.decoder_cross_4 = decoder_cross_block(30)
-        self.decoder_cross_5 = decoder_cross_block(30)
-        self.decoder_cross_6 = decoder_cross_block(30)
-    
-    
-    
-        #self.att_embedding = attention_embedding()
-        self.r_connection = residual_connection()
-        self.r_connection_gene_emb = residual_connection()
-        self.r_connection_gene_mutate = residual_connection()
-        self.r_connection_multi_deco_gene = residual_connection()
-        self.r_connection_feature = residual_connection()
-    
-        self.dense_0 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             use_bias=False,
-                                             kernel_regularizer=regularizers.L2(1e-4))
-                                             #bias_initializer=initializers.Zeros(), name="dense_0")
-    
-        self.dense_1 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             use_bias=False,
-                                             kernel_regularizer=regularizers.L2(1e-4))
-                                             #bias_initializer=initializers.Zeros(), name="dense_1")
-    
-        self.dense_2 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_2")
-        
-        self.dense_3 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_3")
-    
-        self.dense_4 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_4")
-    
-        self.dense_8 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_8")
-    
-        self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
+		#self.input_gene_expression_names = tf.constant(gene_expression_vocab)
+		#self.input_gene_expression_index = self.string_lookup(self.input_gene_expression_names)-1
+
+		#self.relative_pos_enc_lookup = relative_pos_enc_lookup
+
+		#self.input_gene_expression_one_hot = self.layer_one_hot(self.input_gene_expression_index)
+
+		self.input_gene_embeddings = gene_embeddings
+
+		self.masked_softmax_ = masked_softmax()
+		self.masked_softmax_2 = masked_softmax()
+		self.masked_softmax_deco_self = masked_softmax()
+		self.masked_softmax_deco_self2 = masked_softmax()
+		self.masked_softmax_deco_cross = masked_softmax()
+		self.masked_softmax_deco_cross2 = masked_softmax()
+
+		self.feature_selection = feature_selection_layer_global_drug()
+
+		"""
+		global decoder
+		"""
+		self.decoder_global_1 = decoder_cross_block(30)#, if_select_feature_=True)
+		self.decoder_global_2 = decoder_cross_block(30, if_select_feature_=True)
+		self.decoder_global_3 = decoder_cross_block(30, if_select_feature_=True)
+
+		self.encoder_1 = encoder_block(60,130)
+
+		self.encoder_2 = encoder_block(60,130)
+		self.encoder_3 = encoder_block(30,130)
+		self.feature_select_cross = feature_selection_cross_block(60, if_select_feature_=True)
+
+		"""
+		1st head attention
+		"""
+		self.dotproductattention1 = dotproductattention(30)
+
+		self.dotproductattention_deco = dotproductattention_column(30)
+
+		self.dotproductattention_deco_cross = dotproductattention(30)
+
+		self.decoder_cross_1 = decoder_cross_block(60)
+
+		"""
+		2nd head attention
+		"""
+		self.dotproductattention2 = dotproductattention(15)
+
+		self.dotproductattention_deco2 = dotproductattention(10)
+
+		self.dotproductattention_deco_cross2 = dotproductattention(10)
+
+		self.decoder_cross_2 = decoder_cross_block(60)
+
+
+		"""
+		3rd head attention
+		"""
+		self.dotproductattention3 = dotproductattention(10)
+
+		self.dotproductattention_deco3 = dotproductattention(10)
+
+		self.dotproductattention_deco_cross3 = dotproductattention(10)
+
+		self.decoder_cross_3 = decoder_cross_block(10)
+
+		self.decoder_cross_4 = decoder_cross_block(30)
+		self.decoder_cross_5 = decoder_cross_block(30)
+		self.decoder_cross_6 = decoder_cross_block(30)
+
+
+
+		#self.att_embedding = attention_embedding()
+		self.r_connection = residual_connection()
+		self.r_connection_gene_emb = residual_connection()
+		self.r_connection_gene_mutate = residual_connection()
+		self.r_connection_multi_deco_gene = residual_connection()
+		self.r_connection_feature = residual_connection()
+
+		self.dense_0 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     use_bias=False,
+		                                     kernel_regularizer=regularizers.L2(1e-4))
+		                                     #bias_initializer=initializers.Zeros(), name="dense_0")
+
+		self.dense_1 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     use_bias=False,
+		                                     kernel_regularizer=regularizers.L2(1e-4))
+		                                     #bias_initializer=initializers.Zeros(), name="dense_1")
+
+		self.dense_2 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_2")
+
+		self.dense_3 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_3")
+
+		self.dense_4 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_4")
+
+		self.dense_8 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_8")
+
+		self.dense_5 = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
 								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_5")
 
-        self.dense_bias = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
+		self.dense_bias = tf.keras.layers.Dense(1, kernel_initializer=initializers.RandomNormal(seed=42),
 								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="drug_bias_layer")
-    
-        self.dense_6 = tf.keras.layers.Dense(1, activation='relu', 
-                                             kernel_initializer=initializers.RandomNormal(seed=42),
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_6")
-    
-    
-        self.dense_9 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                             activation='relu',
-                                             kernel_regularizer=regularizers.L2(1e-4),
-                                             bias_initializer=initializers.Zeros(), name="dense_9")
-        
-        self.dense_12 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
-                                              activation='relu',
-                                              kernel_regularizer=regularizers.L2(1e-4),
-                                              bias_initializer=initializers.Zeros(), name="dense_12")
-        
-        self.dense_13 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                              activation='relu',
-                                              kernel_regularizer=regularizers.L2(1e-4),
-                                              bias_initializer=initializers.Zeros(), name="dense_13")
 
-        self.dense_14 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                              activation='relu',
-                                              kernel_regularizer=regularizers.L2(1e-4),
-                                              bias_initializer=initializers.Zeros(), name="dense_14")
-
-        self.dense_15 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
-                                              activation='relu',
-                                              kernel_regularizer=regularizers.L2(1e-4),
-                                              bias_initializer=initializers.Zeros(), name="dense_15")
-    
-        
-        self.pos_encoding = positionalencoding(30,130)
-    
-        self.pos_encoding_gene = positionalencoding(30, 5370)
-        self.flattern_enco = tf.keras.layers.Flatten()
-        self.flattern_deco = tf.keras.layers.Flatten()
-        self.flattern_score = tf.keras.layers.Flatten()
-        self.flattern_global = tf.keras.layers.Flatten()
-        self.flattern_global_ = tf.keras.layers.Flatten()
+		self.dense_6 = tf.keras.layers.Dense(1, activation='relu', 
+		                                     kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_6")
 
 
-        self.dotproductattention = dotproductattention(768)
+		self.dense_9 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_9")
 
-        self.kernel_value = tf.keras.layers.Dense(768, kernel_initializer=initializers.RandomNormal(seed=42),
-                                                  kernel_regularizer=regularizers.L2(1e-4),
-                                                  bias_initializer=initializers.Zeros())
+		self.dense_12 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                      activation='relu',
+		                                      kernel_regularizer=regularizers.L2(1e-4),
+		                                      bias_initializer=initializers.Zeros(), name="dense_12")
 
-    def temp_model(self):
-        X_input = Input((130, 8))
-        Y_input = Input((5370, 1))
-        rel_pos_dist = Input((130,130,768))
-        enc_valid_lens_ = Input(())
-        
-        shape_input = tf.shape(X_input)
-        gene_embedding = self.input_gene_embeddings
-        gene_embedding = tf.expand_dims(gene_embedding, axis=0)
-        gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
-    
-        gene_embedding = self.dense_3(gene_embedding)
+		self.dense_13 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                      activation='relu',
+		                                      kernel_regularizer=regularizers.L2(1e-4),
+		                                      bias_initializer=initializers.Zeros(), name="dense_13")
 
-        X = self.dense_0(X_input)
+		self.dense_14 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                      activation='relu',
+		                                      kernel_regularizer=regularizers.L2(1e-4),
+		                                      bias_initializer=initializers.Zeros(), name="dense_14")
 
-        X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
-                                #relative_pos_enc=self.relative_pos_enc_lookup,
-                                relative_pos_enc=rel_pos_dist,
-                                
-                                if_sparse_max=False)
-        #X = self.kernel_value(X)
+		self.dense_15 = tf.keras.layers.Dense(60, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                      activation='relu',
+		                                      kernel_regularizer=regularizers.L2(1e-4),
+		                                      bias_initializer=initializers.Zeros(), name="dense_15")
 
-        X = self.dense_1(X)
-        Y = self.dense_2(Y_input)
-        Y = tf.concat([gene_embedding, Y],axis=-1)
 
-        
-        #Y, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-        #Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-    
-        #Y = tf.concat([Y1,Y2],axis=-1)
-        
-        Y = self.dense_5(X)
-       
-        self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
-    
-        self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
-    
-        return self.model
-    
-    def model_construction_midi(self, if_mutation=None):
-        """
-        construct the transformer model
-        """
-        X_input = Input((70, 8))
-        Y_input = Input((6144, 1))
-        gene_mutation_input = Input((6144, 2))
-        rel_position_embedding = Input((70,70,60))
-        edge_type_embedding = Input((70,70,5))
-        #rel_position_embedding_origin = Input((80,80,60))
-        enc_valid_lens_ = Input(())
+		self.pos_encoding = positionalencoding(30,130)
 
-        
-        shape_input = tf.shape(X_input)
-        gene_embedding = self.input_gene_embeddings
-        gene_embedding = tf.expand_dims(gene_embedding, axis=0)
-        gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
-    
-        gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
+		self.pos_encoding_gene = positionalencoding(30, 5370)
+		self.flattern_enco = tf.keras.layers.Flatten()
+		self.flattern_deco = tf.keras.layers.Flatten()
+		self.flattern_score = tf.keras.layers.Flatten()
+		self.flattern_global = tf.keras.layers.Flatten()
+		self.flattern_global_ = tf.keras.layers.Flatten()
 
-        #rel_position_embedding_ = tf.math.l2_normalize(self.dense_13(rel_position_embedding), axis = -1)
-        edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
-        
-        X = self.dense_0(X_input)
-        #X = self.pos_encoding(X)
-        X, att, score = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
-                                #relative_pos_enc=self.relative_pos_enc_lookup,
-                                relative_pos_enc=rel_position_embedding,
-                                edge_type_enc = edge_type_embedding_,
-                                #relative_pos_origin_ = rel_position_embedding_origin,
-                                if_sparse_max=False,
-                                if_bias_=False)
+
+		self.dotproductattention = dotproductattention(768)
+
+		self.kernel_value = tf.keras.layers.Dense(768, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                          kernel_regularizer=regularizers.L2(1e-4),
+		                                          bias_initializer=initializers.Zeros())
+
+	def temp_model(self):
+		X_input = Input((130, 8))
+		Y_input = Input((5370, 1))
+		rel_pos_dist = Input((130,130,768))
+		enc_valid_lens_ = Input(())
+
+		shape_input = tf.shape(X_input)
+		gene_embedding = self.input_gene_embeddings
+		gene_embedding = tf.expand_dims(gene_embedding, axis=0)
+		gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
+
+		gene_embedding = self.dense_3(gene_embedding)
+
+		X = self.dense_0(X_input)
+
+		X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
+		                        #relative_pos_enc=self.relative_pos_enc_lookup,
+		                        relative_pos_enc=rel_pos_dist,
+		                        
+		                        if_sparse_max=False)
+		#X = self.kernel_value(X)
+
+		X = self.dense_1(X)
+		Y = self.dense_2(Y_input)
+		Y = tf.concat([gene_embedding, Y],axis=-1)
+
+
+		#Y, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+		#Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+
+		#Y = tf.concat([Y1,Y2],axis=-1)
+
+		Y = self.dense_5(X)
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
+
+		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+		return self.model
+
+		def model_construction_midi(self, if_mutation=None):
+		"""
+		construct the transformer model
+		"""
+		X_input = Input((70, 8))
+		Y_input = Input((6144, 1))
+		gene_mutation_input = Input((6144, 2))
+		rel_position_embedding = Input((70,70,60))
+		edge_type_embedding = Input((70,70,5))
+		#rel_position_embedding_origin = Input((80,80,60))
+		enc_valid_lens_ = Input(())
+
+
+		shape_input = tf.shape(X_input)
+		gene_embedding = self.input_gene_embeddings
+		gene_embedding = tf.expand_dims(gene_embedding, axis=0)
+		gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
+
+		gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
+
+		#rel_position_embedding_ = tf.math.l2_normalize(self.dense_13(rel_position_embedding), axis = -1)
+		edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
+
+		X = self.dense_0(X_input)
+		#X = self.pos_encoding(X)
+		X, att, score = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
+		                        #relative_pos_enc=self.relative_pos_enc_lookup,
+		                        relative_pos_enc=rel_position_embedding,
+		                        edge_type_enc = edge_type_embedding_,
+		                        #relative_pos_origin_ = rel_position_embedding_origin,
+		                        if_sparse_max=False,
+		                        if_bias_=False)
 
 		X, att, score = self.encoder_2(X, enc_valid_lens=enc_valid_lens_, 
 		                        #relative_pos_enc=self.relative_pos_enc_lookup,
@@ -1127,95 +1127,95 @@ class drug_transformer_():
 		    #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
 		    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
 		    Y = tf.math.add(Y, Y_gene_mutate)
-        #Y = self.pos_encoding_gene(Y)
-    
-        """
-        cross attention for the decoder
-        """
-    
-        #Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-        #Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-    
-        #Y = tf.concat([Y1,Y2],axis=-1)
+		#Y = self.pos_encoding_gene(Y)
 
-        #Y = tf.math.add(Y1,Y2)
+		"""
+		cross attention for the decoder
+		"""
 
-        #Y = self.r_connection_multi_deco_gene(Y1,Y2)
+		#Y1, att_score_deco_cross1, Y1_key = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
+		#Y2, att_score_deco_cross2, Y2_key = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
 
-        #Y = self.dense_15(Y)
-    
-        X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
-        X_global, att_score_global2, Y_key, score_cross_global = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
-        #X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+		#Y = tf.concat([Y1,Y2],axis=-1)
 
-        #X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
-        #X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
-        #X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
-        
-        #X_global = X_global1
-        #att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
-        att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
-        #att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
+		#Y = tf.math.add(Y1,Y2)
 
-        #X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
-        #Y_key = tf.math.multiply(att_score_global2, Y_key)
-        #Y_key = tf.math.add(X_global_att, Y_key)
+		#Y = self.r_connection_multi_deco_gene(Y1,Y2)
 
-        #X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
+		#Y = self.dense_15(Y)
 
-        Y_key = self.dense_6(Y_key)
-        #Y_key2 = self.dense_6(Y_key2)
-        #Y_key3 = self.dense_6(Y_key3)
-        #att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
-        Y_global = tf.math.multiply(att_score_global2, Y_key)
-        #Y_global = self.r_connection_feature(Y_key, Y_global)
-        #Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
-        #Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
-        #Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
-        Y = Y_global
-        X_global = self.flattern_global_(X_global)
-        #Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-        Y = self.flattern_deco(Y)
-        Y = tf.concat([X_global, Y], axis=-1)   
-        Y = self.dense_5(Y)
-        #Y_bias = self.dense_bias(X_global)
-        #Y = tf.math.add(Y,Y_bias)
-    	
-        self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=[Y,score_cross_global])
-        #self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
-    
-        return self.model
-    
-    def model_construction_deeptta(self):
-        """
-        construct the transformer model
-        """
-        X_input = Input((130, 22))
-        Y_input = Input((5370, 1))
-        enc_valid_lens_ = Input(())
-    
-        shape_input = tf.shape(X_input)
-    
-        X = self.dense_0(X_input)
-        X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_)
-        X_global = self.flattern_global(X)
-        #X_global = tf.expand_dims(X_global, axis=1)
-        X = self.dense_9(X)
-    
-        Y = self.dense_2(Y_input)
-        Y = self.pos_encoding_gene(Y)
-        Y = self.dense_6(Y)
-    
-        X_global = self.flattern_global_(X)
-    
-        Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-        Y = tf.concat([X_global, Y], axis=-1)
-        Y = self.dense_5(Y)
-    
-        self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
-        self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
-    
-        return self.model
+		X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
+		X_global, att_score_global2, Y_key, score_cross_global = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
+		#X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
+
+		#X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
+		#X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
+		#X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
+
+		#X_global = X_global1
+		#att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
+		att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+		#att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
+
+		#X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
+		#Y_key = tf.math.multiply(att_score_global2, Y_key)
+		#Y_key = tf.math.add(X_global_att, Y_key)
+
+		#X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
+
+		Y_key = self.dense_6(Y_key)
+		#Y_key2 = self.dense_6(Y_key2)
+		#Y_key3 = self.dense_6(Y_key3)
+		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
+		Y_global = tf.math.multiply(att_score_global2, Y_key)
+		#Y_global = self.r_connection_feature(Y_key, Y_global)
+		#Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
+		#Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
+		#Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
+		Y = Y_global
+		X_global = self.flattern_global_(X_global)
+		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
+		Y = self.flattern_deco(Y)
+		Y = tf.concat([X_global, Y], axis=-1)   
+		Y = self.dense_5(Y)
+		#Y_bias = self.dense_bias(X_global)
+		#Y = tf.math.add(Y,Y_bias)
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input), outputs=[Y,score_cross_global])
+		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+		return self.model
+
+		def model_construction_deeptta(self):
+		"""
+		construct the transformer model
+		"""
+		X_input = Input((130, 22))
+		Y_input = Input((5370, 1))
+		enc_valid_lens_ = Input(())
+
+		shape_input = tf.shape(X_input)
+
+		X = self.dense_0(X_input)
+		X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_)
+		X_global = self.flattern_global(X)
+		#X_global = tf.expand_dims(X_global, axis=1)
+		X = self.dense_9(X)
+
+		Y = self.dense_2(Y_input)
+		Y = self.pos_encoding_gene(Y)
+		Y = self.dense_6(Y)
+
+		X_global = self.flattern_global_(X)
+
+		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
+		Y = tf.concat([X_global, Y], axis=-1)
+		Y = self.dense_5(Y)
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
+		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
+
+		return self.model
 
 
 def return_drug_gene(CCLE_name_test, drug_name_list_test, gene_expression_test, drug_one_hot_encoding_test, drug_smile_length_test, ic50_list_test, drug_smile_list_test, drug_name):
