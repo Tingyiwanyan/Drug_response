@@ -1037,6 +1037,7 @@ class drug_transformer_():
 		edge_type_embedding = Input((70,70,5))
 		#rel_position_embedding_origin = Input((80,80,60))
 		enc_valid_lens_ = Input(())
+		mask_input = Input((70,1))
 
 		shape_input = tf.shape(X_input)
 		gene_embedding = self.input_gene_embeddings
