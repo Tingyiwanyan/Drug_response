@@ -1148,11 +1148,11 @@ class drug_transformer_():
 		#Y_key3 = self.dense_6(Y_key3)
 		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
 		Y_global = tf.math.multiply(att_score_global2, Y_key)
-		Y_global = self.r_connection_feature(Y_key, Y_global)
+		#Y_global = self.r_connection_feature(Y_key, Y_global)
 		#Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
 		#Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
 		#Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
-		Y = Y_globals
+		Y = Y_global
 		X_global = self.flattern_global_(X_global)
 		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.flattern_deco(Y)
