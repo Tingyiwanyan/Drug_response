@@ -1098,7 +1098,7 @@ class drug_transformer_():
 		X = self.dense_1(X)
 		shape_x = tf.shape(X)
 
-		mask = tf.cast(tf.broadcast_to(mask, shape=shape_x),tf.float32)
+		mask = tf.cast(tf.broadcast_to(mask_input, shape=shape_x),tf.float32)
 		X = tf.multiply(mask,X)
 		"""
 		mask = tf.range(start=0, limit=70, dtype=tf.float32)
