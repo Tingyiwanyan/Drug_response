@@ -1049,8 +1049,8 @@ class drug_transformer_():
 		gene_embedding = tf.expand_dims(gene_embedding, axis=0)
 		gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
 
-		#gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
-		gene_embedding = self.dense_3(gene_embedding)
+		gene_embedding = tf.math.l2_normalize(self.dense_3(gene_embedding),axis=-1)
+		#gene_embedding = self.dense_3(gene_embedding)
 
 		#rel_position_embedding_ = tf.math.l2_normalize(self.dense_13(rel_position_embedding), axis = -1)
 		edge_type_embedding_ = tf.math.l2_normalize(self.dense_8(edge_type_embedding),axis=-1)
@@ -1104,15 +1104,15 @@ class drug_transformer_():
 		"""
 		self-attention for the decoder
 		"""
-		#Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
-		Y = self.dense_2(Y_input)
+		Y = tf.math.l2_normalize(self.dense_2(Y_input),axis=-1)
+		#Y = self.dense_2(Y_input)
 		#Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
 		#Y = self.r_connection_gene_emb(Y, gene_embedding)
 		#Y = tf.math.add(Y, gene_embedding)
 		Y = tf.concat([Y,gene_embedding], axis=-1)
 
 		if not if_mutation == None:
-		    Y_gene_mutate = self.dense_14(gene_mutation_input)
+		    Y_gene_mutate = tf.math.l2_normalize(self.dense_14(gene_mutation_input),axis=-1)
 		    #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
 		    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
 		    #Y = tf.math.add(Y, Y_gene_mutate)
