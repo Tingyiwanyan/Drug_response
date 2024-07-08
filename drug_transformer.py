@@ -978,6 +978,11 @@ class drug_transformer_():
 								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_17")
 
+		self.dense_18 = tf.keras.layers.Dense(30, kernel_initializer=initializers.RandomNormal(seed=42),
+		                                     activation='relu',
+		                                     kernel_regularizer=regularizers.L2(1e-4),
+		                                     bias_initializer=initializers.Zeros(), name="dense_18")
+
 		self.pos_encoding = positionalencoding(30,130)
 
 		self.pos_encoding_gene = positionalencoding(30, 5370)
@@ -1167,16 +1172,18 @@ class drug_transformer_():
 		#Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
 		#Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
 		Y = Y_global
-		X_global = self.dense_17(X_global)
 		X_global = self.flattern_global_(X_global)
-		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
+		X_global = tf.math.l2_normalize(X_global, axis=-1)
+		X_global = self.dense_17(X_global)
 		Y = self.flattern_deco(Y)
+		Y = self.dense_18(Y)
+		Y = tf.math.l2_normalize(Y, axis=-1)
 		#Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
 		Y_predict = tf.math.add(Y, X_global)
 
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X, Y])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X_global, Y])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
