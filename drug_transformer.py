@@ -1167,7 +1167,7 @@ class drug_transformer_():
 		X_global = self.flattern_global_(X_global)
 		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.flattern_deco(Y)
-		Y = tf.concat([X_global_, Y], axis=-1)   
+		Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
 
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global, X])
