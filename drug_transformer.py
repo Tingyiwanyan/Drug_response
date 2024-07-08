@@ -1108,15 +1108,15 @@ class drug_transformer_():
 		#Y = self.dense_2(Y_input)
 		#Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
 		#Y = self.r_connection_gene_emb(Y, gene_embedding)
-		#Y = tf.math.add(Y, gene_embedding)
-		Y = tf.concat([Y,gene_embedding], axis=-1)
+		Y = tf.math.add(Y, gene_embedding)
+		#Y = tf.concat([Y,gene_embedding], axis=-1)
 
 		if not if_mutation == None:
 		    Y_gene_mutate = tf.math.l2_normalize(self.dense_14(gene_mutation_input),axis=-1)
 		    #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
 		    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
-		    #Y = tf.math.add(Y, Y_gene_mutate)
-		    Y = tf.concat([Y, Y_gene_mutate], axis=-1)
+		    Y = tf.math.add(Y, Y_gene_mutate)
+		    #Y = tf.concat([Y, Y_gene_mutate], axis=-1)
 		#Y = self.pos_encoding_gene(Y)
 
 		Y = self.dense_16(Y)
@@ -1167,10 +1167,10 @@ class drug_transformer_():
 		X_global = self.flattern_global_(X_global)
 		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
 		Y = self.flattern_deco(Y)
-		Y = tf.concat([X_global, Y], axis=-1)   
+		Y = tf.concat([X_global_, Y], axis=-1)   
 		Y = self.dense_5(Y)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global, X])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
