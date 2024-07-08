@@ -978,7 +978,6 @@ class drug_transformer_():
 								        	 #kernel_regularizer=regularizers.L2(1e-4),
 								        	 bias_initializer=initializers.Zeros(), name="dense_17")
 
-
 		self.pos_encoding = positionalencoding(30,130)
 
 		self.pos_encoding_gene = positionalencoding(30, 5370)
@@ -1099,11 +1098,11 @@ class drug_transformer_():
 
 		X = tf.multiply(X, mask)
 		"""
-		X_global_ = self.flattern_global(X)
+		X_global = self.flattern_global(X)
 		#X_global = tf.reduce_sum(X, axis=1)
 		#X_global = tf.math.divide(X_global, tf.expand_dims(enc_valid_lens_,axis=-1))
-		X_global_ = tf.expand_dims(X_global_, axis=1)
-		X_global_ = self.dense_9(X_global_)
+		X_global = tf.expand_dims(X_global, axis=1)
+		X_global = self.dense_9(X_global)
 
 		"""
 		self-attention for the decoder
@@ -1140,7 +1139,7 @@ class drug_transformer_():
 
 		#Y = self.dense_15(Y)
 
-		X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global_, Y, if_sparse_max=False)#, if_select_feature_=None)
+		X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
 		X_global, att_score_global2, Y_key, score_cross_global = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
 		#X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
@@ -1168,15 +1167,16 @@ class drug_transformer_():
 		#Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
 		#Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
 		Y = Y_global
+		X_global = self.dense_17(X_global)
 		X_global = self.flattern_global_(X_global)
 		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-		#X_global_bias = self.dense_17(self.flattern_global(X_global_))
 		Y = self.flattern_deco(Y)
-		Y = tf.concat([X_global, Y], axis=-1)   
+		#Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
-		#Y = tf.math.add(Y, X_global_bias)
+		Y_predict = tf.math.add(Y, X_global)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global, X])
+
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X, Y])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
