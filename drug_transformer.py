@@ -1170,13 +1170,13 @@ class drug_transformer_():
 		Y = Y_global
 		X_global = self.flattern_global_(X_global)
 		#Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-		X_global_bias = self.dense_17(X_global)
+		X_global_bias = self.dense_17(X_global_)
 		Y = self.flattern_deco(Y)
 		Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
 		Y = tf.math.add(Y, X_global_bias)
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global, X, X_global_])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y, score_cross_global, X, X_global_bias])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
