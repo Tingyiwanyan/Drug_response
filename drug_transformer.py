@@ -1127,7 +1127,7 @@ class drug_transformer_():
 		    Y = tf.concat([Y, Y_gene_mutate], axis=-1)
 		#Y = self.pos_encoding_gene(Y)
 
-		Y = self.dense_16(Y)
+		#Y = self.dense_16(Y)
 
 		"""
 		cross attention for the decoder
@@ -1152,8 +1152,8 @@ class drug_transformer_():
 		#X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
 		#X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
 
-		#Y = tf.concat([Y,Y_key], axis=-1)
-		#Y = self.dense_16(Y)
+		Y = tf.concat([Y,Y_key], axis=-1)
+		Y = self.dense_16(Y)
 
 		#X_global = X_global1
 		#att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
@@ -1161,26 +1161,29 @@ class drug_transformer_():
 		#att_score_global3 = tf.transpose(att_score_global3, perm=[0,2,1])
 
 		#X_global_att = tf.broadcast_to(X_global, shape=[shape_input[0], Y_key.shape[1], Y_key.shape[-1]])
-		#Y_key = tf.math.multiply(att_score_global2, Y_key)
+		#Y_key = tf.math.multiply(att_score_global2, Y_key)s
 		#Y_key = tf.math.add(X_global_att, Y_key)
 
 		#X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-		Y_key = self.dense_6(Y)
+		#Y_key = self.dense_6(Y)
 		#Y_key2 = self.dense_6(Y_key2)
 		#Y_key3 = self.dense_6(Y_key3)
 		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
-		Y_global = tf.math.multiply(att_score_global2, Y_key)
+		Y_global = tf.math.multiply(att_score_global2, Y)
+		Y_global = tf.reduce_sum(Y_global, axis=1)
+
+		#Y = self.dense_16(Y)
 		#Y_global = self.r_connection_feature(Y_key, Y_global)
 		#Y_global2 = tf.math.multiply(att_score_global2, Y_key2)
 		#Y_global3 = tf.math.multiply(att_score_global3, Y_key3)
 		#Y = tf.concat([Y_global1, Y_global2, Y_global3],axis=-1)
 		Y = Y_global
 		X_global = self.flattern_global_(X_global_)
-		#X_global = tf.math.l2_normalize(X_global, axis=-1)
+		X_global = tf.math.l2_normalize(X_global, axis=-1)
 		X_global = self.dense_17(X_global)
 		Y = self.flattern_deco(Y)
 		Y = self.dense_18(Y)
-		#Y = tf.math.l2_normalize(Y, axis=-1)
+		Y = tf.math.l2_normalize(Y, axis=-1)
 		#Y = tf.concat([X_global, Y], axis=-1)   
 		Y = self.dense_5(Y)
 		Y_predict = tf.math.add(Y, X_global)
