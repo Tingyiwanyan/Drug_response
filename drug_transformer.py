@@ -1127,7 +1127,7 @@ class drug_transformer_():
 		    Y = tf.concat([Y, Y_gene_mutate], axis=-1)
 		#Y = self.pos_encoding_gene(Y)
 
-		#Y = self.dense_16(Y)
+		Y = self.dense_16(Y)
 
 		"""
 		cross attention for the decoder
@@ -1152,8 +1152,8 @@ class drug_transformer_():
 		#X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
 		#X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
 
-		Y = tf.concat([Y,Y_key], axis=-1)
-		Y = self.dense_16(Y)
+		#Y = tf.concat([Y,Y_key], axis=-1)
+		#Y = self.dense_16(Y)
 
 		#X_global = X_global1
 		#att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
@@ -1186,7 +1186,7 @@ class drug_transformer_():
 		Y_predict = tf.math.add(Y, X_global)
 
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X_global, Y])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X_global, Y, gene_embedding])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
