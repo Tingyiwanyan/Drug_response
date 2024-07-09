@@ -1127,7 +1127,7 @@ class drug_transformer_():
 		    Y = tf.concat([Y, Y_gene_mutate], axis=-1)
 		#Y = self.pos_encoding_gene(Y)
 
-		Y = self.dense_16(Y)
+		#Y = self.dense_16(Y)
 
 		"""
 		cross attention for the decoder
