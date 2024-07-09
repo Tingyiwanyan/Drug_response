@@ -1116,15 +1116,15 @@ class drug_transformer_():
 		#Y = self.dense_2(Y_input)
 		#Y = tf.math.l2_normalize(tf.concat([gene_embedding, Y],axis=-1),axis=-1)
 		#Y = self.r_connection_gene_emb(Y, gene_embedding)
-		Y = tf.math.add(Y, gene_embedding)
+		#Y = tf.math.add(Y, gene_embedding)
 		#Y = tf.concat([Y,gene_embedding], axis=-1)
 
 		if not if_mutation == None:
 		    Y_gene_mutate = tf.math.l2_normalize(self.dense_14(gene_mutation_input),axis=-1)
 		    #Y = tf.math.l2_normalize(tf.concat([Y, Y_gene_mutate],axis=-1),axis=-1)
 		    #Y = self.r_connection_gene_mutate(Y, Y_gene_mutate)
-		    Y = tf.math.add(Y, Y_gene_mutate)
-		    #Y = tf.concat([Y, Y_gene_mutate], axis=-1)
+		    #Y = tf.math.add(Y, Y_gene_mutate)
+		    Y = tf.concat([Y, Y_gene_mutate], axis=-1)
 		#Y = self.pos_encoding_gene(Y)
 
 		Y = self.dense_16(Y)
@@ -1144,13 +1144,16 @@ class drug_transformer_():
 
 		#Y = self.dense_15(Y)
 
-		X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, Y, if_sparse_max=False)#, if_select_feature_=None)
+		X_global, att_score_global1, Y_value, score_cross = self.decoder_global_1(X_global, gene_embedding, if_sparse_max=False)#, if_select_feature_=None)
 		X_global, att_score_global2, Y_key, score_cross_global = self.decoder_global_2(X_global, Y_value, if_sparse_max=False, if_select_feature_=True)
 		#X_global3, att_score_global3, Y_key3 = self.decoder_global_3(X_global, Y, if_sparse_max=True, if_select_feature_=True)
 
 		#X_global1, att_score_global1 = self.decoder_global_1(X_global, Y, if_sparse_max=True)
 		#X_global2, att_score_global2 = self.decoder_global_2(X_global, Y, if_sparse_max=True)
 		#X_global3, att_score_global3 = self.decoder_global_3(X_global, Y, if_sparse_max=True)
+
+		Y = tf.concat([Y,Y_key], axis=-1)
+		Y = self.dense_16(Y)
 
 		#X_global = X_global1
 		#att_score_global1 = tf.transpose(att_score_global1, perm=[0,2,1])
@@ -1162,7 +1165,7 @@ class drug_transformer_():
 		#Y_key = tf.math.add(X_global_att, Y_key)
 
 		#X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-		Y_key = self.dense_6(Y_key)
+		Y_key = self.dense_6(Y)
 		#Y_key2 = self.dense_6(Y_key2)
 		#Y_key3 = self.dense_6(Y_key3)
 		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
