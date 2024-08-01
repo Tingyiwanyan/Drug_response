@@ -211,7 +211,7 @@ class masked_softmax_selected(tf.keras.layers.Layer):
 
 class positionalencoding(tf.keras.layers.Layer):  
     """Positional encoding."""
-    def __init__(self, num_hiddens, num_length, max_len=6000):
+    def __init__(self, num_hiddens, num_length, max_len=7000):
         super().__init__()
         #self.dropout = tf.keras.layers.Dropout(dropout)
         # Create a long enough P
@@ -985,7 +985,7 @@ class drug_transformer_():
 
 		self.pos_encoding = positionalencoding(30,130)
 
-		self.pos_encoding_gene = positionalencoding(30, 5370)
+		self.pos_encoding_gene = positionalencoding(30, 6144)
 		self.flattern_enco = tf.keras.layers.Flatten()
 		self.flattern_deco = tf.keras.layers.Flatten()
 		self.flattern_score = tf.keras.layers.Flatten()
@@ -1165,7 +1165,7 @@ class drug_transformer_():
 		#Y_key = tf.math.add(X_global_att, Y_key)
 
 		#X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-		Y_key = self.dense_6(Y)
+		Y = self.dense_6(Y)
 		#Y_key2 = self.dense_6(Y_key2)
 		#Y_key3 = self.dense_6(Y_key3)
 		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
@@ -1200,14 +1200,14 @@ class drug_transformer_():
 		"""
 		construct the transformer model
 		"""
-		X_input = Input((130, 22))
-		Y_input = Input((5370, 1))
+		X_input = Input((70, 8))
+		Y_input = Input((6144, 1))
 		enc_valid_lens_ = Input(())
 
 		shape_input = tf.shape(X_input)
 
 		X = self.dense_0(X_input)
-		X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_)
+		X, att, score = self.encoder_1(X, enc_valid_lens=enc_valid_lens_)
 		X_global = self.flattern_global(X)
 		#X_global = tf.expand_dims(X_global, axis=1)
 		X = self.dense_9(X)

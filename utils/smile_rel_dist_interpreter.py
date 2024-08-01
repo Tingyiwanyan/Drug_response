@@ -4,6 +4,9 @@ from rdkit.Chem import MolFromSmiles, rdmolops
 from rdkit.Chem import AllChem, AddHs
 import networkx as nx
 
+
+vocabulary_drug = ['F', 'S', 'N', 'O', 'I', 'L', 'B', 'C']
+
 def smile_cl_converter(smile):
     new_smile = ''
     for i in range(len(smile)):
@@ -23,7 +26,8 @@ def smile_cl_converter(smile):
                 if smile[i+1] == 'r':
                     new_smile += 'B'
                 else:
-                    new_smile += smile[i]
+                    return None
+                    #new_smile += smile[i]
         elif smile[i] == 'r' and smile[i-1] == 'B':
             continue
             
@@ -162,10 +166,13 @@ def generate_interpret_smile(smile):
     rel_distance_whole = []
     interpret_smile_whole = []
     projection_whole = []
+
     for i in range(length):
         symbol, dist = symbol_converter(new_smile[i])
         if symbol == None:
             continue
+        elif symbol not in vocabulary_drug:
+            return None
         else:
             rel_distance, interpret_smile, projection = smile_rel_dis_interpreter(new_smile, i)
             #length_seq = len(rel_distance)
