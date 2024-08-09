@@ -1043,14 +1043,14 @@ class drug_transformer_():
 		"""
 		construct the transformer model
 		"""
-		X_input = Input((70, 8))
+		X_input = Input((100, 8))
 		Y_input = Input((6144, 1))
 		gene_mutation_input = Input((6144, 2))
-		rel_position_embedding = Input((70,70,60))
-		edge_type_embedding = Input((70,70,5))
+		rel_position_embedding = Input((100,100,60))
+		edge_type_embedding = Input((100,100,5))
 		#rel_position_embedding_origin = Input((80,80,60))
 		enc_valid_lens_ = Input(())
-		mask_input = Input((70,1))
+		mask_input = Input((100,1))
 
 		shape_input = tf.shape(X_input)
 		gene_embedding = self.input_gene_embeddings
