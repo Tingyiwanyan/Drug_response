@@ -1165,7 +1165,7 @@ class drug_transformer_():
 		#Y_key = tf.math.add(X_global_att, Y_key)
 
 		#X_global, att_score_global2, Y_key = self.decoder_global_2(X_global, Y, if_sparse_max=False, if_select_feature_=True)
-		Y = self.dense_6(Y)
+		#Y = self.dense_6(Y)
 		#Y_key2 = self.dense_6(Y_key2)
 		#Y_key3 = self.dense_6(Y_key3)
 		#att_score_global2 = tf.transpose(att_score_global2, perm=[0,2,1])
