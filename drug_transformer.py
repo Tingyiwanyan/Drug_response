@@ -720,7 +720,7 @@ class drug_transformer_():
 		"""
 		self.dotproductattention1 = dotproductattention(30)
 
-		self.dotproductattention_deco = dotproductattention_column(30)
+		#self.dotproductattention_deco = dotproductattention_column(30)
 
 		self.dotproductattention_deco_cross = dotproductattention(30)
 
