@@ -441,7 +441,7 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			else:
 				return scores, queries, keys
 		else:
-			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.2
+			scores_ = tf.matmul(queries, keys, transpose_b=True)*0.3
 			#print("scores_ shape")
 			#print(scores_.shape)
 			#queries_origin_ = tf.concat(queries_origin_, relative_encoding_origin)
@@ -456,8 +456,8 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 			#print(queries_.shape)
 			#relative_encoding_lookup = tf.expand_dims(relative_encoding_lookup,axis=0)
 			#relative_encoding_lookup = tf.broadcast_to(relative_encoding_lookup,[shape[0],shape[1],shape[1],shape[-1]])
-			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)*0.2
-			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, edge_type_embedding), axis=-1)*0.6
+			scores_position = tf.reduce_sum(tf.multiply(queries_, relative_encoding_lookup), axis=-1)*0.5
+			scores_edge_embedding = tf.reduce_sum(tf.multiply(queries_, edge_type_embedding), axis=-1)*0.3
 			#print(scores_position.shape)
 			#scores = tf.reduce_sum(tf.multiply(queries_origin, queries_), axis=-1)
 			scores_ = tf.add(scores_, scores_position)
@@ -471,148 +471,6 @@ class dotproductattention(tf.keras.layers.Layer):  #@save
 				return scores, values, queries, keys
 			else:
 				return scores, queries, keys
-
-class dotproductattention_column(tf.keras.layers.Layer):  #@save
-	"""
-	Define scaled dot product layer
-	for column-wise specific gene self-attention
-
-	Parameters:
-	-----------
-	kernel_key: embedding matrix for key
-	kernel_value: embedding matrix for value
-	kernel_query: embedding matrix for query
-
-	Returns:
-	--------
-	attention_score: the scale dot product score
-	"""
-	def __init__(self, output_dim):#, column_limit=200):
-		super().__init__()
-		self.output_dim = output_dim
-		#self.column_limit = column_limit
-		#self.masked_softmax = masked_softmax()
-
-		#self.kernel_key = tf.keras.layers.D ense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
-
-		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
- 
-		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
-			kernel_regularizer=regularizers.L2(1e-4))
-
-	def build(self, input_shape):
-		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		b_init = tf.zeros_initializer()
-		self.b_key = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		self.b_query = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-	def call(self, queries, keys, values, indices_, **kwargs):
-		#indices_ = tf.range(start=start_, limit=self.column_limit)
-		keys = tf.gather(keys, indices=indices_, batch_dims=1)
-		queries = tf.gather(queries, indices=indices_, batch_dims=1)
-		values = tf.gather(values, indices=indices_, batch_dims=1)
-		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
-		#queries = self.kernel_query(queries)
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
-		#keys = self.kernel_key(keys)
-		#values = tf.matmul(values, self.kernel_value) + self.b_value
-		values = self.kernel_value(values)
-		#values_ = tf.gather(values, indices=indices_, axis=1)
-		scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
-			tf.cast(d, dtype=tf.float32))
-
-		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries#, values_
-
-class dotproductattention_linformer(tf.keras.layers.Layer):  #@save
-	"""
-	Define scaled dot product layer
-	Adding Linformer algorithms for reduce the gene-gene
-	self-attention computation to linear time:
-	https://arxiv.org/abs/2006.04768
-
-	Parameters:
-	-----------
-	kernel_key: embedding matrix for key
-	kernel_value: embedding matrix for value
-	kernel_query: embedding matrix for query
-	kernel_projection_e: the linear projection matrix for keys
-	kernel_projection_f: the linear projection matrix for values
-
-	Returns:
-	--------
-	attention_score: the scale dot product score
-	"""
-	def __init__(self, output_dim, project_dim=200):
-		super().__init__()
-		self.output_dim = output_dim
-		self.project_dim = project_dim
-		#self.masked_softmax = masked_softmax()
-
-		#self.kernel_key = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
-
-		#self.kernel_query = tf.keras.layers.Dense(output_dim, activation='sigmoid', 
-		#	kernel_regularizer=regularizers.L2(1e-4))
- 
-		self.kernel_value = tf.keras.layers.Dense(output_dim, activation='relu', 
-			kernel_regularizer=regularizers.L2(1e-4))
-
-	
-	def build(self, input_shape):
-		self.kernel_key = self.add_weight(name = 'kernel_key', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		b_init = tf.zeros_initializer()
-		self.b_key = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-		self.kernel_query  = self.add_weight(name = 'kernel_quary', shape = (input_shape[-1], self.output_dim),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		self.b_query = tf.Variable(
-			initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-
-		self.kernel_projection_e = self.add_weight(name = 'kernel_quary', shape = (self.project_dim, input_shape[1]),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		self.kernel_projection_f = self.add_weight(name = 'kernel_quary', shape = (self.project_dim, input_shape[1]),
-			initializer = tf.keras.initializers.he_normal(seed=None), trainable = True)
-
-		#self.kernel_value = self.add_weight(name='kernel_value', shape=(input_shape[-1], self.output_dim),
-		#	initializer=tf.keras.initializers.he_normal(seed=None), trainable=True)
-
-		#self.b_value = tf.Variable(
-		#	initial_value=b_init(shape=(self.output_dim,), dtype="float32"), trainable=True)
-	
-
-	def call(self, queries, keys, values, valid_lens=None, **kwargs):
-		d = queries.shape[-1]
-		queries = tf.matmul(queries, self.kernel_query) + self.b_query
-		#queries = self.kernel_query(queries)
-		keys = tf.matmul(keys, self.kernel_key) + self.b_key
-		#keys = self.kernel_key(keys)
-		#values = tf.matmul(values, self.kernel_value) + self.b_value
-		values = self.kernel_value(values)
-
-		values_linformer = tf.matmul(self.kernel_projection_f, values)
-		
-		projected_keys = tf.matmul(self.kernel_projection_e, keys)
-		scores = tf.matmul(queries, projected_keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
-
-		#self.attention_weights = self.masked_softmax(scores, valid_lens)
-		return scores, values, queries, values_linformer, self.kernel_projection_f
 
 class attention_embedding(tf.keras.layers.Layer):
 	"""
@@ -1191,7 +1049,8 @@ class drug_transformer_():
 		Y_predict = tf.math.add(Y, X_global)
 
 
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), outputs=[Y_predict, score_cross_global, X_global, Y, gene_embedding, X_global_, att_score_global2, Y_global])
+		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), \
+			outputs=[Y_predict, score_cross_global, X_global, Y, gene_embedding, X_global_, att_score_global2, Y_global])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
