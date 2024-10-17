@@ -15,6 +15,7 @@ class masked_softmax(tf.keras.layers.Layer):
 	def __init__(self, value=-1e7):
 		super().__init__()
 		self.value = value
+		self.temperature = 6
 
 	def call(self, X, if_sparse_max=False, valid_lens=None, **kwargs):
 		"""
@@ -26,6 +27,7 @@ class masked_softmax(tf.keras.layers.Layer):
 			if if_sparse_max == True:
 				return tfa.activations.sparsemax(X)
 			else:
+				X = X * self.temperature
 				return tf.nn.softmax(X, axis=-1)
 			#print("Im here")
 		else:
