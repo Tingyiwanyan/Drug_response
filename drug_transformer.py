@@ -15,7 +15,7 @@ class masked_softmax(tf.keras.layers.Layer):
 	def __init__(self, value=-1e7):
 		super().__init__()
 		self.value = value
-		self.temperature = 5
+		self.temperature = 4
 
 	def call(self, X, if_sparse_max=False, valid_lens=None, **kwargs):
 		"""
