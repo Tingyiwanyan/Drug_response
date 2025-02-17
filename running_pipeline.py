@@ -29,161 +29,6 @@ import Geneformer.geneformer as ge
 import gseapy as gp
 import sys 
 
-ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
-gene_expression = gene_expression.set_index("CCLE_ID")
-kk = pd.read_csv('/home/tingyi/Ling-Tingyi/LCCL_input/sample_info.csv')
-total_pathway = pd.read_excel('GSEA.graph_midi_.xlsx')
-prior_knowledge_drug_gene = pd.read_table('canonical_smiles.Tingyi_gene.pccompound.gene_id.interaction_score.txt',sep="\t",on_bad_lines='skip',header=None)
-
-
-P = np.zeros((1, 100, 60))
-XX = np.arange(100, dtype=np.float32).reshape(
-    -1,1)/np.power(1000, np.arange(
-        0, 60, 2, dtype=np.float32) / 60)
-P[:, :, 0::2] = np.sin(XX)
-P[:, :, 1::2] = np.cos(XX)
-#P[0][0] = np.zeros((60))
-#shape_X = tf.shape(X)
-#X = tf.math.l2_normalize(X, axis=-1)
-P = tf.cast(tf.math.l2_normalize(P[:, :100,:], axis=-1), 
-    dtype=tf.float32)
-edge_type_dict = np.zeros((5,5))
-gene_expression_bin_dict = np.zeros((4,4))
-gene_mutation_dict = np.zeros((2,2))
-for i in range(5):
-    edge_type_dict[i,i] = 1
-edge_type_dict = tf.cast(edge_type_dict,dtype=tf.float32)
-for i in range(4):
-    gene_expression_bin_dict[i,i] = 1
-gene_expression_bin_dict = tf.cast(gene_expression_bin_dict,dtype=tf.float32)
-for i in range(2):
-    gene_mutation_dict[i,i] = 1
-gene_mutation_dict = tf.cast(gene_mutation_dict, dtype=tf.float32)
-
-
-"""
-Load gene identification embeddings
-"""
-gene_filtered_var = filtering_raw_gene_expression(gene_expression)
-drug_ic50_value_whole = []
-drug_name_whole = []
-gene_expression_value_avail = []
-gene_expression_value_whole = []
-cell_line_name_avail = []
-cell_line_name_whole = []
-cell_line_name = cell_line_drug["Cell_line_Name"]
-for i in list(cell_line_name):
-    try:
-        gene_expression_value_avail.append(gene_expression.loc[i])
-        cell_line_name_avail.append(i)
-    except:
-        continue
-
-mutation = pyreadr.read_r('/home/tingyi/Ling-Tingyi/lung_and_all_processed_data/CCLE/driver_mutations_all.rds')[None]
-mutation.set_index("CCLE_ID", inplace =True)
-mutation_avail_filter = mutation.loc[cell_line_name_avail].replace('',0)
-mutation_avail_filter[mutation_avail_filter != 0] = 1
-
-
-"""
-Drug tokenize information
-"""
-drug_prior = pd.read_csv('drug.pccompound.TARGET.TARGET_PATHWAY 1.txt',header=None,sep="\t",on_bad_lines='skip')
-k = [i.split(',') for i in list(drug_prior[2])]
-target_genes = []
-for i in k:
-    target_genes += i
-target_genes = [i.strip() for i in target_genes]
-pathway_gene = pd.read_csv("pathway.Tingyi_gene.tsv",sep='\t')
-drug_gene_interaction = pd.read_csv("interactions_laetst.tsv",sep='\t')
-drug_target_df = pd.read_csv("gene.max_interaction_score.anti_neoplastic_or_immunotherapy.known_target_added.txt", sep="\t",header=None)
-gene_important = np.unique(list(pathway_gene['ALDH2'])+list(drug_target_df[0])+
-                           list(gene_filtered_var.columns)+list(mutation_avail_filter.columns)+target_genes)
-
-pathway_gene = pd.read_csv("pathway.Tingyi_gene.tsv",sep='\t',header=None)
-pathway_names = np.unique(list(pathway_gene[0]))
-pathway_gene.set_index(0, inplace=True)
-target_path_way = pd.read_csv('drug.pathway_with_target_gene.NES_rank.txt',sep='\t',header=None)
-target_drug_name = list(target_path_way[0])
-target_drug_pathway = list(target_path_way[1])
-gene_set = {}
-for i in pathway_names:
-    pathway_gene_set = list(pathway_gene.loc[i][1])
-    gene_set[i] = pathway_gene_set
-
-#import geneformer as ge
-import pickle
-gene_names = []
-ensemble_ids = []
-ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
-ensemble_id.set_index('EntrezSymbol',inplace =True)
-for i in gene_important:
-    try:
-        ens = ensemble_id.loc[i]['ENSG_id']
-        gene_names.append(i)
-        ensemble_ids.append(ens)
-    except:
-        continue
-        
-ge.emb_extractor.pu
-ge.tokenizer.TOKEN_DICTIONARY_FILE
-with open(ge.tokenizer.TOKEN_DICTIONARY_FILE, "rb") as f:
-    gene_token_dict = pickle.load(f)
-ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
-ensemble_id.set_index('ENSG_id',inplace =True)
-gene_name_avail_geneformer = []
-token_avail_geneformer = []
-ensemble_avail_geneformer = []
-for i in ensemble_ids:
-    try:
-        token_id = gene_token_dict[i]
-        token_avail_geneformer.append(token_id)
-        ensemble_avail_geneformer.append(i)
-        gene_name_avail_geneformer.append(ensemble_id.loc[i]['EntrezSymbol'])
-    except:
-        continue
-
-gene_expression_filter = gene_expression[gene_name_avail_geneformer]
-cell_line_name = cell_line_drug['Cell_line_Name']
-cell_line_drug.set_index("Cell_line_Name", inplace =True) 
-
-gene_expression_whole_avail = gene_expression.loc[cell_line_name_avail]
-disc_gene_total = []
-continuous_gene_total = []
-for name in cell_line_name_avail:
-    #print(name)
-    max_value = np.max(np.array(gene_expression.loc[name]))
-    #min_value = np.min(np.array(gene_expression.loc[name]))
-    continuous_gene = normalize_min_max(gene_expression_whole_avail.loc[name])
-    continuous_gene_total.append(continuous_gene)
-    bin_value = max_value/5
-    #bin_value = max_value/4
-    #Dis = tf.keras.layers.Discretization(bin_boundaries=[0, bin_value,2*bin_value, 3*bin_value ],epsilon=0.001)
-    Dis = tf.keras.layers.Discretization(bin_boundaries=[bin_value,2*bin_value,3*bin_value],epsilon=0.001)
-    #Dis.adapt(np.array(gene_expression_whole_avail))
-    disc_gene_ = Dis(np.array(gene_expression_whole_avail.loc[name]))
-    disc_gene_total.append(disc_gene_)
-disc_gene_total = tf.stack(disc_gene_total)
-disc_gene_df = pd.DataFrame(disc_gene_total, index=cell_line_name_avail)
-disc_gene_df.columns = list(gene_expression.columns)
-disc_gene_df_filter = disc_gene_df[gene_name_avail_geneformer]
-
-continuous_gene_total = tf.stack(continuous_gene_total)
-continuous_gene_df = pd.DataFrame(continuous_gene_total, index=cell_line_name_avail)
-continuous_gene_df.columns = list(gene_expression.columns)
-continuous_gene_df_filter = continuous_gene_df[gene_name_avail_geneformer]
-
-avail_mutation_list = disc_gene_df_filter.columns.intersection(mutation_avail_filter.columns)
-mutation_avail_filter = mutation_avail_filter[avail_mutation_list]
-mutation_whole = np.zeros(np.array(disc_gene_df_filter).shape)
-mutation_whole = pd.DataFrame(mutation_whole, index=cell_line_name_avail)
-mutation_whole.columns = list(disc_gene_df_filter.columns)
-mutation_whole[mutation_avail_filter.columns] = mutation_avail_filter
-
-prior_drug_information_total = pd.read_csv('prior_drug_gene_target_info.csv')
-
-
-
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
     """
@@ -431,7 +276,158 @@ if __name__ == '__main__':
 	    print("No Smile Input")
 	    sys.exit(0)
 
-	batch_length = 10
+	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	gene_expression = gene_expression.set_index("CCLE_ID")
+	kk = pd.read_csv('/home/tingyi/Ling-Tingyi/LCCL_input/sample_info.csv')
+	total_pathway = pd.read_excel('GSEA.graph_midi_.xlsx')
+	prior_knowledge_drug_gene = pd.read_table('canonical_smiles.Tingyi_gene.pccompound.gene_id.interaction_score.txt',sep="\t",on_bad_lines='skip',header=None)
+
+
+	P = np.zeros((1, 100, 60))
+	XX = np.arange(100, dtype=np.float32).reshape(
+	    -1,1)/np.power(1000, np.arange(
+	        0, 60, 2, dtype=np.float32) / 60)
+	P[:, :, 0::2] = np.sin(XX)
+	P[:, :, 1::2] = np.cos(XX)
+	#P[0][0] = np.zeros((60))
+	#shape_X = tf.shape(X)
+	#X = tf.math.l2_normalize(X, axis=-1)
+	P = tf.cast(tf.math.l2_normalize(P[:, :100,:], axis=-1), 
+	    dtype=tf.float32)
+	edge_type_dict = np.zeros((5,5))
+	gene_expression_bin_dict = np.zeros((4,4))
+	gene_mutation_dict = np.zeros((2,2))
+	for i in range(5):
+	    edge_type_dict[i,i] = 1
+	edge_type_dict = tf.cast(edge_type_dict,dtype=tf.float32)
+	for i in range(4):
+	    gene_expression_bin_dict[i,i] = 1
+	gene_expression_bin_dict = tf.cast(gene_expression_bin_dict,dtype=tf.float32)
+	for i in range(2):
+	    gene_mutation_dict[i,i] = 1
+	gene_mutation_dict = tf.cast(gene_mutation_dict, dtype=tf.float32)
+
+
+	"""
+	Load gene identification embeddings
+	"""
+	gene_filtered_var = filtering_raw_gene_expression(gene_expression)
+	drug_ic50_value_whole = []
+	drug_name_whole = []
+	gene_expression_value_avail = []
+	gene_expression_value_whole = []
+	cell_line_name_avail = []
+	cell_line_name_whole = []
+	cell_line_name = cell_line_drug["Cell_line_Name"]
+	for i in list(cell_line_name):
+	    try:
+	        gene_expression_value_avail.append(gene_expression.loc[i])
+	        cell_line_name_avail.append(i)
+	    except:
+	        continue
+
+	mutation = pyreadr.read_r('/home/tingyi/Ling-Tingyi/lung_and_all_processed_data/CCLE/driver_mutations_all.rds')[None]
+	mutation.set_index("CCLE_ID", inplace =True)
+	mutation_avail_filter = mutation.loc[cell_line_name_avail].replace('',0)
+	mutation_avail_filter[mutation_avail_filter != 0] = 1
+
+
+	"""
+	Drug tokenize information
+	"""
+	drug_prior = pd.read_csv('drug.pccompound.TARGET.TARGET_PATHWAY 1.txt',header=None,sep="\t",on_bad_lines='skip')
+	k = [i.split(',') for i in list(drug_prior[2])]
+	target_genes = []
+	for i in k:
+	    target_genes += i
+	target_genes = [i.strip() for i in target_genes]
+	pathway_gene = pd.read_csv("pathway.Tingyi_gene.tsv",sep='\t')
+	drug_gene_interaction = pd.read_csv("interactions_laetst.tsv",sep='\t')
+	drug_target_df = pd.read_csv("gene.max_interaction_score.anti_neoplastic_or_immunotherapy.known_target_added.txt", sep="\t",header=None)
+	gene_important = np.unique(list(pathway_gene['ALDH2'])+list(drug_target_df[0])+
+	                           list(gene_filtered_var.columns)+list(mutation_avail_filter.columns)+target_genes)
+
+	pathway_gene = pd.read_csv("pathway.Tingyi_gene.tsv",sep='\t',header=None)
+	pathway_names = np.unique(list(pathway_gene[0]))
+	pathway_gene.set_index(0, inplace=True)
+	target_path_way = pd.read_csv('drug.pathway_with_target_gene.NES_rank.txt',sep='\t',header=None)
+	target_drug_name = list(target_path_way[0])
+	target_drug_pathway = list(target_path_way[1])
+	gene_set = {}
+	for i in pathway_names:
+	    pathway_gene_set = list(pathway_gene.loc[i][1])
+	    gene_set[i] = pathway_gene_set
+
+	#import geneformer as ge
+	import pickle
+	gene_names = []
+	ensemble_ids = []
+	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	ensemble_id.set_index('EntrezSymbol',inplace =True)
+	for i in gene_important:
+	    try:
+	        ens = ensemble_id.loc[i]['ENSG_id']
+	        gene_names.append(i)
+	        ensemble_ids.append(ens)
+	    except:
+	        continue
+	        
+	ge.emb_extractor.pu
+	ge.tokenizer.TOKEN_DICTIONARY_FILE
+	with open(ge.tokenizer.TOKEN_DICTIONARY_FILE, "rb") as f:
+	    gene_token_dict = pickle.load(f)
+	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	ensemble_id.set_index('ENSG_id',inplace =True)
+	gene_name_avail_geneformer = []
+	token_avail_geneformer = []
+	ensemble_avail_geneformer = []
+	for i in ensemble_ids:
+	    try:
+	        token_id = gene_token_dict[i]
+	        token_avail_geneformer.append(token_id)
+	        ensemble_avail_geneformer.append(i)
+	        gene_name_avail_geneformer.append(ensemble_id.loc[i]['EntrezSymbol'])
+	    except:
+	        continue
+
+	gene_expression_filter = gene_expression[gene_name_avail_geneformer]
+	cell_line_name = cell_line_drug['Cell_line_Name']
+	cell_line_drug.set_index("Cell_line_Name", inplace =True) 
+
+	gene_expression_whole_avail = gene_expression.loc[cell_line_name_avail]
+	disc_gene_total = []
+	continuous_gene_total = []
+	for name in cell_line_name_avail:
+	    #print(name)
+	    max_value = np.max(np.array(gene_expression.loc[name]))
+	    #min_value = np.min(np.array(gene_expression.loc[name]))
+	    continuous_gene = normalize_min_max(gene_expression_whole_avail.loc[name])
+	    continuous_gene_total.append(continuous_gene)
+	    bin_value = max_value/5
+	    #bin_value = max_value/4
+	    #Dis = tf.keras.layers.Discretization(bin_boundaries=[0, bin_value,2*bin_value, 3*bin_value ],epsilon=0.001)
+	    Dis = tf.keras.layers.Discretization(bin_boundaries=[bin_value,2*bin_value,3*bin_value],epsilon=0.001)
+	    #Dis.adapt(np.array(gene_expression_whole_avail))
+	    disc_gene_ = Dis(np.array(gene_expression_whole_avail.loc[name]))
+	    disc_gene_total.append(disc_gene_)
+	disc_gene_total = tf.stack(disc_gene_total)
+	disc_gene_df = pd.DataFrame(disc_gene_total, index=cell_line_name_avail)
+	disc_gene_df.columns = list(gene_expression.columns)
+	disc_gene_df_filter = disc_gene_df[gene_name_avail_geneformer]
+
+	continuous_gene_total = tf.stack(continuous_gene_total)
+	continuous_gene_df = pd.DataFrame(continuous_gene_total, index=cell_line_name_avail)
+	continuous_gene_df.columns = list(gene_expression.columns)
+	continuous_gene_df_filter = continuous_gene_df[gene_name_avail_geneformer]
+
+	avail_mutation_list = disc_gene_df_filter.columns.intersection(mutation_avail_filter.columns)
+	mutation_avail_filter = mutation_avail_filter[avail_mutation_list]
+	mutation_whole = np.zeros(np.array(disc_gene_df_filter).shape)
+	mutation_whole = pd.DataFrame(mutation_whole, index=cell_line_name_avail)
+	mutation_whole.columns = list(disc_gene_df_filter.columns)
+	mutation_whole[mutation_avail_filter.columns] = mutation_avail_filter
+
+	prior_drug_information_total = pd.read_csv('prior_drug_gene_target_info.csv')
 
 	interpret_drug_smile_input = generate_interpret_smile(drug_smile_input)[0]
 	drug_smile_input = list(drug_smile_input)
@@ -465,37 +461,7 @@ if __name__ == '__main__':
 	drug_feature_select_score = []
 	df_data = pd.read_csv('train_data_midi.csv')
 	df_data.set_index("drug_name", inplace=True)
-	#evidence_drug = drug_names
-	#evidence_pathway = target_pathways
 
-	#for drug_name in drug_names:
-	#drug_name = evidence_drug[i]
-	#target_pathway = evidence_pathway[i]
-	#print(drug_name)
-	#print(target_pathway)
-
-	"""
-	try:
-	    #drug_prior.loc[drug_name]
-	    prior_genes = drug_prior.loc[drug_name][2].split(',')
-	    check_genes = []
-	    for each_gene in prior_genes:
-	        check_genes.append(each_gene.strip())
-	except:
-	    continue
-	try:
-	    name_pathways = list(total_pathway.set_index('Drug').loc[drug_name]['Pathway enrichment'])
-	except:
-	    continue
-	print(drug_name)
-	pathway_total = []
-	for pathway_single in name_pathways:
-	    #print(np.where(pathway_names == i)[0])
-	    if pathway_single in pathway_names:
-	        #print(i)
-	        pathway_total.append(pathway_single)
-	#print(pathway_total)
-	"""
 	drug_name = drug_names[21]
 	print(drug_name)
 	df_drug_train_data = df_data.loc[drug_name]
