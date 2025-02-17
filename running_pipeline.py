@@ -308,8 +308,7 @@ if __name__ == '__main__':
 	gene_mutation_dict = tf.cast(gene_mutation_dict, dtype=tf.float32)
 
 	with open('gene_embedding_important.npy', 'rb') as f:
-    gene_embeddings = np.load(f)
-	#gene_embeddings = tf.math.l2_normalize(gene_embeddings, axis=-1)
+    	gene_embeddings = np.load(f)
 
 	k = drug_transformer_(gene_embeddings)
 
