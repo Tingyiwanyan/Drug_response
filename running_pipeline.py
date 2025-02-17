@@ -340,6 +340,7 @@ if __name__ == '__main__':
 	"""
 	Drug tokenize information
 	"""
+	
 	drug_prior = pd.read_csv('drug.pccompound.TARGET.TARGET_PATHWAY 1.txt',header=None,sep="\t",on_bad_lines='skip')
 	k = [i.split(',') for i in list(drug_prior[2])]
 	target_genes = []
@@ -435,8 +436,6 @@ if __name__ == '__main__':
 	prior_drug_information_total = pd.read_csv('prior_drug_gene_target_info.csv')
 
 	interpret_drug_smile_input = generate_interpret_smile(drug_smile_input)[0]
-	drug_smile_input = list(drug_smile_input)
-	interpret_drug_smile_input = list(interpret_drug_smile_input)
 
 	k = drug_transformer_(gene_embeddings)#, relative_pos_enc_lookup=relative_pos_embedding)
 	model_midi = k.model_construction_midi(if_mutation=True)
@@ -466,9 +465,10 @@ if __name__ == '__main__':
 	drug_feature_select_score = []
 	df_data = pd.read_csv('train_data_midi.csv')
 	df_data.set_index("drug_name", inplace=True)
+	
 
-	drug_name = drug_names[21]
-	print(drug_name)
+	#drug_name = drug_names[21]
+	#print(drug_name)
 	df_drug_train_data = df_data.loc[drug_name]
 	#batch_smile_seq = df_drug_train_data['smile_seq'] 
 	batch_smile_seq = [drug_smile_input]
