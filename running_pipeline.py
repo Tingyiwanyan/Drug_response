@@ -308,7 +308,7 @@ if __name__ == '__main__':
 	gene_mutation_dict = tf.cast(gene_mutation_dict, dtype=tf.float32)
 
 	with open('gene_embedding_important.npy', 'rb') as f:
-    	gene_embeddings = np.load(f)
+		gene_embeddings = np.load(f)
 
 	k = drug_transformer_(gene_embeddings)
 
@@ -444,7 +444,7 @@ if __name__ == '__main__':
 	model_midi.summary()
 
 	df_drug_smile = pd.DataFrame(list(zip(drug_names,CCLE_drug_smiles)),
-                                 columns=['drug_name','drug_smiles'])
+	                             columns=['drug_name','drug_smiles'])
 	df_drug_smile.set_index('drug_name',inplace =True)
 	drug_prior = pd.read_csv('drug.pccompound.TARGET.TARGET_PATHWAY 1.txt',header=None,sep="\t",on_bad_lines='skip')
 	drug_prior.set_index(0,inplace=True)
