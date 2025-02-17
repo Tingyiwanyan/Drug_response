@@ -467,7 +467,7 @@ if __name__ == '__main__':
 	df_data.set_index("drug_name", inplace=True)
 	
 
-	#drug_name = drug_names[21]
+	drug_name = drug_names[21]
 	#print(drug_name)
 	df_drug_train_data = df_data.loc[drug_name]
 	#batch_smile_seq = df_drug_train_data['smile_seq'] 
