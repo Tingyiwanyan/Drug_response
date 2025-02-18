@@ -1,0 +1,22 @@
+pip install numpy==1.24.3
+pip install pandas==2.2.2
+pip install pyreadr==0.5.2
+pip install tensorflow==2.13.1
+pip install rdkit==2024.09.5
+python -m pip install -U matplotlib==3.10.0
+pip install ipython
+pip install networkx
+pip install seaborn==0.13.2
+pip install pubchempy
+pip install -U scikit-learn
+pip install tensorflow_addons==0.23.0
+pip install selfies
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install transformers
+pip install datasets
+pip install anndata
+pip install loompy
+pip install scanpy
+pip install tdigest
+pip install gseapy
+pip install openpyxl
