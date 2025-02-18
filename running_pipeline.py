@@ -269,8 +269,9 @@ if __name__ == '__main__':
 	"""
 	Load model
 	"""
-	if len(sys.argv) > 1:
-	    drug_smile_input = sys.argv[1]
+	if len(sys.argv) > 2:
+	    drug_smile_input = sys.argv[2]
+	    job_id = sys.argv[1]
 	    print(f"Smile Sequence input is, {drug_smile_input}")
 	else:
 	    print("No Smile Input")
@@ -518,7 +519,7 @@ if __name__ == '__main__':
 	#g.set(title =drug_name)
 	#g.plot()
 	figure = g.get_figure()
-	figure.savefig('Output/heatmap.png', dpi=300)
+	figure.savefig(f'Output/{job_id}_heatmap.png', dpi=300)
 
 	weight_atoms_indices, highlight_bond, colors, colors_bond = extract_atoms_bonds(feature_select_score_drug[0], batch_smile_seq[0])
 	#weight_atoms_indices, highlight_bond, colors, colors_bond = extract_atoms_bonds(feature_select_score_drug_whole[0], batch_smile_seq[0])
@@ -533,6 +534,6 @@ if __name__ == '__main__':
 	d2d.DrawMolecule(mol,highlightAtoms=weight_atoms_indices,highlightAtomColors=colors)#, highlightBonds=highlight_bond, highlightBondColors=colors_bond)
 	#d2d.DrawMolecule(mol,highlightAtoms=weight_atoms_indices, highlightBonds=highlight_bond, highlightBondColors=colors_bond)
 	d2d.FinishDrawing()
-	d2d.WriteDrawingText("Output/molecule.png")
+	d2d.WriteDrawingText(f"Output/{job_id}_molecule.png")
 
     
