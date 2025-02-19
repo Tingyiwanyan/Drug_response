@@ -277,9 +277,9 @@ if __name__ == '__main__':
 	    print("No Smile Input")
 	    sys.exit(0)
 
-	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	ensemble_id = pyreadr.read_r('Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
 	gene_expression = gene_expression.set_index("CCLE_ID")
-	kk = pd.read_csv('/home/tingyi/Ling-Tingyi/LCCL_input/sample_info.csv')
+	kk = pd.read_csv('Ling-Tingyi/LCCL_input/sample_info.csv')
 	total_pathway = pd.read_excel('GSEA.graph_midi_.xlsx')
 	prior_knowledge_drug_gene = pd.read_table('canonical_smiles.Tingyi_gene.pccompound.gene_id.interaction_score.txt',sep="\t",on_bad_lines='skip',header=None)
 
@@ -332,7 +332,7 @@ if __name__ == '__main__':
 	    except:
 	        continue
 
-	mutation = pyreadr.read_r('/home/tingyi/Ling-Tingyi/lung_and_all_processed_data/CCLE/driver_mutations_all.rds')[None]
+	mutation = pyreadr.read_r('Ling-Tingyi/lung_and_all_processed_data/CCLE/driver_mutations_all.rds')[None]
 	mutation.set_index("CCLE_ID", inplace =True)
 	mutation_avail_filter = mutation.loc[cell_line_name_avail].replace('',0)
 	mutation_avail_filter[mutation_avail_filter != 0] = 1
@@ -369,7 +369,7 @@ if __name__ == '__main__':
 	import pickle
 	gene_names = []
 	ensemble_ids = []
-	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	ensemble_id = pyreadr.read_r('Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
 	ensemble_id.set_index('EntrezSymbol',inplace =True)
 	for i in gene_important:
 	    try:
@@ -383,7 +383,7 @@ if __name__ == '__main__':
 	ge.tokenizer.TOKEN_DICTIONARY_FILE
 	with open(ge.tokenizer.TOKEN_DICTIONARY_FILE, "rb") as f:
 	    gene_token_dict = pickle.load(f)
-	ensemble_id = pyreadr.read_r('/home/tingyi/Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
+	ensemble_id = pyreadr.read_r('Ling-Tingyi/LCCL_input/RNA-CCLE_RNAseq.annot.rds')[None]
 	ensemble_id.set_index('ENSG_id',inplace =True)
 	gene_name_avail_geneformer = []
 	token_avail_geneformer = []
