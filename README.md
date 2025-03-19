@@ -1,6 +1,8 @@
 # MIDI
 This is the official codebase for **MIDI: Attention-Guided Mechanism-Interpretable Drug-Gene Interaction (MIDI) Modeling for Cancer Drug Response Prediction and Target Effect Explanation**.
 
+![Webapp](https://ai.swmed.edu/projects/midi/) &nbsp;
+
 ### Introduction
 MIDI is an AI model that analyse the targeting relationship between drug molecules against genetic patterns. It can be used to
 predict cancer drug response, molecular binding cite and find noval gene targets.
