@@ -1,7 +1,7 @@
 # MIDI
-This is the official codebase for **MIDI: Attention-Guided Mechanism-Interpretable Drug-Gene Interaction (MIDI) Modeling for Cancer Drug Response Prediction and Target Effect Explanation**.
+This is the official codebase for MIDI: Attention-Guided Mechanism-Interpretable Drug-Gene Interaction (MIDI) Modeling for Cancer Drug Response Prediction and Target Effect Explanation.
 
-Note this codebase and our web server are currently used only for reviewing purpose for the journal submission.
+**Note this codebase and our web server are currently used only for reviewing purpose for the journal submission.**
 
 [![Webserver](https://img.shields.io/badge/Webserver-blue)](https://ai.swmed.edu/projects/midi/)
 
