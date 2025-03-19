@@ -4,36 +4,19 @@ This is the official codebase for **MIDI: Attention-Guided Mechanism-Interpretab
 [![Webserver](https://img.shields.io/badge/Webserver-blue)](https://ai.swmed.edu/projects/midi/)
 
 ### Introduction
-MIDI is an AI model that analyse the targeting relationship between drug molecules against genetic patterns. It can be used to
-predict cancer drug response, molecular binding cite and find noval gene targets.
+MIDI is an AI model trained on CCLE dataset to analyse the targeting relationship between drug molecules against genetic patterns. It can be used to predict cancer drug response, molecular binding cite and detect the drug targeted genes.
 
-MIDI is now available for a breif demo in our webserver: https://ai.swmed.edu/projects/midi/
+MIDI is now available for a brief demo in our webserver: https://ai.swmed.edu/projects/midi/
 
 ## Installation
 
-MIDI works with Python = 3.7.13 and R >=3.6.1. Please make sure you have the correct version of Python 
+MIDI works with Python >= 3.11.9 Please make sure you have the correct version of Python, and with conda installed
 
 ```bash
-pip install scgpt "flash-attn<1.0.5"  # optional, recommended
-# As of 2023.09, pip install may not run with new versions of the google orbax package, if you encounter related issues, please use the following command instead:
-# pip install scgpt "flash-attn<1.0.5" "orbax<0.1.8"
+conda create -n "envtest" python=3.11.9
+conda activate envtest
+bash requirement.txt
 ```
-
-[Optional] We recommend using [wandb](https://wandb.ai/) for logging and visualization.
-
-```bash
-pip install wandb
-```
-
-For developing, we are using the [Poetry](https://python-poetry.org/) package manager. To install Poetry, follow the instructions [here](https://python-poetry.org/docs/#installation).
-
-```bash
-$ git clone this-repo-url
-$ cd scGPT
-$ poetry install
-```
-
-**Note**: The `flash-attn` dependency usually requires specific GPU and CUDA version. If you encounter any issues, please refer to the [flash-attn](https://github.com/HazyResearch/flash-attention/tree/main) repository for installation instructions. For now, May 2023, we recommend using CUDA 11.7 and flash-attn<1.0.5 due to various issues reported about installing new versions of flash-attn.
 
 ## Pretrained scGPT Model Zoo
 
