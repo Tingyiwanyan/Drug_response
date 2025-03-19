@@ -1,6 +1,8 @@
 # MIDI
 This is the official codebase for **MIDI: Attention-Guided Mechanism-Interpretable Drug-Gene Interaction (MIDI) Modeling for Cancer Drug Response Prediction and Target Effect Explanation**.
 
+Note this codebase and our web server are currently used only for reviewing purpose for the journal submission.
+
 [![Webserver](https://img.shields.io/badge/Webserver-blue)](https://ai.swmed.edu/projects/midi/)
 
 ## Introduction
@@ -17,6 +19,9 @@ conda create -n "envtest" python=3.11.9
 conda activate envtest
 bash requirement.txt
 ```
+
+## Training data statistics and model explaination demonstration
+The current model training is performed on CCLE dataset, for specific drug-gene interaction dataset, please refer to the paper manuscript.
 
 ## Pretrained scGPT Model Zoo
 
@@ -37,42 +42,6 @@ Here is the list of pretrained models. Please find the links for downloading the
 
 Please see our example code in [examples/finetune_integration.py](examples/finetune_integration.py). By default, the script assumes the scGPT checkpoint folder stored in the `examples/save` directory.
 
-## To-do-list
-
-- [x] Upload the pretrained model checkpoint
-- [x] Publish to pypi
-- [ ] Provide the pretraining code with generative attention masking
-- [ ] Finetuning examples for multi-omics integration, cell type annotation, perturbation prediction, cell generation
-- [x] Example code for Gene Regulatory Network analysis
-- [x] Documentation website with readthedocs
-- [x] Bump up to pytorch 2.0
-- [x] New pretraining on larger datasets
-- [x] Reference mapping example
-- [ ] Publish to huggingface model hub
-
-## Contributing
-
-We greatly welcome contributions to scGPT. Please submit a pull request if you have any ideas or bug fixes. We also welcome any issues you encounter while using scGPT.
 
 ## Acknowledgements
 
-We sincerely thank the authors of following open-source projects:
-
-- [flash-attention](https://github.com/HazyResearch/flash-attention)
-- [scanpy](https://github.com/scverse/scanpy)
-- [scvi-tools](https://github.com/scverse/scvi-tools)
-- [scib](https://github.com/theislab/scib)
-- [datasets](https://github.com/huggingface/datasets)
-- [transformers](https://github.com/huggingface/transformers)
-
-## Citing scGPT
-
-```bibtex
-@article{cui2023scGPT,
-title={scGPT: Towards Building a Foundation Model for Single-Cell Multi-omics Using Generative AI},
-author={Cui, Haotian and Wang, Chloe and Maan, Hassaan and Pang, Kuan and Luo, Fengning and Wang, Bo},
-journal={bioRxiv},
-year={2023},
-publisher={Cold Spring Harbor Laboratory}
-}
-```
