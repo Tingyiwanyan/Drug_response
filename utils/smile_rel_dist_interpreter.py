@@ -224,50 +224,6 @@ def get_drug_edge_type(smile):
 
     return edge_type_matrix
 
-def extract_atoms_bonds(weight_min_max,smile):
-    mol = Chem.MolFromSmiles(smile)
-    resolution = (weight_min_max.max()-weight_min_max.min())/40
-    resolution_color = 1/40
-    highlight_atoms = []
-    weight_atoms_indices = list(np.argsort(-weight_min_max.diagonal())[0:7])
-    weight_atoms_indices = [int(kk) for kk in weight_atoms_indices]
-    colors = {}
-    value_color_list = []
-    for h in weight_atoms_indices:
-        value_color = ((weight_min_max.diagonal()[h]-weight_min_max.min())/resolution)*resolution_color
-        #colors[h] = ( 1, 1-value_color, 1-value_color)
-        value_color_list.append(1-value_color)
-    max_value_color = np.array(value_color_list).max()
-    min_value_color = np.array(value_color_list).min()
-    range_value_color = max_value_color - min_value_color
-    for h in weight_atoms_indices:
-        value_color = 1-((weight_min_max.diagonal()[h]-weight_min_max.min())/resolution)*resolution_color
-        new_value_color = ((value_color - min_value_color)/range_value_color)*(0.7)
-        colors[h] = ( 1, new_value_color, new_value_color)
-    
-    highlight_bond = []
-    weight_bond = []
-    colors_bond = {}
-    bond_idx_ = []
-    value_color_list_bond = []
-    for bond_idx, bond in enumerate(mol.GetBonds()):
-        bond_i, bond_j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        mid_weight = weight_min_max[bond_i,bond_j]#(weight_min_max[bond_i] + weight_min_max[bond_j]) / 2
-        weight_bond.append(mid_weight)
-        bond_idx_.append(bond_idx)
-    highlight_indices = list(np.argsort(-np.array(weight_bond)))[0:10]
-    for bond_idx, bond in enumerate(mol.GetBonds()):
-        bond_i, bond_j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        #mid_weight = weight_min_max[bond_i,bond_j]#(weight_min_max[bond_i] + weight_min_max[bond_j]) / 2
-        mid_weight = weight_bond[bond_idx]
-        #weight_bond.append(mid_weight)
-        #if bond_i in weight_atoms_indices:
-        if bond_idx in highlight_indices:
-            highlight_bond.append(bond_idx)
-            value_color_ = ((mid_weight-weight_min_max.min())/resolution)*resolution_color
-            #value_color_list_bond.append(1-value_color_)
-            colors_bond[bond_idx] = (1, 1-value_color_, 1-value_color_)
-    return weight_atoms_indices, highlight_bond, colors, colors_bond
 
 
 

@@ -8,7 +8,7 @@ import keras.backend as K
 from tensorflow.keras import initializers
 from sklearn.metrics import f1_score
 from utils.smile_rel_dist_interpreter import *
-from utils.process_data import *
+#from utils.process_data import *
 
 
 class masked_softmax(tf.keras.layers.Layer):
@@ -859,46 +859,6 @@ class drug_transformer_():
 		                                          kernel_regularizer=regularizers.L2(1e-4),
 		                                          bias_initializer=initializers.Zeros())
 
-	def temp_model(self):
-		X_input = Input((130, 8))
-		Y_input = Input((5370, 1))
-		rel_pos_dist = Input((130,130,768))
-		enc_valid_lens_ = Input(())
-
-		shape_input = tf.shape(X_input)
-		gene_embedding = self.input_gene_embeddings
-		gene_embedding = tf.expand_dims(gene_embedding, axis=0)
-		gene_embedding = tf.broadcast_to(gene_embedding, [shape_input[0], gene_embedding.shape[1], gene_embedding.shape[-1]])
-
-		gene_embedding = self.dense_3(gene_embedding)
-
-		X = self.dense_0(X_input)
-
-		X, att = self.encoder_1(X, enc_valid_lens=enc_valid_lens_, 
-		                        #relative_pos_enc=self.relative_pos_enc_lookup,
-		                        relative_pos_enc=rel_pos_dist,
-		                        
-		                        if_sparse_max=False)
-		#X = self.kernel_value(X)
-
-		X = self.dense_1(X)
-		Y = self.dense_2(Y_input)
-		Y = tf.concat([gene_embedding, Y],axis=-1)
-
-
-		#Y, att_score_deco_cross1 = self.decoder_cross_1(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-		#Y2, att_score_deco_cross2 = self.decoder_cross_2(Y, X, enc_valid_lens=enc_valid_lens_, if_sparse_max=False)
-
-		#Y = tf.concat([Y1,Y2],axis=-1)
-
-		Y = self.dense_5(X)
-
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
-
-		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
-
-		return self.model
-
 	def model_construction_midi(self, if_mutation=None):
 		"""
 		construct the transformer model
@@ -1054,37 +1014,6 @@ class drug_transformer_():
 		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_, rel_position_embedding, edge_type_embedding, gene_mutation_input, mask_input), \
 			outputs=[Y_predict, score_cross_global, X_global, Y, gene_embedding, X_global_, att_score_global2, Y_global])
 		#self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
-
-		return self.model
-
-	def model_construction_deeptta(self):
-		"""
-		construct the transformer model
-		"""
-		X_input = Input((70, 8))
-		Y_input = Input((6144, 1))
-		enc_valid_lens_ = Input(())
-
-		shape_input = tf.shape(X_input)
-
-		X = self.dense_0(X_input)
-		X, att, score = self.encoder_1(X, enc_valid_lens=enc_valid_lens_)
-		X_global = self.flattern_global(X)
-		#X_global = tf.expand_dims(X_global, axis=1)
-		X = self.dense_9(X)
-
-		Y = self.dense_2(Y_input)
-		Y = self.pos_encoding_gene(Y)
-		Y = self.dense_6(Y)
-
-		X_global = self.flattern_global_(X)
-
-		Y = tf.math.l2_normalize(self.flattern_deco(Y), axis=-1)
-		Y = tf.concat([X_global, Y], axis=-1)
-		Y = self.dense_5(Y)
-
-		self.model = Model(inputs=(X_input, Y_input, enc_valid_lens_), outputs=Y)
-		self.model.compile(loss= "mean_squared_error" , optimizer="adam", metrics=["mean_squared_error"])
 
 		return self.model
 
