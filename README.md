@@ -9,11 +9,17 @@ MIDI is an AI model trained on CCLE dataset to analyse the targeting relationshi
 
 MIDI is now available for a brief demo in our webserver: https://ai.swmed.edu/projects/midi/ 
 
-Fig. 1 shows the model architecture
+
 
 ![Model Architecture](figures/pipeline.png)
 
-**Fig.1 |** An example of a target dataset in .csv format.
+a. Technology pipeline and general model architecture. 
+
+b. Learning strategy of incorporating prior knowledge on drug-gene interaction. 
+
+c. Detailed illustration of the self-attention GraphFormer architecture for processing drug chemical structure input. 
+
+d. Detailed illustration for Drug-Gene cross-attention architecture design for important gene ranking and selection.**
 
 ## Installation
 
