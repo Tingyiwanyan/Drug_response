@@ -19,7 +19,7 @@ b. Learning strategy of incorporating prior knowledge on drug-gene interaction.
 
 c. Detailed illustration of the self-attention GraphFormer architecture for processing drug chemical structure input. 
 
-d. Detailed illustration for Drug-Gene cross-attention architecture design for important gene ranking and selection.**
+d. Detailed illustration for Drug-Gene cross-attention architecture design for important gene ranking and selection.
 
 ## Installation
 
