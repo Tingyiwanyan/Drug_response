@@ -27,4 +27,3 @@ Our pre-trained model parameters are store in file
 
 
 ## Acknowledgements
-
