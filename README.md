@@ -9,7 +9,11 @@ MIDI is an AI model trained on CCLE dataset to analyse the targeting relationshi
 
 MIDI is now available for a brief demo in our webserver: https://ai.swmed.edu/projects/midi/ 
 
+Fig. 1 shows the model architecture
+
 ![Model Architecture](figures/pipeline.png)
+
+**Fig.1 |** An example of a target dataset in .csv format.
 
 ## Installation
 
