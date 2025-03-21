@@ -11,7 +11,7 @@ MIDI is now available for a brief demo in our webserver: https://ai.swmed.edu/pr
 
 
 
-[Model Architecture](figures/pipeline.png)
+![Model Architecture](figures/pipeline.png)
 
 a. Technology pipeline and general model architecture. 
 
