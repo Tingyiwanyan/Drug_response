@@ -152,26 +152,26 @@ def generate_interpret_smile(smile):
     return interpret_smile_whole
 
 def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_cell_line_name, batch_drug_response, continuous_gene_exp, batch_gene_prior=None):
-    """
-    Return the actual input data for midi model
-    """
-    rel_distance_batch = [generate_rel_dist_matrix(x) for x in batch_smile_seq]
-    drug_rel_position_chunk = []
-    drug_smile_length_chunk = []
-    drug_atom_one_hot_chunk = []
-    gene_mutation_chunk = []
-    edge_type_matrix_chunk = []
-    gene_expression_chunk = []
-    gene_selection_chunk = []
-    for rel_distance_ in rel_distance_batch: 
-        shape = rel_distance_.shape[0]
-        drug_rel_position = tf.cast(tf.gather(P[0], tf.cast(rel_distance_,tf.int32), axis=0), tf.float32)
-        concat_left = tf.cast(tf.zeros((smile_length-shape,shape,60)), tf.float32)
-        concat_right = tf.cast(tf.zeros((smile_length,smile_length-shape,60)), tf.float32)
-        drug_rel_position = tf.concat((drug_rel_position,concat_left),axis=0)
-        drug_rel_position = tf.concat((drug_rel_position,concat_right),axis=1)
-        drug_rel_position_chunk.append(drug_rel_position)
-    drug_rel_position_chunk = tf.stack(drug_rel_position_chunk)
+	"""
+	Return the actual input data for midi model
+	"""
+	rel_distance_batch = [generate_rel_dist_matrix(x) for x in batch_smile_seq]
+	drug_rel_position_chunk = []
+	drug_smile_length_chunk = []
+	drug_atom_one_hot_chunk = []
+	gene_mutation_chunk = []
+	edge_type_matrix_chunk = []
+	gene_expression_chunk = []
+	gene_selection_chunk = []
+	for rel_distance_ in rel_distance_batch: 
+	    shape = rel_distance_.shape[0]
+	    drug_rel_position = tf.cast(tf.gather(P[0], tf.cast(rel_distance_,tf.int32), axis=0), tf.float32)
+	    concat_left = tf.cast(tf.zeros((smile_length-shape,shape,60)), tf.float32)
+	    concat_right = tf.cast(tf.zeros((smile_length,smile_length-shape,60)), tf.float32)
+	    drug_rel_position = tf.concat((drug_rel_position,concat_left),axis=0)
+	    drug_rel_position = tf.concat((drug_rel_position,concat_right),axis=1)
+	    drug_rel_position_chunk.append(drug_rel_position)
+	drug_rel_position_chunk = tf.stack(drug_rel_position_chunk)
     
 	for smile_seq_origin in batch_smile_seq:
 		interpret_smile = generate_interpret_smile(smile_seq_origin)
