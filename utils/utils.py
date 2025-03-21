@@ -56,6 +56,10 @@ drug_names = ['17-AAG','NVP-AEW541','AZD0530','AZD6244','Erlotinib','Irinotecan'
  'PD-0325901','PD-0332991','Crizotinib','PHA-665752','PLX-4720','RAF265','sorafenib',
  'NVP-TAE684','dovitinib','topotecan','vandetanib']
 
+"""
+define the maximum smile length
+"""
+smile_length = 100
 
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
