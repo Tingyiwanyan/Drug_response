@@ -185,8 +185,8 @@ def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_cell_line_na
 	drug_rel_position_chunk = tf.stack(drug_rel_position_chunk)
     
 	for smile_seq_origin in batch_smile_seq:
-		interpret_smile = generate_interpret_smile(smile_seq_origin)
-		input_drug_atom_names = tf.constant(list(interpret_smile))
+		interpret_smile = generate_interpret_smile(smile_seq_origin)[0]
+		input_drug_atom_names = tf.constant(interpret_smile)
 		input_drug_atom_index = string_lookup(input_drug_atom_names)-1
 		input_drug_atom_one_hot = layer_one_hot(input_drug_atom_index)
 		shape_drug_miss = input_drug_atom_one_hot.shape[0]
