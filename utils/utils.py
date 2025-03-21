@@ -151,7 +151,7 @@ def generate_interpret_smile(smile):
 
     return interpret_smile_whole
 
-def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_interpret_smile, batch_cell_line_name, batch_drug_response, batch_gene_prior=None):
+def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_cell_line_name, batch_drug_response, continuous_gene_exp, batch_gene_prior=None):
     """
     Return the actual input data for midi model
     """
@@ -173,7 +173,8 @@ def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_interpret_sm
         drug_rel_position_chunk.append(drug_rel_position)
     drug_rel_position_chunk = tf.stack(drug_rel_position_chunk)
     
-    for interpret_smile in batch_interpret_smile:
+    for smile_seq_origin in batch_smile_seq:
+    	interpret_smile = generate_interpret_smile(smile_seq_origin)
         input_drug_atom_names = tf.constant(list(interpret_smile))
         input_drug_atom_index = string_lookup(input_drug_atom_names)-1
         input_drug_atom_one_hot = layer_one_hot(input_drug_atom_index)
@@ -198,7 +199,7 @@ def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_interpret_sm
     edge_type_matrix_chunk = tf.stack(edge_type_matrix_chunk)
     
     for cell_line_ in batch_cell_line_name:
-        gene_expression_singlecelline = continuous_gene_df_filter.loc[cell_line_]
+        gene_expression_singlecelline = continuous_gene_exp.loc[cell_line_]
         gene_expression_chunk.append(gene_expression_singlecelline)
         gene_mutation_singlecelline = mutation_whole.loc[cell_line_]
         gene_mutation_chunk.append(gene_mutation_singlecelline)
