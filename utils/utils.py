@@ -61,6 +61,13 @@ define the maximum smile length
 """
 smile_length = 100
 
+string_lookup = tf.keras.layers.StringLookup(vocabulary=vocabulary_drug)
+layer_one_hot = tf.keras.layers.CategoryEncoding(num_tokens=8, output_mode="one_hot")
+gene_name_lists = []
+top_gene_score_whole = []
+top_gene_index_whole = []
+feature_select_score_drug_whole = []
+total_top_gene_rank = []
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
     """
