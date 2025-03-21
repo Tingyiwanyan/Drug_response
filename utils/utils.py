@@ -174,15 +174,15 @@ def extract_input_data_midi(batch_drug_name, batch_smile_seq, batch_cell_line_na
     drug_rel_position_chunk = tf.stack(drug_rel_position_chunk)
     
     for smile_seq_origin in batch_smile_seq:
-    	interpret_smile = generate_interpret_smile(smile_seq_origin)
-        input_drug_atom_names = tf.constant(list(interpret_smile))
-        input_drug_atom_index = string_lookup(input_drug_atom_names)-1
-        input_drug_atom_one_hot = layer_one_hot(input_drug_atom_index)
-        shape_drug_miss = input_drug_atom_one_hot.shape[0]
-        concat_right = tf.zeros((smile_length-shape_drug_miss,8))
-        input_drug_atom_one_hot = tf.concat((input_drug_atom_one_hot,concat_right),axis=0)
-        drug_smile_length_chunk.append(shape_drug_miss)
-        drug_atom_one_hot_chunk.append(input_drug_atom_one_hot)
+		interpret_smile = generate_interpret_smile(smile_seq_origin)
+		input_drug_atom_names = tf.constant(list(interpret_smile))
+		input_drug_atom_index = string_lookup(input_drug_atom_names)-1
+		input_drug_atom_one_hot = layer_one_hot(input_drug_atom_index)
+		shape_drug_miss = input_drug_atom_one_hot.shape[0]
+		concat_right = tf.zeros((smile_length-shape_drug_miss,8))
+		input_drug_atom_one_hot = tf.concat((input_drug_atom_one_hot,concat_right),axis=0)
+		drug_smile_length_chunk.append(shape_drug_miss)
+		drug_atom_one_hot_chunk.append(input_drug_atom_one_hot)
     drug_smile_length_chunk = np.array(drug_smile_length_chunk)
     drug_atom_one_hot_chunk = tf.stack(drug_atom_one_hot_chunk)
     
