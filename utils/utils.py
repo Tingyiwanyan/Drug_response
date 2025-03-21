@@ -48,6 +48,15 @@ gene_mutation_dict = tf.cast(gene_mutation_dict, dtype=tf.float32)
 with open('gene_embedding_important.npy', 'rb') as f:
 	gene_embeddings = np.load(f)
 
+vocabulary_drug = ['F', 'S', 'N', 'O', 'I', 'L', 'B', 'C']
+vocabulary_gene_mutation = [0, 1]
+
+drug_names = ['17-AAG','NVP-AEW541','AZD0530','AZD6244','Erlotinib','Irinotecan',
+ 'L-685458','lapatinib','LBW242','nilotinib','nutlin-3','Paclitaxel','Panobinostat',
+ 'PD-0325901','PD-0332991','Crizotinib','PHA-665752','PLX-4720','RAF265','sorafenib',
+ 'NVP-TAE684','dovitinib','topotecan','vandetanib']
+
+
 
 def filtering_raw_gene_expression(gene_expression: pd.DataFrame)->pd.DataFrame:
     """

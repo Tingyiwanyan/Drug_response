@@ -45,7 +45,7 @@ gene_expression_bin_dict = tf.cast(gene_expression_bin_dict,dtype=tf.float32)
 
 std_threshold = 0.8
 zero_threshold = 300
-"""
+
 gene_expression_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
 cell_line_drug_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.rds"
 drug_index_match_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/drug-CCLE.annot.csv"
@@ -59,6 +59,7 @@ feature_ic50_normalized_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/d
 gene_expression_filtered_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/gene_expression_filtered.csv"
 
 gene_expression_selected_path = "/project/DPDS/Xiao_lab/shared/lcai/Ling-Tingyi/drug_consistency/gene_expression_selected.csv"
+
 """
 gene_expression_path = "Ling-Tingyi/lung_and_all_processed_data/CCLE/RNAseq.rds"
 cell_line_drug_path = "Ling-Tingyi/drug_consistency/drug-CCLE.rds"
@@ -73,7 +74,7 @@ feature_ic50_normalized_path = "Ling-Tingyi/drug_consistency/drug_celline_ic50_n
 gene_expression_filtered_path = "Ling-Tingyi/drug_consistency/gene_expression_filtered.csv"
 
 gene_expression_selected_path = "Ling-Tingyi/drug_consistency/gene_expression_selected.csv"
-
+"""
 
 CCLE_drug_smiles = ['CC1CC(C(C(C=C(C(C(C=CC=C(C(=O)NC2=CC(=O)C(=C(C1)C2=O)NCC=C)C)OC)OC(=O)N)C)C)O)OC',
  'C1CN(C1)CC2CC(C2)N3C=C(C4=C(N=CN=C43)N)C5=CC(=CC=C5)OCC6=CC=CC=C6',
