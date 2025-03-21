@@ -23,7 +23,7 @@ d. Detailed illustration for Drug-Gene cross-attention architecture design for i
 
 ## Installation
 
-MIDI works with Python >= 3.11.9 Please make sure you have the correct version of Python, and with anaconda installed
+MIDI works with Python >= 3.11.9 Please make sure you have the correct version of Python, and with anaconda and Geneformer installed
 
 ```bash
 conda create -n "envtest" python=3.11.9
@@ -34,7 +34,7 @@ bash requirement.txt
 ## Tutorial
 The tutorial for running MIDI is listed step-by-step in .
 
-Our pre-trained model parameters are store in file
+Our pre-trained model parameters are store in ![here](Pre_train_model) 
 
 
 ## Acknowledgements
